@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_checked="true"
+        android:drawable="@drawable/gomarket_appcenter_download_manager_checkbox_selected">
+    </item>
+    <item android:state_checked="false"
+        android:drawable="@drawable/gomarket_appcenter_download_manager_checkbox">
+    </item>
+    <item android:drawable="@drawable/gomarket_appcenter_download_manager_checkbox">
+    </item>
+</selector>

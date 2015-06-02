@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>  
+<LinearLayout  
+  xmlns:android="http://schemas.android.com/apk/res/android"  
+  android:orientation="vertical"  
+  android:gravity="center_horizontal"
+  android:layout_width="fill_parent"  
+  android:layout_height="fill_parent">  
+    
+    <TextView android:id="@+id/tv_name"  
+     android:layout_width="wrap_content"  
+     android:layout_height="wrap_content"
+     android:textColor="@color/title_blue"
+     android:textSize="18sp"
+     android:paddingTop="10dp"
+     android:paddingBottom="10dp"
+     android:gravity="center"	
+     />  
+   <TextView android:id="@+id/tv_checked_issue_count"  
+     android:layout_width="wrap_content"  
+     android:layout_height="wrap_content"
+     android:textSize="18sp"
+     android:paddingTop="10dp"
+     android:paddingBottom="10dp"
+     android:gravity="center"	
+     /> 
+     <TextView
+     android:layout_width="wrap_content"  
+     android:layout_height="wrap_content"
+     android:textColor="@color/title_blue"
+     android:textSize="18sp"
+     android:paddingTop="10dp"
+     android:paddingBottom="10dp"
+     android:gravity="center"	
+     android:text="输入陪同质检的该分店工作人员工号后点击确认"
+     /> 
+     <LinearLayout
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:orientation="horizontal">
+         <TextView
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:text="陪同人工号"/>
+         <EditText
+             android:id="@+id/et_number"
+             android:layout_width="200dp"
+             android:layout_height="wrap_content"
+             android:textSize="16sp"
+             android:inputType="number"
+             android:textColor="@android:color/black"
+             android:theme="@android:style/Theme.Holo.Light"/>
+         </LinearLayout>
+     
+</LinearLayout>

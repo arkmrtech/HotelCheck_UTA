@@ -1,0 +1,107 @@
+{
+  "id": 8006,
+  "name": "客房",
+  "isgetsublist": false,
+  "sublist": [
+  ],
+  "issuelist": [
+    {
+      "imagelist": [
+      ],
+      "name": "床上用品",
+      "id": 90112,
+      "content": ""
+    },
+    {
+      "imagelist": [
+      ],
+      "name": "芯类",
+      "id": 90111,
+      "content": ""
+    },
+    {
+      "imagelist": [
+      ],
+      "name": "巾类",
+      "id": 90110,
+      "content": ""
+    },
+    {
+      "imagelist": [
+      ],
+      "name": "干净卫生",
+      "id": 90001,
+      "content": ""
+    },
+    {
+      "imagelist": [
+      ],
+      "content": "",
+      "name": "天花",
+      "id": 90002
+    },
+    {
+      "imagelist": [
+      ],
+      "content": "",
+      "name": "墙面",
+      "id": 90003
+    },
+    {
+      "imagelist": [
+      ],
+      "content": "",
+      "name": "防撞条",
+      "id": 90004
+    },
+    {
+      "imagelist": [
+      ],
+      "content": "",
+      "name": "地毯",
+      "id": 90005
+    },
+    {
+      "imagelist": [
+      ],
+      "content": "",
+      "name": "地板",
+      "id": 90015
+    },
+    {
+      "imagelist": [
+      ],
+      "content": "",
+      "name": "地脚线",
+      "id": 90018
+    },
+    {
+      "imagelist": [
+      ],
+      "content": "",
+      "name": "VI及宣传品",
+      "id": 90006
+    },
+    {
+      "imagelist": [
+      ],
+      "name": "WIFI",
+      "id": 90010,
+      "content": ""
+    },
+    {
+      "imagelist": [
+      ],
+      "name": "电视",
+      "id": 90019,
+      "content": ""
+    },
+    {
+      "imagelist": [
+      ],
+      "name": "空调",
+      "id": 90201,
+      "content": ""
+    }
+  ]
+}

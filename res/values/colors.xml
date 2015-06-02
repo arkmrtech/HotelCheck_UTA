@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="title_blue">#4fc1e9</color>
+    <color name="base_info_bg_color">#55000000</color>
+    <color name="upload_button_bg_color">#aa000000</color>
+    <color name="gray">#c4c4c4</color>
+    <color name="gray_dark">#a4a4a4</color>
+    <color name="white">#ffffffff</color>
+    <color name="chose_photo_bg">#d4d4d4</color>
+    
+    <color name="primary">#4fc1e9</color>
+    <color name="primaryDark">#4fc1e9</color>
+    <color name="accent">#ffffff</color>
+    <color name="accentLight">#ffffff</color>
+    
+    <color name="color_one">#754da6</color>
+    <color name="color_two">#02a863</color>
+    <color name="color_three">#0095e5</color>
+    <color name="color_four">#df4a3e</color>
+    <color name="color_five">#00cccc</color>
+    <color name="color_six">#4fc1e9</color>
+    <color name="color_seven">#75ffa6</color>
+    <color name="red">#FF0000</color>
+</resources>

@@ -1,0 +1,21 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.lk.hotelcheck.MainActivity" >
+
+    <item
+        android:id="@+id/upload_all_data"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/upload_all_data"/>
+    <item
+        android:id="@+id/upload_all_image"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/upload_all_image"/>
+    <item
+        android:id="@+id/check_image_transfer_speed"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/check_image_transfer_speed"/>
+
+</menu>

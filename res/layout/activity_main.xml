@@ -1,0 +1,52 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res/com.lk.hotelcheck"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.lk.hotelcheck.activity.main.MainActivity"
+    tools:ignore="MergeRootFrame" >
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/title_blue"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="@style/Toolbar"
+        app:popupTheme="@style/Theme.AppCompat.Light"/>
+
+    <TextView
+        android:id="@+id/tv_welcome"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@android:color/white"
+        android:drawableLeft="@drawable/user"
+        android:drawablePadding="20dp"
+        android:gravity="center_vertical"
+        android:paddingLeft="20dp"
+        android:text="欢迎回来：admin"
+        android:textSize="16sp" />
+
+    <ExpandableListView
+        android:id="@+id/elv_hotel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:groupIndicator="@null"
+        android:divider="@color/gray"
+        android:dividerHeight="1dp"
+        android:layout_marginTop="10dp"
+        android:background="@android:color/white" 
+        />
+    
+  <!--   <ListView
+        android:id="@+id/lv_hotel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="10dp"
+        android:background="@android:color/white" /> -->
+
+</LinearLayout>

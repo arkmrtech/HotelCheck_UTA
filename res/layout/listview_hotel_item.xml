@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="60dp"
+    android:orientation="vertical" >
+
+    
+
+    <ImageView
+        android:id="@+id/iv_flag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:src="@drawable/arrow"
+        android:layout_marginRight="20dp"/>
+
+    <ImageView
+        android:id="@+id/iv_data"
+        android:layout_width="30dp"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="20dp"
+        android:layout_centerVertical="true"
+        android:src="@drawable/pic_gray"
+        android:layout_toLeftOf="@id/iv_flag" />
+
+    <TextView
+        android:id="@+id/tv_data"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:text="data"
+        android:gravity="center"
+        android:paddingRight="10dp"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@+id/iv_data" />
+    
+    <TextView
+        android:id="@+id/tv_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_toLeftOf="@+id/tv_data"
+        android:gravity="center"
+        android:paddingRight="30dp"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="38dp"
+        android:textSize="18sp"
+        android:singleLine="true" />
+
+</RelativeLayout>

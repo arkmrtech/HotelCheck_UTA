@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">质检系统</string>
+    <string name="chose_hotel">选择酒店</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="room_number">房间数量</string>
+	<string name="room_check_number">在住房数</string>
+	<string name="room_checked_count">实际检查房间数</string>
+	<string name="floor_number">楼层范围</string>
+	<string name="check_date">检查日期</string>
+	<string name="check_men">检查人</string>
+	<string name="base_info">基本信息</string>
+	<string name="issue_number">问题总数</string>
+	<string name="look_photo">查看图片</string>
+	<string name="upload">上传</string>
+	
+	<!-- menu -->
+	<string name="upload_all_data">上传所有数据</string>
+	<string name="upload_all_image">上传所有图片</string>
+	<string name="check_image_transfer_speed">查看图片传输列表</string>
+	<string name="check_done">完成检查</string>
+	<string name="upload_data">上传数据</string>
+	<string name="chose_image_upload">选择图片上传</string>
+	<string name="chose_all">全选</string>
+	<string name="chose_none">全不选</string>
+	
+	
+</resources>

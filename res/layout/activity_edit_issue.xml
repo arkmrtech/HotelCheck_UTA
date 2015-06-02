@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="20dp"
+    android:paddingRight="20dp"
+    android:orientation="vertical" >
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:layout_marginBottom="15dp"
+        android:layout_marginTop="15dp"
+        android:text="问题描述"/>
+    <EditText
+        android:id="@+id/et_issue"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:hint="编写问题描述"
+        android:focusable="false"
+        android:gravity="top|left"
+        android:padding="10dp"
+        android:background="@color/white"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:layout_marginBottom="15dp"
+        android:layout_marginTop="15dp"
+        android:text="添加照片"/>
+	<android.support.v7.widget.RecyclerView
+	    android:id="@+id/rv_photo"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    />
+</LinearLayout>
