@@ -19,7 +19,7 @@ import android.widget.RelativeLayout;
 @SuppressLint("NewApi")
 public class PhotoChosenItem extends RelativeLayout{
 
-	private CheckBox mCheckBox;
+//	private CheckBox mCheckBox;
 	private ImageView mImageView;
 	private static final int IMAGE_ID = 0X000001;
 	
@@ -61,17 +61,17 @@ public class PhotoChosenItem extends RelativeLayout{
 //		imageParams.setMargins(padding, padding, padding, padding);
 		
 		
-		mCheckBox = new CheckBox(getContext());
-		LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-		params.addRule(ALIGN_RIGHT, IMAGE_ID);
-		params.addRule(ALIGN_TOP, IMAGE_ID);
-		mCheckBox.setPadding(padding * 2, padding * 2, padding * 2, padding * 4);
-		mCheckBox.setButtonDrawable(R.drawable.image_check_box);
-		mCheckBox.setLayoutParams(params);
+//		mCheckBox = new CheckBox(getContext());
+//		LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+//		params.addRule(ALIGN_RIGHT, IMAGE_ID);
+//		params.addRule(ALIGN_TOP, IMAGE_ID);
+//		mCheckBox.setPadding(padding * 2, padding * 2, padding * 2, padding * 4);
+//		mCheckBox.setButtonDrawable(R.drawable.image_check_box);
+//		mCheckBox.setLayoutParams(params);
 		
 		
 		addView(mImageView);
-		addView(mCheckBox);
+//		addView(mCheckBox);
 	}
 	
 	public void setImageData(String imageURL) {
@@ -81,28 +81,35 @@ public class PhotoChosenItem extends RelativeLayout{
 		}
 	}
 	
-	public void setChecked(boolean check) {
-		if (mCheckBox != null) {
-			mCheckBox.setChecked(check);
+	public void setOriginImageData(String imageURL) {
+		if (mImageView != null) {
+			mImageView.setScaleType(ScaleType.FIT_CENTER);
+			ImageLoader.getInstance().displayImage(imageURL, mImageView);
 		}
 	}
 	
-	public boolean isChecked() {
-		if (mCheckBox == null) {
-			return false;
-		} else {
-			return mCheckBox.isChecked();
-		}
-	}
-	
+//	public void setChecked(boolean check) {
+////		if (mCheckBox != null) {
+//			mCheckBox.setChecked(check);
+////		}
+//	}
+//	
+//	public boolean isChecked() {
+//		if (mCheckBox == null) {
+//			return false;
+//		} else {
+//			return mCheckBox.isChecked();
+//		}
+//	}
+//	
 	
 	private int getImageWidth () {
 		int width = (DrawUtil.sWidthPixels - DrawUtil.dip2px(24)) / 2;
 		return width;
 	}
 	
-	public CheckBox getCheckBox() {
-		return mCheckBox;
-	}
+//	public CheckBox getCheckBox() {
+//		return mCheckBox;
+//	}
 	
 }

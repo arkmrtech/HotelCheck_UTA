@@ -3,6 +3,8 @@ package com.lk.hotelcheck.activity.hotel;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONObject;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -23,6 +25,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,20 +33,28 @@ import android.widget.Toast;
 import com.lk.hotelcheck.R;
 import com.lk.hotelcheck.activity.BaseActivity;
 import com.lk.hotelcheck.activity.photochosen.PhotoChosenActivity;
+import com.lk.hotelcheck.activity.upload.UploadProcessActivity;
 import com.lk.hotelcheck.bean.Hotel;
+import com.lk.hotelcheck.bean.ImageItem;
 import com.lk.hotelcheck.manager.DataManager;
+import com.lk.hotelcheck.network.HttpCallback;
+import com.lk.hotelcheck.network.HttpRequest;
+import com.lk.hotelcheck.upload.UploadProxy;
+import com.lk.hotelcheck.util.Machine;
 
 import common.Constance;
+import common.NetConstance;
 import common.view.SlidingTabLayout;
 
 
 public class HotelInfoDetailActivity extends BaseActivity{
 	
 	private int position;
-//	private Hotel mHotel;
+	private Hotel mHotel;
 	private ViewPager mViewPager;
 	private SlidingTabLayout mSlidingTabLayout;
 	private DetailAdapter mAdapter;
+	private View mLoadingGroup;
 	
 	
 	public static void goToHotel(Context context , int id) {
@@ -53,6 +64,8 @@ public class HotelInfoDetailActivity extends BaseActivity{
 		intent.putExtra(Constance.IntentKey.INTENT_KEY_POSITION, positiion);
 		context.startActivity(intent);
 	}
+	
+
 
 	
 	@Override
@@ -64,7 +77,9 @@ public class HotelInfoDetailActivity extends BaseActivity{
 		position = -1;
 		if (getIntent().hasExtra(Constance.IntentKey.INTENT_KEY_POSITION)) {
 			position = getIntent().getIntExtra(Constance.IntentKey.INTENT_KEY_POSITION, -1);
-			String name = DataManager.getInstance().getHotelName(position);
+			mHotel = DataManager.getInstance().getHotel(position);
+//			String name = DataManager.getInstance().getHotelName(position);
+			String name = mHotel.getName();
 			toolbar.setTitle(name);
 			init();
 		}
@@ -77,6 +92,19 @@ public class HotelInfoDetailActivity extends BaseActivity{
 			}
 		});
 		setSupportActionBar(toolbar);
+		mLoadingGroup = findViewById(R.id.vg_loadig);
+	}
+	
+	@Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+	}
+	
+	@Override
+	protected void onStop() {
+		super.onStop();
+		mHotel.save();
 	}
 
 	private void init() {
@@ -91,6 +119,14 @@ public class HotelInfoDetailActivity extends BaseActivity{
 				R.color.white));
 		mSlidingTabLayout.setDistributeEvenly(true);
 		mSlidingTabLayout.setViewPager(mViewPager);
+//		Hotel hotel = DataManager.getInstance().getHotel(position);
+//		if (hotel.isStatus()) {
+//			mViewPager.setCurrentItem(2);
+//		}
+		
+		if (mHotel.isStatus()) {
+			mViewPager.setCurrentItem(2);
+		}
 	}
 	
 	 @Override
@@ -102,32 +138,37 @@ public class HotelInfoDetailActivity extends BaseActivity{
 
 	    @Override
 	    public boolean onOptionsItemSelected(MenuItem item) {
-	    	Hotel hotel = DataManager.getInstance().getHotel(position);
 	        int id = item.getItemId();
 	        switch (id) {
 			case android.R.id.home:
 				finish();
 				return true;
+			case R.id.menu_upload_data :
+				uploadData();
+				break;
 			case R.id.menu_chose_image_upload :
-				PhotoChosenActivity.gotoPhotoChosen(this, position, 0, 0);
+				uploadImage();
 				break;
 			case R.id.menu_check_done:
-				if (hotel != null) {
-					if (hotel.isStatus()) {
+				if (mHotel != null) {
+					if (mHotel.isStatus()) {
 						Toast.makeText(this, "已检查", Toast.LENGTH_SHORT).show();
 					} else {
-					if (hotel.getRoomCount() == 0
-							|| hotel.getRoomInUseCount() == 0
-							|| hotel.getFloorStart() == 0
-							|| hotel.getFloorEnd() == 0
-							|| TextUtils.isEmpty(hotel.getCheckDate())) {
-						Toast.makeText(HotelInfoDetailActivity.this, "酒店基本信息未填写完整", Toast.LENGTH_SHORT).show();
-						mViewPager.setCurrentItem(0);
-					} else {
-						showCheckedDoneAlert(hotel);
-					}
+						if (mHotel.getRoomCount() == 0
+								|| mHotel.getRoomInUseCount() == 0
+								|| TextUtils.isEmpty(mHotel.getFloorStart())
+								|| TextUtils.isEmpty(mHotel.getFloorEnd())
+								|| TextUtils.isEmpty(mHotel.getCheckDate())) {
+							Toast.makeText(HotelInfoDetailActivity.this, "酒店基本信息未填写完整", Toast.LENGTH_SHORT).show();
+							mViewPager.setCurrentItem(0);
+						} else {
+							showCheckedDoneAlert();
+						}
 					}
 				}
+				break;
+			case R.id.menu_check_image_transfer_speed :
+				UploadProcessActivity.goToHotel(this, mHotel.getCheckId());
 				break;
 			default:
 				break;
@@ -135,7 +176,7 @@ public class HotelInfoDetailActivity extends BaseActivity{
 	        return super.onOptionsItemSelected(item);
 	    }
 	    
-	    private void showCheckedDoneAlert(final Hotel hotel) {
+	    private void showCheckedDoneAlert() {
 			LayoutInflater factory = LayoutInflater.from(this);// 提示框
 			View view = factory.inflate(R.layout.alert_check_done, null);// 这里必须是final的
 			TextView nameTextView = (TextView) view.findViewById(R.id.tv_name);// 获得输入框对象
@@ -144,15 +185,18 @@ public class HotelInfoDetailActivity extends BaseActivity{
 //			TextView imageCountTextView = (TextView) view.findViewById(R.id.tv_image_count);
 			ForegroundColorSpan redSpan = new ForegroundColorSpan(Color.RED); 
 			ForegroundColorSpan blackSpan = new ForegroundColorSpan(Color.BLACK); 
-			SpannableStringBuilder hotelName = new SpannableStringBuilder(hotel.getName());
-			SpannableStringBuilder issueCount = new SpannableStringBuilder(""+hotel.getIssueCount());
-			SpannableStringBuilder imageCount = new SpannableStringBuilder(""+hotel.getImageCount());
+			SpannableStringBuilder hotelName = new SpannableStringBuilder(mHotel.getName());
+			SpannableStringBuilder issueCount = new SpannableStringBuilder(""+mHotel.getIssueCount());
+			SpannableStringBuilder imageCount = new SpannableStringBuilder(""+mHotel.getImageCount());
 			
 			hotelName.setSpan(blackSpan, 0, hotelName.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE); 
 			issueCount.setSpan(redSpan, 0, issueCount.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE); 
 			imageCount.setSpan(redSpan, 0, imageCount.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE); 
 			nameTextView.setText("本次检查中，"+hotelName);
 			issueCountTextView.setText("共登记问题"+issueCount+"个问题"+",拍摄"+imageCount+"张照片");
+			if (!TextUtils.isEmpty(mHotel.getGuardianNumber())) {
+				numberEditText.setText(mHotel.getGuardianNumber());
+			}
 //			imageCountTextView.setText("已拍摄照片数："+hotel.getImageCount());
 			AlertDialog alertDialog = new AlertDialog.Builder(this)
 //					 .setTitle("完成检查信息确认")//提示框标题
@@ -166,11 +210,8 @@ public class HotelInfoDetailActivity extends BaseActivity{
 									if (TextUtils.isEmpty(number)) {
 										Toast.makeText(HotelInfoDetailActivity.this, "请输入陪同人工号", Toast.LENGTH_SHORT).show();
 									} else {
-										hotel.setGuardianNumber(number);
-										hotel.setStatus(true);
-//										((HotelBaseInfoFragment)mAdapter.getItem(0)).setGuardianNumber(number);
-										DataManager.getInstance().setHotelChecked(position, hotel);
-										Toast.makeText(HotelInfoDetailActivity.this, "酒店检查完成", Toast.LENGTH_SHORT).show();
+										mHotel.setGuardianNumber(number);
+										updateHotelCheckState();
 									}
 									
 								}
@@ -187,6 +228,75 @@ public class HotelInfoDetailActivity extends BaseActivity{
 			alertDialog.show();
 		}    
 	    
+	    
+	    
+	    
+	private void uploadImage() {
+		if (!Machine.isNetworkOK(this)) {
+			Toast.makeText(this, "网络未链接，请检查网络链接", Toast.LENGTH_SHORT).show();
+			return;
+		}
+		if (!mHotel.isStatus()) {
+			Toast.makeText(this, "请先完成酒店检查", Toast.LENGTH_SHORT).show();
+			return;
+		}
+		if (mHotel.isImageStatus()) {
+			Toast.makeText(this, "该酒店图片已经上传过", Toast.LENGTH_SHORT).show();
+			return;
+		}
+		mHotel.setImageStatus(true);
+		UploadProxy.addUploadTask(mHotel);
+		UploadProcessActivity.goToHotel(this, mHotel.getCheckId());
+	} 
+	    
+	 private void uploadData() {
+		 if (!mHotel.isStatus()) {
+			 Toast.makeText(this, "请先完成酒店检查", Toast.LENGTH_SHORT).show();
+			return;
+		}
+		 mLoadingGroup.setVisibility(View.VISIBLE);
+			HttpRequest.getInstance().updateHotelData(this, mHotel, NetConstance.DEFAULT_SESSION, new HttpCallback() {
+				
+				@Override
+				public void onSuccess(JSONObject response) {
+					mHotel.setDataStatus(true);
+					mLoadingGroup.setVisibility(View.GONE);
+				}
+				
+				@Override
+				public void onError() {
+					Toast.makeText(HotelInfoDetailActivity.this, "酒店检查失败，网络异常，请稍后再试", Toast.LENGTH_SHORT).show();
+					mLoadingGroup.setVisibility(View.GONE);
+				}
+			});
+	 }
+	 
+	 private void updateHotelCheckState() {
+		 mLoadingGroup.setVisibility(View.VISIBLE);
+			HttpRequest.getInstance().updateHotelCheckStatus(this, mHotel.getCheckId(), mHotel.isStatus(), NetConstance.DEFAULT_SESSION, new HttpCallback() {
+				
+				@Override
+				public void onSuccess(JSONObject response) {
+//					((HotelBaseInfoFragment)mAdapter.getItem(0)).setGuardianNumber(number);
+//					DataManager.getInstance().setHotelChecked(position, hotel);
+					mHotel.setStatus(true);
+					if (mViewPager.getCurrentItem() != 2) {
+						mViewPager.setCurrentItem(2);
+					}
+					Fragment fragment = (HotelReportFragment) mAdapter.getItem(2);
+					if (fragment instanceof HotelReportFragment) {
+						((HotelReportFragment)fragment).refreshInfo();
+					}
+					mLoadingGroup.setVisibility(View.GONE);
+				}
+				
+				@Override
+				public void onError() {
+					Toast.makeText(HotelInfoDetailActivity.this, "酒店检查失败，网络异常，请稍后再试", Toast.LENGTH_SHORT).show();
+					mLoadingGroup.setVisibility(View.GONE);
+				}
+			});
+	 }
 	
 	class DetailAdapter extends FragmentStatePagerAdapter{
 

@@ -8,7 +8,7 @@
     <EditText android:id="@+id/et_content"  
     android:layout_width="match_parent"  
      android:layout_height="50dp"
-     android:inputType="number"
+    android:inputType="number"
      android:textColor="@color/title_blue"
      android:theme="@android:style/Theme.Holo.Light"
      android:focusable="true"

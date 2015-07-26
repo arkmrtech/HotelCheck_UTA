@@ -11,6 +11,6 @@ public class BaseActivity extends ActionBarActivity{
 	protected void onDestroy() {
 		// TODO Auto-generated method stub
 		super.onDestroy();
-		DataManager.getInstance().saveDataCache();
+//		DataManager.getInstance().saveDataCache();
 	}
 }

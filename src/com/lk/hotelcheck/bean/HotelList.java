@@ -34,6 +34,11 @@ public class HotelList {
 			hotels = new ArrayList<Hotel>();
 		}
 //		hotels.add(hotel);
-		hotels.set(position, hotel);
+		if (hotels.size() == 0) {
+			hotels.add(hotel);
+		} else {
+			hotels.set(position, hotel);
+		}
+		
 	}
 }

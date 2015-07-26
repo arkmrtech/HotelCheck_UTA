@@ -9,6 +9,9 @@ import com.lk.hotelcheck.manager.DataManager;
 import com.lk.hotelcheck.util.DrawUtil;
 
 import common.Constance;
+import common.Constance.CheckDataType;
+import common.Constance.CheckType;
+import common.Constance.PreQueType;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -47,12 +50,14 @@ public class HotelReportFragment extends Fragment{
 	private TextView mRoomCheckedNumberTextView;
 	private TextView mIssueCountTextView;
 	private TextView mGNumberTextView;
+	private ViewGroup mReviewGroup;
+	private TextView mFixedTextView;
+	private TextView mFixingTextView;
+	private TextView mNewTextView;
 	private ExpandableListView mExpandableListView;
 	@Override
 	public void setUserVisibleHint(boolean isVisibleToUser) {
-		// TODO Auto-generated method stub
 		super.setUserVisibleHint(isVisibleToUser);
-		hotel = DataManager.getInstance().getHotel(position);
 		if (getUserVisibleHint() && adapter != null) {
 			adapter.notifyDataSetChanged();
 			initInfoData();
@@ -69,7 +74,7 @@ public class HotelReportFragment extends Fragment{
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		position = getArguments().getInt(Constance.IntentKey.INTENT_KEY_POSITION);
-		
+		hotel = DataManager.getInstance().getHotel(position);
 	}
 	
 	@Override
@@ -93,14 +98,28 @@ public class HotelReportFragment extends Fragment{
 		expanAll();
 	}
 	
+	
+	public void refreshInfo() {
+		initInfoData();
+	}
+	
 	private void initInfoData() {
 		if (hotel != null) {
+			mUserNameTextView.setText(DataManager.getInstance().getUser().getUserName());
 			mCheckDateTextView.setText(hotel.getCheckDate());
 			mRoomNumberTextView.setText(""+hotel.getRoomCount());
 			mRoomInUseNumberTextView.setText(""+hotel.getRoomInUseCount());
 			mRoomCheckedNumberTextView.setText(""+hotel.getRoomHadCheckedCount());
 			mIssueCountTextView.setText(""+hotel.getIssueCount());
 			mGNumberTextView.setText(hotel.getGuardianNumber());
+			if (hotel.getCheckType() == CheckType.CHECK_TYPE_NEW) {
+				mReviewGroup.setVisibility(View.GONE);
+			} else {
+				mReviewGroup.setVisibility(View.VISIBLE);
+				mFixedTextView.setText(""+hotel.getFixedIssueCount());
+				mFixingTextView.setText(""+hotel.getFixingIssueCount());
+				mNewTextView.setText(""+hotel.getNewIssueCount());
+			}
 		}
 	}
 	
@@ -115,6 +134,10 @@ public class HotelReportFragment extends Fragment{
 		mRoomCheckedNumberTextView = (TextView) headerView.findViewById(R.id.tv_checked_count);
 		mIssueCountTextView = (TextView) headerView.findViewById(R.id.tv_issue_number);
 		mGNumberTextView = (TextView) headerView.findViewById(R.id.tv_guardian_number);
+		mReviewGroup = (ViewGroup) headerView.findViewById(R.id.ll_review);
+		mFixingTextView = (TextView) headerView.findViewById(R.id.tv_issue_fixing);
+		mFixedTextView = (TextView) headerView.findViewById(R.id.tv_issue_fixed);
+		mNewTextView = (TextView) headerView.findViewById(R.id.tv_issue_new);
 		initInfoData();
 		
 		
@@ -149,6 +172,11 @@ public class HotelReportFragment extends Fragment{
 	class IssueListAdapter extends BaseExpandableListAdapter {
 
 		
+
+		public IssueListAdapter() {
+			super();
+			
+		}
 
 		@Override
 		public int getGroupCount() {
@@ -253,23 +281,40 @@ public class HotelReportFragment extends Fragment{
 				viewHolder.nameTextView = (TextView) convertView.findViewById(R.id.tv_name);
 				viewHolder.flagTextView = (TextView) convertView.findViewById(R.id.tv_flag);
 				viewHolder.percentTextView = (TextView) convertView.findViewById(R.id.tv_percent);
+				viewHolder.statusTextView = (TextView) convertView.findViewById(R.id.tv_status);
 				convertView.setTag(viewHolder);
 			} else {
 				viewHolder = (ViewHolder) convertView.getTag();
 			}
 			CheckData checkData = hotel.getCheckData(groupPosition);
 			IssueItem issueItem = checkData.getCheckedIssue(childPosition);
-			if (issueItem.getImageCount() >0 ) {
-				viewHolder.flagTextView.setText("查看图片");
-			} else {
-				viewHolder.flagTextView.setText("");
+			if (issueItem != null) {
+				if (issueItem.getImageCount() >0 ) {
+					viewHolder.flagTextView.setText("查看图片");
+				} else {
+					viewHolder.flagTextView.setText("");
+				}
+				viewHolder.nameTextView.setText(issueItem.getName());
+				if (issueItem.getIsPreQue() == PreQueType.TYPE_REVIEW) {
+					if (issueItem.isCheck()) {
+						viewHolder.statusTextView.setText("未整改/整改中");
+						viewHolder.statusTextView.setTextColor(getResources().getColor(R.color.content_orange));
+					} else {
+						viewHolder.statusTextView.setText("已整改");
+						viewHolder.statusTextView.setTextColor(getResources().getColor(R.color.color_two));
+					}
+				} else {
+					viewHolder.statusTextView.setText("新发现");
+					viewHolder.statusTextView.setTextColor(getResources().getColor(R.color.color_three));
+				}
 			}
-			viewHolder.nameTextView.setText(issueItem.getName());
-			if (checkData.isGetSublist()) {
+			if (checkData.getType() == CheckDataType.TYPE_ROOM)  {
+				viewHolder.percentTextView.setText(hotel.getRoomIssuePercent(issueItem.getId()));
 				viewHolder.percentTextView.setVisibility(View.VISIBLE);
-				String percent = checkData.getSubIssuePercent(childPosition);
-				viewHolder.percentTextView.setText(percent);
-			} else {
+			} else if (checkData.getType() == CheckDataType.TYPE_PASSWAY) {
+				viewHolder.percentTextView.setText(hotel.getPasswayIssuePercent(issueItem.getId()));
+				viewHolder.percentTextView.setVisibility(View.VISIBLE);
+			}else {
 				viewHolder.percentTextView.setVisibility(View.GONE);
 			}
 			return convertView;
@@ -280,41 +325,6 @@ public class HotelReportFragment extends Fragment{
 			return true;
 		}
 
-		@Override
-		public boolean areAllItemsEnabled() {
-			// TODO Auto-generated method stub
-			return false;
-		}
-
-		@Override
-		public boolean isEmpty() {
-			// TODO Auto-generated method stub
-			return false;
-		}
-
-		@Override
-		public void onGroupExpanded(int groupPosition) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void onGroupCollapsed(int groupPosition) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public long getCombinedChildId(long groupId, long childId) {
-			// TODO Auto-generated method stub
-			return 0;
-		}
-
-		@Override
-		public long getCombinedGroupId(long groupId) {
-			// TODO Auto-generated method stub
-			return 0;
-		}
 		
 		class ViewHolder {
 			private TextView nameTextView;
@@ -323,6 +333,7 @@ public class HotelReportFragment extends Fragment{
 			private TextView flagTextView;
 			private ImageView colorImageView;
 			private View mNumberView;
+			private TextView statusTextView;
 		}
 	}
 }

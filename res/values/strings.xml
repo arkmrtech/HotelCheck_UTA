@@ -15,14 +15,16 @@
 	<string name="issue_number">问题总数</string>
 	<string name="look_photo">查看图片</string>
 	<string name="upload">上传</string>
-	
+	<string name="issue_fixed">已整改问题</string>
+	<string name="issue_fixing">未整改/整改问题</string>
+	<string name="issue_new">新发现问题</string>
 	<!-- menu -->
 	<string name="upload_all_data">上传所有数据</string>
 	<string name="upload_all_image">上传所有图片</string>
 	<string name="check_image_transfer_speed">查看图片传输列表</string>
 	<string name="check_done">完成检查</string>
-	<string name="upload_data">上传数据</string>
-	<string name="chose_image_upload">选择图片上传</string>
+	<string name="upload_data">上传本店数据</string>
+	<string name="chose_image_upload">上传本店图片</string>
 	<string name="chose_all">全选</string>
 	<string name="chose_none">全不选</string>
 	

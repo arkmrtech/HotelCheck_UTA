@@ -961,4 +961,12 @@ public class ImageUtil {
             iv.setImageBitmap(bm);
         return bm;
     }
+
+	public static boolean isWidthPic(String localImagePath) {
+		Bitmap bitmap = BitmapFactory.decodeFile(localImagePath);
+		if (bitmap != null) {
+			return bitmap.getWidth() > bitmap.getHeight();
+		} 
+		return false;
+	}
 }

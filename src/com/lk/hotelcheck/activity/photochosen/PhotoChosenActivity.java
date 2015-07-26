@@ -4,24 +4,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import android.R.integer;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.GridLayoutManager.LayoutParams;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.support.v7.widget.Toolbar;
-import android.util.TypedValue;
-import android.view.Gravity;
+import android.util.Log;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,15 +24,12 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.lk.hotelcheck.R;
 import com.lk.hotelcheck.activity.BaseActivity;
@@ -45,11 +37,11 @@ import com.lk.hotelcheck.bean.CheckData;
 import com.lk.hotelcheck.bean.Hotel;
 import com.lk.hotelcheck.bean.ImageItem;
 import com.lk.hotelcheck.manager.DataManager;
+import com.lk.hotelcheck.upload.UploadProxy;
+import com.lk.hotelcheck.util.CustomBasePagerAdapter;
 import com.lk.hotelcheck.util.DrawUtil;
 import com.lk.hotelcheck.util.FileUtil;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
-
 import common.Constance.IntentKey;
 
 public class PhotoChosenActivity extends BaseActivity {
@@ -65,117 +57,174 @@ public class PhotoChosenActivity extends BaseActivity {
 		context.startActivity(intent);
 	}
 
-	private Hotel hotel;
-	private int hotelPosition;
-	private int checkDataPosition;
-	private int issuePosition;
-	private Button uploadButton;
-	private TextView uploadTextView;
+	private Hotel mHotel;
+	private int mHotelPosition;
+	private int mCheckDataPosition;
+	private int mIssuePosition;
+//	private Button mUploadButton;
+//	private TextView mUploadTextView;
 	private static final int MENU_SELECT_ALL = 0X10086;
-	private boolean isSelectAll = false;
-	private HashMap<String, Boolean> selectedMap;
-	private PhotoChosenAdapter adapter;
-	private GridLayoutManager layoutManager;
-	private RecyclerView photoRecyclerView;
-	private MenuItem choseAllItem;
+	private boolean mIsSelectAll = false;
+	private HashMap<String, Boolean> mSelectedMap;
+	private PhotoChosenAdapter mAdapter;
+	private GridLayoutManager mLayoutManager;
+	private RecyclerView mPhotoRecyclerView;
+	private MenuItem mChoseAllItem;
 	private static final int SPINNER_TYPE_NAME = 1;
 	private static final int SPINNER_TYPE_ISSUE = 2;
-	// private SpinnerNameAdapter checkDataMenuAdapter;
-	// private SpinnerNameAdapter issueDataMenuAdapter;
+	private SpinnerNameAdapter mCheckDataMenuAdapter;
+	private SpinnerNameAdapter mIssueDataMenuAdapter;
 	private View mDetailLayout;
-	private ImageView mDetailImageView;
+//	private ImageView mDetailImageView;
+	private ViewPager mDetailViewPager;
 	private ImageView mDetailBackImageView;
 	private ImageView mDetailDeleteImageView;
-	private CheckData mCheckData;
+//	private CheckData mCheckData;
+	private Toolbar mToolbar;
+	private TextView mErrorTextView;
+	private Spinner mNameSpinner;
+	private Spinner mIssueSpinner;
+	private boolean mIsFristTime;
+	private ImageDetailAdapter mDetailAdapter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_photo_chosen);
-		selectedMap = new HashMap<String, Boolean>();
-		uploadButton = (Button) findViewById(R.id.btn_upload);
-		uploadTextView = (TextView) findViewById(R.id.tv_upload);
+		mSelectedMap = new HashMap<String, Boolean>();
+//		mUploadButton = (Button) findViewById(R.id.btn_upload);
+//		mUploadTextView = (TextView) findViewById(R.id.tv_upload);
 		mDetailLayout = findViewById(R.id.rl_image_detail);
-		mDetailImageView = (ImageView) findViewById(R.id.iv_detail);
+//		mDetailImageView = (ImageView) findViewById(R.id.iv_detail);
+		mDetailViewPager = (ViewPager) findViewById(R.id.vp_detail);
 		mDetailBackImageView = (ImageView) findViewById(R.id.iv_back);
 		mDetailDeleteImageView = (ImageView) findViewById(R.id.iv_delete);
 		mDetailBackImageView.setOnClickListener(mImageBackClickListener);
 		mDetailDeleteImageView.setOnClickListener(mImageDeleteClickListener);
-		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-		hotelPosition = getIntent().getIntExtra(IntentKey.INTENT_KEY_POSITION,
+//		mUploadButton.setOnClickListener(mUploadClickListener);
+		mToolbar = (Toolbar) findViewById(R.id.toolbar);
+		mErrorTextView = (TextView) findViewById(R.id.tv_error_tips);
+		initData();
+
+	}
+	
+	private void initData() {
+		mHotelPosition = getIntent().getIntExtra(IntentKey.INTENT_KEY_POSITION,
 				-1);
-		checkDataPosition = getIntent().getIntExtra(
+		mCheckDataPosition = getIntent().getIntExtra(
 				IntentKey.INTENT_KEY_CHECK_DATA_POSITION, -1);
-		issuePosition = getIntent().getIntExtra(
+		mIssuePosition = getIntent().getIntExtra(
 				IntentKey.INTENT_KEY_ISSUE_POSITION, -1);
-		hotel = DataManager.getInstance().getHotel(hotelPosition);
-		// Spinner nameSpinner = (Spinner) findViewById(R.id.sp_name);
-		// Spinner issueSpinner = (Spinner) findViewById(R.id.sp_issue);
-		if (hotel != null) {
-			toolbar.setTitle(hotel.getName());
-			toolbar.setNavigationIcon(R.drawable.back);
-			toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+		mHotel = DataManager.getInstance().getHotel(mHotelPosition);
+		mNameSpinner = (Spinner) findViewById(R.id.sp_name);
+		mIssueSpinner = (Spinner) findViewById(R.id.sp_issue);
+		if (mHotel != null) {
+			mToolbar.setTitle(mHotel.getName());
+			mToolbar.setNavigationIcon(R.drawable.back);
+			mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
 
 				@Override
 				public void onClick(View v) {
 					finish();
 				}
 			});
-			setSupportActionBar(toolbar);
-			// checkDataMenuAdapter = new SpinnerNameAdapter(SPINNER_TYPE_NAME);
-			// issueDataMenuAdapter = new
-			// SpinnerNameAdapter(SPINNER_TYPE_ISSUE);
-			// nameSpinner.setAdapter(checkDataMenuAdapter);
-			// issueSpinner.setAdapter(issueDataMenuAdapter);
-			photoRecyclerView = (RecyclerView) findViewById(R.id.rv_photo);
-			layoutManager = new GridLayoutManager(this, 2);
-			photoRecyclerView.setLayoutManager(layoutManager);
-			adapter = new PhotoChosenAdapter();
-//			adapter.updateList(hotel.getCheckData(checkDataPosition).getCheckedIssue(issuePosition).getImagelist());
-			adapter.updateList(hotel.getCheckData(checkDataPosition).getIssueImageList(issuePosition));
-			photoRecyclerView.setAdapter(adapter);
-			// nameSpinner.setOnItemSelectedListener(new
-			// AdapterView.OnItemSelectedListener() {
-			//
-			// @Override
-			// public void onItemSelected(AdapterView<?> parent, View view,
-			// int position, long id) {
-			// // if (position == 0) {
-			// checkDataPosition = position;
-			// // } else {
-			// // checkDataPosition = position - 1;
-			// // }
-			// issueDataMenuAdapter.notifyDataSetChanged();
-			// adapter.updateList(hotel.getCheckData(checkDataPosition).getIssue(issuePosition).getImagelist());
-			// }
-			//
-			// @Override
-			// public void onNothingSelected(AdapterView<?> parent) {
-			// // TODO Auto-generated method stub
-			//
-			// }
-			// });
-			//
-			// issueSpinner.setOnItemSelectedListener(new
-			// AdapterView.OnItemSelectedListener() {
-			//
-			// @Override
-			// public void onItemSelected(AdapterView<?> parent, View view,
-			// int position, long id) {
-			// issuePosition = position;
-			// adapter.updateList(hotel.getCheckData(checkDataPosition).getIssue(issuePosition).getImagelist());
-			// }
-			//
-			// @Override
-			// public void onNothingSelected(AdapterView<?> parent) {
-			// // TODO Auto-generated method stub
-			//
-			// }
-			//
-			// });
+			setSupportActionBar(mToolbar);
+			mCheckDataMenuAdapter = new SpinnerNameAdapter(SPINNER_TYPE_NAME);
+			mIssueDataMenuAdapter = new SpinnerNameAdapter(SPINNER_TYPE_ISSUE);
+			mNameSpinner.setAdapter(mCheckDataMenuAdapter);
+			mIssueSpinner.setAdapter(mIssueDataMenuAdapter);
+			mPhotoRecyclerView = (RecyclerView) findViewById(R.id.rv_photo);
+			mLayoutManager = new GridLayoutManager(this, 2);
+			mPhotoRecyclerView.setLayoutManager(mLayoutManager);
+			mAdapter = new PhotoChosenAdapter();
+			mPhotoRecyclerView.setAdapter(mAdapter);
+			mDetailAdapter = new ImageDetailAdapter();
+			mDetailViewPager.setAdapter(mDetailAdapter);
+			if (mHotel.isStatus()) {
+				mDetailDeleteImageView.setVisibility(View.GONE);
+			}
+//			updatePhotoData();
+			mNameSpinner
+					.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
+						@Override
+						public void onItemSelected(AdapterView<?> parent,
+								View view, int position, long id) {
+							mCheckDataPosition = position;
+							mIssueDataMenuAdapter.notifyDataSetChanged();
+							if (mIsFristTime) {
+								mIssueSpinner.setSelection(mIssuePosition+1);
+								mIsFristTime = false;
+							} else {
+								if (mIssueSpinner.getSelectedItemPosition() == 0) {
+									updatePhotoData();
+								} else {
+									mIssueSpinner.setSelection(0);
+								}
+							}
+//							mIssueSpinner.setSelection(0);
+//							updatePhotoData();
+						}
+
+						@Override
+						public void onNothingSelected(AdapterView<?> parent) {
+
+						}
+					});
+
+			mIssueSpinner
+					.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+						@Override
+						public void onItemSelected(AdapterView<?> parent,
+								View view, int position, long id) {
+							mIssuePosition = position;
+							updatePhotoData();
+						}
+
+						@Override
+						public void onNothingSelected(AdapterView<?> parent) {
+
+						}
+
+					});
 		}
-
+		if (mCheckDataPosition != -1 && mIssuePosition != -1) {
+			Log.d("lxk", "mCheckDataPosition = "+mCheckDataPosition +" mIssuePosition "+mIssuePosition);
+			mIsFristTime = true;
+			mNameSpinner.setSelection(mCheckDataPosition);
+//			mIssueSpinner.setSelection(mIssuePosition+1);
+		}
+	}
+	
+	private void updatePhotoData() {
+		List<ImageItem> data = null;
+		Log.d("lxk", "mCheckDataPosition = "+mCheckDataPosition +" mIssuePosition "+mIssuePosition);
+		if (mIssuePosition == 0) {
+			data = mHotel.getCheckData(mCheckDataPosition).getAllCheckedImage();
+		} else {
+			data = mHotel.getCheckData(mCheckDataPosition)
+						.getCheckedPointImageList(mIssuePosition-1);
+		}
+		
+		mAdapter.updateList(data);
+		mDetailAdapter.notifyDataSetChanged();
+		if (mAdapter.getItemCount() == 0) {
+			showError();
+		} else {
+			hideError();
+		}
+	}
+	
+	private void showError() {
+		mDetailLayout.setVisibility(View.GONE);
+		mPhotoRecyclerView.setVisibility(View.GONE);
+		mErrorTextView.setVisibility(View.VISIBLE);
+	}
+	
+	private void hideError() {
+		mPhotoRecyclerView.setVisibility(View.VISIBLE);
+		mErrorTextView.setVisibility(View.GONE);
 	}
 
 	private OnClickListener mImageBackClickListener = new OnClickListener() {
@@ -187,6 +236,22 @@ public class PhotoChosenActivity extends BaseActivity {
 			}
 		}
 	};
+			
+	private OnClickListener mUploadClickListener = new OnClickListener() {
+		
+		@Override
+		public void onClick(View v) {
+//			if (mSelectedMap.size() > 0) {
+//				Iterator<String> keys = mSelectedMap.keySet().iterator();
+//				List<String> key = new ArrayList<String>();
+//				while (keys.hasNext()) {
+//					key.add(keys.next());
+//				}
+//				UploadActivity.gotoUpload(v.getContext(), mAdapter.getDataItem(0).getLocalImagePath());
+//			}
+			UploadProxy.addUploadTask(mHotel);
+		}
+	};		
 
 	private OnClickListener mImageDeleteClickListener = new OnClickListener() {
 
@@ -201,17 +266,26 @@ public class PhotoChosenActivity extends BaseActivity {
 								@Override
 								public void onClick(DialogInterface dialog,
 										int which) {
-									ImageItem imageItem = adapter
+									ImageItem imageItem = mAdapter
 											.getDataItem(position);
-									hotel.getCheckData(checkDataPosition)
-											.getIssue(issuePosition)
-											.getImagelist().remove(position);
+									if (mIssuePosition == 0) {
+										mHotel.getCheckData(mCheckDataPosition).deleteCheckedIssueImage(imageItem);
+									} else {
+										mHotel.getCheckData(mCheckDataPosition).deleteCheckedIssueImage(mIssuePosition -1, imageItem);
+									}
 									DataManager.getInstance().setHotel(
-											hotelPosition, hotel);
-									selectedMap.remove(imageItem.getImageUrl());
-									adapter.remove(position);
-									updateUploadText();
-									mDetailLayout.setVisibility(View.GONE);
+											mHotelPosition, mHotel);
+//									mSelectedMap.remove(imageItem.getImageUrl());
+									mAdapter.remove(position);
+									if (mAdapter.getItemCount() == 0) {
+										mDetailLayout.setVisibility(View.GONE);
+										showError();
+									} 
+									mDetailAdapter.notifyDataSetChanged();
+//									updateUploadText();
+									FileUtil.deleteFile(imageItem.getLocalImagePath());
+									
+									
 								}
 							})
 					.setNegativeButton(
@@ -228,30 +302,30 @@ public class PhotoChosenActivity extends BaseActivity {
 		}
 	};
 
-	private void updateUploadText() {
-		StringBuffer textBuffer = new StringBuffer();
-		textBuffer.append(getString(R.string.upload));
-		if (selectedMap.size() > 0) {
-			textBuffer.append("(");
-			textBuffer.append(selectedMap.size());
-			textBuffer.append(")");
-		}
-		if (selectedMap.size() == 0 && isSelectAll) {
-			isSelectAll = false;
-			choseAllItem.setTitle(getString(R.string.chose_all));
-		} else if (selectedMap.size() == adapter.getItemCount() && !isSelectAll) {
-			isSelectAll = true;
-			choseAllItem.setTitle(getString(R.string.chose_none));
-		}
-		uploadTextView.setText(textBuffer.toString());
-	}
+//	private void updateUploadText() {
+//		StringBuffer textBuffer = new StringBuffer();
+//		textBuffer.append(getString(R.string.upload));
+//		if (mSelectedMap.size() > 0) {
+//			textBuffer.append("(");
+//			textBuffer.append(mSelectedMap.size());
+//			textBuffer.append(")");
+//		}
+//		if (mSelectedMap.size() == 0 && mIsSelectAll) {
+//			mIsSelectAll = false;
+//			mChoseAllItem.setTitle(getString(R.string.chose_all));
+//		} else if (mSelectedMap.size() == mAdapter.getItemCount() && !mIsSelectAll) {
+//			mIsSelectAll = true;
+//			mChoseAllItem.setTitle(getString(R.string.chose_none));
+//		}
+//		mUploadTextView.setText(textBuffer.toString());
+//	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		choseAllItem = menu.add(0, 0X10086, 0, getString(R.string.chose_all));
-		choseAllItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-		return true;
-	}
+//	@Override
+//	public boolean onCreateOptionsMenu(Menu menu) {
+//		mChoseAllItem = menu.add(0, 0X10086, 0, getString(R.string.chose_all));
+//		mChoseAllItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+//		return true;
+//	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -261,29 +335,28 @@ public class PhotoChosenActivity extends BaseActivity {
 			finish();
 			break;
 		case MENU_SELECT_ALL:
-			isSelectAll = !isSelectAll;
-			if (isSelectAll) {
+			mIsSelectAll = !mIsSelectAll;
+			if (mIsSelectAll) {
 				item.setTitle(getString(R.string.chose_none));
-				if (adapter != null && adapter.getDataList() != null) {
-					for (ImageItem imageItem : adapter.getDataList()) {
+				if (mAdapter != null && mAdapter.getDataList() != null) {
+					for (ImageItem imageItem : mAdapter.getDataList()) {
 						if (imageItem != null) {
-							selectedMap.put(imageItem.getImageUrl(),
+							mSelectedMap.put(imageItem.getLocalImagePath(),
 									Boolean.TRUE);
 						}
 					}
 				}
 			} else {
 				item.setTitle(R.string.chose_all);
-				selectedMap.clear();
+				mSelectedMap.clear();
 			}
-			updateUploadText();
-			if (adapter != null && adapter.getDataList() != null) {
-				for (int i = 0; i < adapter.getItemCount(); i++) {
-					PhotoItemViewHolder viewHolder = (PhotoItemViewHolder) photoRecyclerView
-							.getChildViewHolder(layoutManager.getChildAt(i));
-					viewHolder.setItemChecked(isSelectAll);
-				}
+//			updateUploadText();
+			if (mAdapter.getItemCount() >0 ) {
+				int firstIndex = mLayoutManager.findFirstVisibleItemPosition();
+				int lastIndex = mLayoutManager.findLastVisibleItemPosition()+1;
+				mAdapter.notifyItemRangeChanged(firstIndex, lastIndex);
 			}
+			
 			break;
 		default:
 			break;
@@ -298,7 +371,6 @@ public class PhotoChosenActivity extends BaseActivity {
 
 		public PhotoChosenAdapter() {
 			super();
-//			mDataList = hotel.getAllImage();
 		}
 
 		public ImageItem getDataItem(int position) {
@@ -311,7 +383,7 @@ public class PhotoChosenActivity extends BaseActivity {
 			mDataList.remove(position);
 			notifyItemRemoved(position);
 			notifyDataSetChanged();
-			FileUtil.deleteFile(imageItem.getImageUrl());
+			FileUtil.deleteFile(imageItem.getLocalImagePath());
 		}
 
 		public List<ImageItem> getDataList() {
@@ -373,16 +445,16 @@ public class PhotoChosenActivity extends BaseActivity {
 		@Override
 		public int getCount() {
 			int count = 0;
+			if (mHotel == null) {
+				return count;
+			}
 			switch (type) {
 			case SPINNER_TYPE_NAME:
-				count = hotel == null ? 0 : hotel.getCheckDataCount();
+				count = mHotel == null ? 0 : mHotel.getCheckDataCount();
 				return count;
 			case SPINNER_TYPE_ISSUE:
-				if (hotel == null) {
-					return count;
-				}
-				CheckData checkData = hotel.getCheckData(checkDataPosition);
-				return checkData == null ? 0 : checkData.getIssueCount();
+				CheckData checkData = mHotel.getCheckData(mCheckDataPosition);
+				return checkData == null ? 0 : checkData.getCheckedIssueCount()+1;
 			default:
 				break;
 			}
@@ -391,13 +463,11 @@ public class PhotoChosenActivity extends BaseActivity {
 
 		@Override
 		public Object getItem(int position) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public long getItemId(int position) {
-			// TODO Auto-generated method stub
 			return 0;
 		}
 
@@ -430,28 +500,25 @@ public class PhotoChosenActivity extends BaseActivity {
 
 		private String getTitle(int position) {
 			String name = "";
-			// if (position == 0) {
-			// name = "全部";
-			// } else {
 			switch (type) {
 			case SPINNER_TYPE_NAME:
-				name = hotel.getCheckData(position).getName();
-				return name;
+				name = mHotel.getCheckData(position).getName();
+				break;
 			case SPINNER_TYPE_ISSUE:
-
-				// if (checkDataPosition == 0) {
-				name = hotel.getCheckData(checkDataPosition).getIssue(position)
-						.getName();
-				// } else {
-				// name =
-				// hotel.getCheckData(checkDataPosition).getIssue(position -
-				// 1).getName();
-				// }
-				return name;
+				if (position == 0) {
+					name = "全部";
+				} else {
+					CheckData checkData = mHotel.getCheckData(mCheckDataPosition);
+//					if (checkData.isGetSublist()) {
+//						name = checkData.getName()+checkData.getCheckedIssue(position-1).getName();
+//					} else {
+						name = checkData.getCheckedIssue(position-1).getName();
+//					}
+				}
+				break;
 			default:
 				break;
 			}
-			// }
 			return name;
 		}
 
@@ -471,83 +538,117 @@ public class PhotoChosenActivity extends BaseActivity {
 			if (item == null) {
 				return;
 			}
-			// ImageItem tagItem = (ImageItem) mItem.getTag();
-			// if (tagItem == null
-			// || (tagItem != null && !item.getImageUrl().equals(
-			// tagItem.getImageUrl()))) {
-			mItem.setImageData(item.getImageUrl());
-			// }
-			// mItem.setChecked(item.isSelected());
-			mItem.setTag(R.id.iv_back, item);
+			mItem.setImageData(item.getLocalImagePath());
 			mItem.setTag(R.id.iv_delete, position);
 			mItem.setOnClickListener(mClickListener);
-			mItem.getCheckBox().setTag(item);
-			mItem.getCheckBox().setOnCheckedChangeListener(changeListener);
-			if (selectedMap.containsKey(item.getImageUrl())) {
-				mItem.setChecked(true);
-			} else {
-				mItem.setChecked(false);
-			}
+//			mItem.getCheckBox().setTag(item);
+//			mItem.setChecked(mSelectedMap.containsKey(item.getLocalImagePath()));
+//			mItem.getCheckBox().setOnCheckedChangeListener(changeListener);
 		}
 
 		public void setImageData(String imageURL) {
 			mItem.setImageData(imageURL);
 		}
 
-		public void setItemChecked(boolean check) {
-			mItem.setChecked(check);
-		}
+//		public void setItemChecked(boolean check) {
+//			mItem.setChecked(check);
+//		}
+//
+//		public boolean isChecked() {
+//			if (mItem == null) {
+//				return false;
+//			} else {
+//				return mItem.isChecked();
+//			}
+//		}
 
-		public boolean isChecked() {
-			if (mItem == null) {
-				return false;
-			} else {
-				return mItem.isChecked();
-			}
-		}
-
-		private OnCheckedChangeListener changeListener = new OnCheckedChangeListener() {
-
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView,
-					boolean isChecked) {
-				ImageItem item = (ImageItem) buttonView.getTag();
-				if (item != null) {
-					item.setSelected(!item.isSelected());
-					setItemChecked(item.isSelected());
-				}
-				if (isChecked) {
-					selectedMap.put(item.getImageUrl(), isChecked);
-				} else {
-					selectedMap.remove(item.getImageUrl());
-				}
-				updateUploadText();
-			}
-		};
+//		private OnCheckedChangeListener changeListener = new OnCheckedChangeListener() {
+//
+//			@Override
+//			public void onCheckedChanged(CompoundButton buttonView,
+//					boolean isChecked) {
+//				ImageItem item = (ImageItem) buttonView.getTag();
+//				if (item != null) {
+//					item.setSelected(!item.isSelected());
+//					setItemChecked(item.isSelected());
+//				}
+//				if (isChecked) {
+//					mSelectedMap.put(item.getLocalImagePath(), isChecked);
+//				} else {
+//					mSelectedMap.remove(item.getLocalImagePath());
+//				}
+////				updateUploadText();
+//			}
+//		};
 
 		private OnClickListener mClickListener = new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				ImageItem item = (ImageItem) v.getTag(R.id.iv_back);
+//				ImageItem item = (ImageItem) v.getTag(R.id.iv_back);
 				int position = (Integer) v.getTag(R.id.iv_delete);
 				mDetailLayout.setVisibility(View.VISIBLE);
-				String imageUrl = "file://" + item.getImageUrl();
-				DisplayImageOptions options = new DisplayImageOptions.Builder()
-						.showImageForEmptyUri(R.drawable.icon) // resource or
-																// drawable
-						.showImageOnFail(R.drawable.icon) // resource or
-															// drawable
-						.cacheInMemory(true).cacheOnDisk(true)
-
-						.build();
-				ImageLoader.getInstance().displayImage(imageUrl,
-						mDetailImageView, options);
+				mDetailViewPager.setCurrentItem(position);
 				mDetailDeleteImageView.setTag(position);
+//				String imageUrl = "file://" + item.getImageUrl();
+//				DisplayImageOptions options = new DisplayImageOptions.Builder()
+//						.showImageForEmptyUri(R.drawable.icon) // resource or
+//																// drawable
+//						.showImageOnFail(R.drawable.icon) // resource or
+//															// drawable
+//						.cacheInMemory(true).cacheOnDisk(true)
+//
+//						.build();
+//				ImageLoader.getInstance().displayImage(imageUrl,
+//						mDetailImageView, options);
+				
 			}
 		};
 
 	}
+	
+	class ImageDetailAdapter extends CustomBasePagerAdapter {
+
+		
+		
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			if (convertView == null) {
+				ImageView imageView = new ImageView(parent.getContext());
+				convertView = imageView;
+			} 
+			ImageItem imageItem = mAdapter.getDataItem(position);
+			String filePath = "file://"+imageItem.getLocalImagePath();
+			ImageLoader.getInstance().displayImage(filePath, (ImageView)convertView);
+			return convertView;
+		}
+
+		@Override
+		public int getCount() {
+			return mAdapter.getItemCount();
+		}
+
+		private int mChildCount = 0;
+		 
+	     @Override
+	     public void notifyDataSetChanged() {         
+	           mChildCount = getCount();
+	           super.notifyDataSetChanged();
+	     }
+	 
+	     @Override
+	     public int getItemPosition(Object object)   {          
+	           if ( mChildCount > 0) {
+	           mChildCount --;
+	           return POSITION_NONE;
+	           }
+	           return super.getItemPosition(object);
+	     }
+		
+		
+		
+	}
+	
 
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -563,17 +664,7 @@ public class PhotoChosenActivity extends BaseActivity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		DataManager.getInstance().setHotel(hotelPosition, hotel);
+		DataManager.getInstance().setHotel(mHotelPosition, mHotel);
 	}
-	// @Override
-	// public void onBackPressed() {
-	// super.onBackPressed();
-	// if (mDetailLayout.getVisibility() == View.VISIBLE) {
-	// mDetailLayout.setVisibility(View.GONE);
-	// } else {
-	// finish();
-	// DataManager.getInstance().setHotel(hotelPosition, hotel);
-	// }
-	// }
 
 }

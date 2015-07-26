@@ -25,7 +25,19 @@
         android:text="test"
         android:textColor="@android:color/black"
         android:textSize="16sp" />
-
+	<TextView
+	    android:id="@+id/tv_review"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_toRightOf="@+id/tv_name"
+	    android:layout_marginLeft="10dp"
+	    android:layout_centerVertical="true"
+	    android:textColor="@color/white"
+	    android:gravity="center"
+	    android:textSize="14sp"
+	    android:background="@color/content_orange"
+	    android:visibility="gone"/>
+    
     <ImageView
         android:id="@+id/iv_photo"
         android:layout_width="wrap_content"

@@ -12,10 +12,10 @@
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="@string/upload_all_image"/>
-    <item
+   <!--  <item
         android:id="@+id/check_image_transfer_speed"
         android:orderInCategory="100"
         android:showAsAction="never"
-        android:title="@string/check_image_transfer_speed"/>
+        android:title="@string/check_image_transfer_speed"/> -->
 
 </menu>

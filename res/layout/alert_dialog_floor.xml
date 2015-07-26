@@ -10,35 +10,33 @@
         android:layout_width="100dp"
         android:layout_height="50dp"
         android:focusable="true"
-        android:inputType="number"
         android:textColor="@color/title_blue"
         android:theme="@android:style/Theme.Holo.Light" />
 
-    <TextView
+  <!--   <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:gravity="center"
-        android:text="F - " />
+        android:text="F - " /> -->
 
     <EditText
         android:id="@+id/et_end"
         android:layout_width="100dp"
         android:layout_height="50dp"
         android:focusable="true"
-        android:inputType="number"
         android:textColor="@color/title_blue"
         android:theme="@android:style/Theme.Holo.Light" />
 
-    <TextView
+  <!--   <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:gravity="center"
-        android:text="F" />
+        android:text="F" /> -->
 
 </LinearLayout>

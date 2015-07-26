@@ -52,7 +52,7 @@
         android:layout_height="20dp"
         android:layout_alignParentTop="true"
         android:layout_marginRight="20dp"
-        android:layout_marginTop="14dp"
+        android:layout_marginTop="19dp"
         android:layout_toLeftOf="@+id/tv_flag"
         android:gravity="center"
         android:text="1"

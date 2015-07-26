@@ -25,6 +25,7 @@ import android.widget.Toast;
 import com.lk.hotelcheck.R;
 import com.lk.hotelcheck.bean.Hotel;
 import com.lk.hotelcheck.manager.DataManager;
+import com.lk.hotelcheck.util.StringUtil;
 
 import common.Constance;
 
@@ -121,7 +122,7 @@ public class HotelBaseInfoFragment extends Fragment {
 	@Override
 	public void onPause() {
 		super.onPause();
-		DataManager.getInstance().setHotel(mPosition, mHotel);
+//		DataManager.getInstance().setHotel(mPosition, mHotel);
 	}
 	
 //	public void setGuardianNumber(String number) {
@@ -134,14 +135,25 @@ public class HotelBaseInfoFragment extends Fragment {
 	private void init() {
 		mNameTextView.setText(mHotel.getName());
 		mAddressTextView.setText(mHotel.getAddress());
-		mPhoneTextView.setText(mHotel.getPhone());
+		mPhoneTextView.setText("电话："+mHotel.getPhone());
 		memoTextView.setText(mHotel.getMemo());
-		mOpenDateTextView.setText("开业时间：" + mHotel.getLastCheckedDate());
-		mLastCheckedDateTextView.setText("上次检查：" + mHotel.getLastCheckedDate());
+		if (!TextUtils.isEmpty(mHotel.getOpenDate())) {
+			mOpenDateTextView.setText("开业时间：" + mHotel.getLastCheckedDate());
+		}
+		if (!TextUtils.isEmpty(mHotel.getLastCheckedDate())) {
+			mLastCheckedDateTextView.setText("上次检查：" + mHotel.getLastCheckedDate());
+		}
+		StringBuffer floorBuffer = new StringBuffer();
+		if (!TextUtils.isEmpty(mHotel.getFloorStart())) {
+			floorBuffer.append(mHotel.getFloorStart());
+		}
+		floorBuffer.append(" -- ");
+		if (!TextUtils.isEmpty(mHotel.getFloorEnd())) {
+			floorBuffer.append(mHotel.getFloorEnd());
+		}
 		mRoomNumberTextView.setText("" + mHotel.getRoomCount());
 		mRoomCheckedNumberTextView.setText("" + mHotel.getRoomCheckedCount());
-		mFloorTextView.setText(mHotel.getFloorStart() + "F -- " + mHotel.getFloorEnd() + "F");
-//		mGuardianNumberTextView.setText(mHotel.getGuardianNumber());
+		mFloorTextView.setText(floorBuffer.toString());
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(System.currentTimeMillis());
 		String date = calendar.get(Calendar.YEAR) + "-"
@@ -149,50 +161,52 @@ public class HotelBaseInfoFragment extends Fragment {
 				+ calendar.get(Calendar.DAY_OF_MONTH);
 		mHotel.setCheckDate(date);
 		mCheckedDateTextView.setText(date);
-		mFloorLayout.setOnClickListener(new View.OnClickListener() {
+		if (!mHotel.isStatus()) {
+			mFloorLayout.setOnClickListener(new View.OnClickListener() {
 
-			@Override
-			public void onClick(View v) {
-				showFloor();
-			}
-		});
-		mRoomNumberLayout.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					showFloor();
+				}
+			});
+			mRoomNumberLayout.setOnClickListener(new View.OnClickListener() {
 
-			@Override
-			public void onClick(View v) {
-				showDialog(ALERT_DIALOG_ROOM_NUMBER);
-			}
-		});
-		mRoomCheckedNumberLayout.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					showDialog(ALERT_DIALOG_ROOM_NUMBER);
+				}
+			});
+			mRoomCheckedNumberLayout.setOnClickListener(new View.OnClickListener() {
 
-			@Override
-			public void onClick(View v) {
-				showDialog(ALERT_DIALOG_ROOM_CHECKED_NUMBER);
-			}
-		});
+				@Override
+				public void onClick(View v) {
+					showDialog(ALERT_DIALOG_ROOM_CHECKED_NUMBER);
+				}
+			});
 
-		mCheckedDateLayout.setOnClickListener(new View.OnClickListener() {
+			mCheckedDateLayout.setOnClickListener(new View.OnClickListener() {
 
-			@Override
-			public void onClick(View v) {
-				Calendar cal = Calendar.getInstance();
-				cal.setTimeInMillis(System.currentTimeMillis());
-				mDatePickerDialog = new DatePickerDialog(mContext,
-						new OnDateSetListener() {
+				@Override
+				public void onClick(View v) {
+					Calendar cal = Calendar.getInstance();
+					cal.setTimeInMillis(System.currentTimeMillis());
+					mDatePickerDialog = new DatePickerDialog(mContext,
+							new OnDateSetListener() {
 
-							@Override
-							public void onDateSet(DatePicker view, int year,
-									int monthOfYear, int dayOfMonth) {
-								String date = year + "-" + (monthOfYear + 1)
-										+ "-" + dayOfMonth;
-								mCheckedDateTextView.setText(date);
-								mHotel.setCheckDate(date);
-							}
-						}, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal
-								.get(Calendar.DAY_OF_MONTH));
-				mDatePickerDialog.show();
-			}
-		});
+								@Override
+								public void onDateSet(DatePicker view, int year,
+										int monthOfYear, int dayOfMonth) {
+									String date = year + "-" + (monthOfYear + 1)
+											+ "-" + dayOfMonth;
+									mCheckedDateTextView.setText(date);
+									mHotel.setCheckDate(date);
+								}
+							}, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal
+									.get(Calendar.DAY_OF_MONTH));
+					mDatePickerDialog.show();
+				}
+			});
+		}
 	}
 
 	private void showDialog(final int type) {
@@ -209,8 +223,13 @@ public class HotelBaseInfoFragment extends Fragment {
 									int which) {
 								String number = alertEditText.getText()
 										.toString();
+								
 								if (TextUtils.isEmpty(number)) {
 									Toast.makeText(mContext, "请输入内容", Toast.LENGTH_SHORT).show();
+									return;
+								}
+								if (!StringUtil.isNumeric(number)) {
+									Toast.makeText(mContext, "只能输入数字", Toast.LENGTH_SHORT).show();
 									return;
 								}
 								switch (type) {
@@ -285,10 +304,8 @@ public class HotelBaseInfoFragment extends Fragment {
 											+ floorEnd);
 									mFloorEndEditText.setText("");
 									mFloorStartEditText.setText("");
-									mHotel.setFloorStart(Integer
-											.valueOf(floorStart));
-									mHotel.setFloorEnd(Integer
-											.parseInt(floorEnd));
+									mHotel.setFloorStart(floorStart);
+									mHotel.setFloorEnd(floorEnd);
 									// DataManager.getInstance().setHotel(mPosition,
 									// mHotel);
 								}

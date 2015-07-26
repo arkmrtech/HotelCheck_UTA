@@ -12,6 +12,12 @@ public class IssueItem {
 	private String content;
 	private List<ImageItem> imagelist;
 	private boolean isCheck;
+	private int isDefQue;//是否自定义问题，0=固定问题，1=自定义问题
+	private int isPreQue;
+	private int dimOneId;
+	private String dimOneName;
+	private int reformState;//整改状态：0.未整改，1整改中，2完成整改
+	
 	public int getId() {
 		return id;
 	}
@@ -51,6 +57,49 @@ public class IssueItem {
 	}
 	public void setCheck(boolean isCheck) {
 		this.isCheck = isCheck;
+	}
+	public ImageItem getImageItem(int i) {
+		if (imagelist == null) {
+			return null;
+		}
+		return imagelist.get(i);
+	}
+	public void removeImageItem(int i) {
+		if (imagelist == null) {
+			return ;
+		}
+		imagelist.remove(i);
+	}
+	
+	public int getIsDefQue() {
+		return isDefQue;
+	}
+	public void setIsDefQue(int isDefQue) {
+		this.isDefQue = isDefQue;
+	}
+	public int getIsPreQue() {
+		return isPreQue;
+	}
+	public void setIsPreQue(int isPreQue) {
+		this.isPreQue = isPreQue;
+	}
+	public int getDimOneId() {
+		return dimOneId;
+	}
+	public void setDimOneId(int dimOneId) {
+		this.dimOneId = dimOneId;
+	}
+	public String getDimOneName() {
+		return dimOneName;
+	}
+	public void setDimOneName(String dimOneName) {
+		this.dimOneName = dimOneName;
+	}
+	public int getReformState() {
+		return reformState;
+	}
+	public void setReformState(int reformState) {
+		this.reformState = reformState;
 	}
 	
 }

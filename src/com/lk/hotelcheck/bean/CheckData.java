@@ -1,33 +1,40 @@
 package com.lk.hotelcheck.bean;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import com.orm.SugarRecord;
+import com.orm.dsl.Ignore;
+import common.Constance.PreQueType;
+
 import android.support.v4.util.SparseArrayCompat;
+import android.text.TextUtils;
+import android.util.Log;
 import android.util.SparseArray;
 import android.util.SparseIntArray;
 
-public class CheckData {
-	private List<IssueItem> issuelist;
-	private int id;
+public class CheckData extends SugarRecord<CheckData> implements Serializable{
+	/**
+	 * 
+	 */
+	@Ignore
+	private static final long serialVersionUID = 2005075015087879505L;
+	@Ignore
+	private List<IssueItem> mIssuelist;
 	private String name;
-	private boolean isgetsublist;
-	private List<CheckData> sublist;
-	private List<IssueItem> checkedIssueList;
-	private SparseArray<IssueItem> checkedSubMap;
+	private int type;
+	private long checkId;
+	@Ignore
+	private SparseArray<IssueItem> checkedIssueArray;
 	
 	public List<IssueItem> getIssuelist() {
-		return issuelist;
+		return mIssuelist;
 	}
 	public void setIssuelist(List<IssueItem> issuelist) {
-		this.issuelist = issuelist;
-	}
-	public int getId() {
-		return id;
-	}
-	public void setId(int id) {
-		this.id = id;
+		this.mIssuelist = issuelist;
 	}
 	public String getName() {
 		return name;
@@ -35,182 +42,204 @@ public class CheckData {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public boolean isGetSublist() {
-		return isgetsublist;
-	}
-	public void setIsgetsublist(boolean isgetsublist) {
-		this.isgetsublist = isgetsublist;
-	}
-	public List<CheckData> getSublist() {
-		return sublist;
-	}
-	public void setSublist(List<CheckData> sublist) {
-		this.sublist = sublist;
-	}
 	public IssueItem getIssue(int position) {
-		if (isgetsublist) {
-			if (checkedSubMap == null) {
+			if (mIssuelist == null) {
 				return null;
 			}
-			return checkedSubMap.get(checkedSubMap.keyAt(position));
-		} else {
-			if (issuelist == null) {
-				return null;
-			}
-			return issuelist.get(position);
-		}
+			return mIssuelist.get(position);
 		
 	}
 	
 	public int getIssueCount() {
-		return issuelist == null ? 0 :issuelist.size();
+		return mIssuelist == null ? 0 :mIssuelist.size();
 	}
 	
+	
 	public int getCheckedIssueCount() {
-		int count = 0;
-		if (isgetsublist) {
-			if (sublist != null) {
-				if (checkedSubMap == null) {
-					checkedSubMap = new SparseArray<IssueItem>();
-				}
-				for (CheckData checkData : sublist) {
-					for (IssueItem issueItem : checkData.getIssuelist()) {
-						if (issueItem.isCheck()) {
-							checkedSubMap.put(issueItem.getId(), issueItem);
-						}
-					}
-				}
-				count = checkedSubMap.size();
-//				count = sublist.size();
+		return checkedIssueArray == null ? 0 :checkedIssueArray.size();
+	}
+	
+	
+	public void setIssueItem(int position, IssueItem issueItem) {
+		mIssuelist.set(position, issueItem);
+		
+	}
+	
+	
+	public void addIssue(IssueItem issueItem) {
+		if (issueItem == null) {
+			return;
+		}
+		if (mIssuelist == null) {
+			mIssuelist = new ArrayList<IssueItem>();
+		}
+		mIssuelist.add(issueItem);
+	}
+	public int getType() {
+		return type;
+	}
+	public void setType(int type) {
+		this.type = type;
+	}
+	public long getCheckId() {
+		return checkId;
+	}
+	public void setCheckId(long checkId) {
+		this.checkId = checkId;
+	}
+	
+	public void updateIssueCheck(IssueItem issueItem) {
+		if (issueItem == null) {
+			return;
+		}
+		if (checkedIssueArray == null) {
+			checkedIssueArray = new SparseArray<IssueItem>();
+		}
+		if (issueItem.isCheck()) {
+			if (checkedIssueArray.indexOfKey(issueItem.getId()) < 0) {
+				checkedIssueArray.put(issueItem.getId(), issueItem);
 			}
 		} else {
-			if (issuelist != null) {
-				if (checkedIssueList == null) {
-					checkedIssueList = new ArrayList<IssueItem>();
-				} else {
-					checkedIssueList.clear();
+			if (checkedIssueArray.indexOfKey(issueItem.getId()) > -1) {
+				checkedIssueArray.remove(issueItem.getId());
+			}
+		}
+	}
+	
+	public void initCheckedIssue() {
+		if (checkedIssueArray == null) {
+			checkedIssueArray = new SparseArray<IssueItem>();
+		}
+		for (IssueItem issueItem : mIssuelist) {
+			if (issueItem.isCheck() || issueItem.getIsPreQue() == PreQueType.TYPE_REVIEW) {
+				checkedIssueArray.put(issueItem.getId(), issueItem);
+			}
+		}
+	}
+	
+	public IssueItem getCheckedIssue(int position) {
+		if (checkedIssueArray == null ) {
+			return null;
+		}
+		return checkedIssueArray.valueAt(position);
+	}
+	
+	public List<ImageItem> getCheckedPointImageList(int issuePosition) {
+		List<ImageItem> imageList = null;
+		if (checkedIssueArray == null || checkedIssueArray.size() == 0) {
+			imageList = Collections.emptyList();
+		} else {
+			if (imageList == null) {
+				imageList = new ArrayList<ImageItem>();
+			}
+			IssueItem issueItem = checkedIssueArray.valueAt(issuePosition);
+			if (issueItem.getImageCount() > 0) {
+				imageList.addAll(issueItem.getImagelist());
+			}
+		}
+		return imageList;
+	}
+
+	public List<ImageItem> getAllCheckedImage() {
+		List<ImageItem> imageList = null;
+		if (checkedIssueArray == null || checkedIssueArray.size() == 0) {
+			imageList = Collections.emptyList();
+		} else {
+			if (imageList == null) {
+				imageList = new ArrayList<ImageItem>();
+			}
+			for (int i = 0; i < checkedIssueArray.size(); i++) {
+				IssueItem issueItem = checkedIssueArray.valueAt(i);
+				if (issueItem.getImageCount() > 0) {
+					imageList.addAll(issueItem.getImagelist());
 				}
-				for (IssueItem issueItem : issuelist) {
-					if (issueItem.isCheck()) {
-						checkedIssueList.add(issueItem);
+			}
+		}
+		return imageList;
+	}
+
+	public void deleteCheckedIssueImage(int issuePosition, ImageItem imageItem) {
+		IssueItem issueItem = checkedIssueArray.valueAt(issuePosition);
+		for (int i = 0; i < issueItem.getImageCount(); i++) {
+			ImageItem temp = issueItem.getImageItem(i);
+			if (temp.getLocalImagePath().equals(imageItem.getLocalImagePath())) {
+				issueItem.removeImageItem(i);
+				if (TextUtils.isEmpty(issueItem.getContent())
+						&& issueItem.getImageCount() == 0) {
+					issueItem.setCheck(false);
+				}
+				return;
+			}
+		}
+	}
+
+	public void deleteCheckedIssueImage(ImageItem imageItem) {
+		for (int j = 0; j < checkedIssueArray.size(); j++) {
+			IssueItem issueItem = checkedIssueArray.valueAt(j);
+			for (int i = 0; i < issueItem.getImageCount(); i++) {
+				ImageItem temp = issueItem.getImageItem(i);
+				if (temp.getLocalImagePath().equals(
+						imageItem.getLocalImagePath())) {
+					issueItem.removeImageItem(i);
+					if (TextUtils.isEmpty(issueItem.getContent())
+							&& issueItem.getImageCount() == 0) {
+						issueItem.setCheck(false);
 					}
+					return;
 				}
-				count = checkedIssueList.size();
+			}
+		}
+		
+	}
+	
+	public List<IssueItem> getCheckedIssue() {
+		if (checkedIssueArray == null) {
+			return Collections.emptyList();
+		}
+		List<IssueItem> data = new ArrayList<IssueItem>();
+		for (int i = 0; i < checkedIssueArray.size(); i++) {
+			IssueItem issueItem = checkedIssueArray.valueAt(i);
+			if (issueItem.getImageCount() > 0) {
+				data.add(issueItem);
+			}
+		}
+		return data;
+	}
+	
+	public int getFixedIssueCount() {
+		int count = 0;
+		if (checkedIssueArray != null) {
+			for (IssueItem issueItem : mIssuelist) {
+				if (issueItem.getIsPreQue() == PreQueType.TYPE_REVIEW && !issueItem.isCheck()) {
+					count++;
+				}
 			}
 		}
 		return count;
 	}
 	
-	public IssueItem getCheckedIssue(int position) {
-//		if (getCheckedIssueCount() > 0 && checkedIssueList == null) {
-//			for (IssueItem issueItem : issuelist) {
-//				if (issueItem.isCheck()) {
-//					if (checkedIssueList == null) {
-//						checkedIssueList = new ArrayList<IssueItem>();
-//					}
-//					checkedIssueList.add(issueItem);
-//				}
-//			}
-//		}
-//		if (checkedIssueList == null) {
-//			return null;
-//		}
-//		return checkedIssueList.get(position);
-		if (isgetsublist) {
-				return checkedSubMap.get(checkedSubMap.keyAt(position));
-		} else {
-				return checkedIssueList.get(position);
-		}
-	}
-	public int getSubCheckDataCount() {
-		return sublist == null ? 0 : sublist.size();
-	}
-	
-	public CheckData getSubCheckData(int subCheckDataPosition) {
-		if (sublist == null || subCheckDataPosition >= sublist.size()) {
-			return null;
-		}
-		return sublist.get(subCheckDataPosition);
-	}
-	public void setSubCheckData(int subCheckDataPosition, CheckData checkData) {
-		if (sublist == null) {
-			sublist = new ArrayList<CheckData>();
-		}
-		sublist.set(subCheckDataPosition, checkData);
-		
-	}
-	public String getSubIssuePercent(int position) {
-		if (checkedSubMap == null || sublist == null) {
-			return "";
-		}
-		String percent = "";
-		IssueItem issueItem = checkedSubMap.get(checkedSubMap.keyAt(position));
+	public int getFixingIssueCount() {
 		int count = 0;
-		for (CheckData checkData : sublist) {
-			if (checkData.getCheckedIssueCount() >0 ) {
-				for (IssueItem temp : checkData.getCheckedIssueList()) {
-					if (issueItem.getId() == temp.getId()) {
-						count++;
-						break;
-					}
+		if (checkedIssueArray != null) {
+			for (IssueItem issueItem : mIssuelist) {
+				if (issueItem.getIsPreQue() == PreQueType.TYPE_REVIEW && issueItem.isCheck()) {
+					count++;
 				}
 			}
 		}
-		int total = getSubCheckDataCount();
-		if (count >0 && total >0) {
-			
-			percent = String.format(Locale.CHINA, "%.2f%s", (count*1.00) /total * 100, "%");
-		}
-		return percent ;
+		return count;
 	}
 	
-	public List<IssueItem> getCheckedIssueList() {
-		if (getCheckedIssueCount() > 0 && checkedIssueList == null) {
-			for (IssueItem issueItem : issuelist) {
-				if (issueItem.isCheck()) {
-					if (checkedIssueList == null) {
-						checkedIssueList = new ArrayList<IssueItem>();
-					}
-					checkedIssueList.add(issueItem);
+	public int getNewIssueCount() {
+		int count = 0;
+		if (checkedIssueArray != null) {
+			for (IssueItem issueItem : mIssuelist) {
+				if (issueItem.getIsPreQue() != PreQueType.TYPE_REVIEW && issueItem.isCheck()) {
+					count++;
 				}
 			}
 		}
-		return checkedIssueList;
+		return count;
 	}
-	public void setIssueItem(int position, IssueItem issueItem) {
-		issuelist.set(position, issueItem);
-		
-	}
-	public int getSubCheckedCount() {
-//		int count = 0;
-//		if (isgetsublist && sublist != null) {
-//			for (CheckData checkData : sublist) {
-//				if (checkData.getCheckedIssueCount() >0) {
-//					count++;
-//				}
-//			}
-//		}
-		
-		return sublist == null ? 0: sublist.size();
-	}
-	public List<ImageItem> getIssueImageList(int issuePosition) {
-		List<ImageItem> imageList = null;
-		if (isgetsublist) {
-			imageList = new ArrayList<ImageItem>();
-			IssueItem issueItem = getCheckedIssue(issuePosition);
-			for (CheckData checkData : sublist) {
-				if (checkData.getCheckedIssueCount() >0 ) {
-					for (IssueItem temp : checkData.getCheckedIssueList()) {
-						if (issueItem.getId() == temp.getId()) {
-							imageList.addAll(temp.getImagelist());
-							break;
-						}
-					}
-				}
-			}
-		} else {
-			imageList = getCheckedIssue(issuePosition).getImagelist();
-		}
-		return imageList;
-	}
+	
 }

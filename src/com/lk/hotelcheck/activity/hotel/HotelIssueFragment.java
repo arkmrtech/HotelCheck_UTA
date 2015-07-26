@@ -4,14 +4,12 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnDismissListener;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.LayoutManager;
 import android.support.v7.widget.RecyclerView.ViewHolder;
-import android.text.TextUtils;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -30,16 +28,15 @@ import com.lk.hotelcheck.bean.CheckData;
 import com.lk.hotelcheck.bean.Hotel;
 import com.lk.hotelcheck.manager.DataManager;
 import com.lk.hotelcheck.util.DrawUtil;
-import com.lk.hotelcheck.util.HotelUtil;
-import com.lk.hotelcheck.util.StringUtil;
 
 import common.Constance;
+import common.Constance.CheckDataType;
 
 public class HotelIssueFragment extends Fragment {
 
 	private Context mContext;
 	private View mRootView;
-//	private Hotel mHotel;
+	private Hotel mHotel;
 	private int mPosition;
 	private static final int VIEW_TYPE_SUBLIST = 10087;
 	private static final int  VIEW_TYPE_NORMAL = 10088;
@@ -69,6 +66,7 @@ public class HotelIssueFragment extends Fragment {
 		if (getArguments() != null) {
 			mPosition = getArguments().getInt(
 					Constance.IntentKey.INTENT_KEY_POSITION);
+			mHotel = DataManager.getInstance().getHotel(mPosition);
 		}
 	}
 
@@ -108,12 +106,12 @@ public class HotelIssueFragment extends Fragment {
 
 		@Override
 		public int getItemCount() {
-			return DataManager.getInstance().getHotel(mPosition).getCheckDataCount();
+			return mHotel.getCheckDataCount();
 		}
 
 		@Override
 		public void onBindViewHolder(ViewHolder arg0, int arg1) {
-			CheckData data = DataManager.getInstance().getHotel(mPosition).getCheckData(arg1);
+			CheckData data = mHotel.getCheckData(arg1);
 			if (arg0 instanceof CheckDataItemHolder) {
 				((CheckDataItemHolder) arg0).setData(data, arg1);
 			} else if (arg0 instanceof MultiCheckDataItemHolder) {
@@ -124,9 +122,8 @@ public class HotelIssueFragment extends Fragment {
 
 		@Override
 		public int getItemViewType(int position) {
-			CheckData data = DataManager.getInstance().getHotel(mPosition)
-					.getCheckData(position);
-			if (data.getId() == Constance.CHECK_DATA_ID_FLOOR || data.getId() == Constance.CHECK_DATA_ID_ROOM) {
+			CheckData data = mHotel.getCheckData(position);
+			if (data.getId() == Constance.CHECK_DATA_ID_PASSWAY || data.getId() == Constance.CHECK_DATA_ID_ROOM) {
 				return VIEW_TYPE_SUBLIST;
 			} else {
 				return VIEW_TYPE_NORMAL;
@@ -154,7 +151,6 @@ public class HotelIssueFragment extends Fragment {
 			private View mView;
 			private TextView mNameTextView;
 			private TextView mNumberTextView;
-			private View mNumberView;
 
 			public CheckDataItemHolder(View itemView) {
 				super(itemView);
@@ -164,7 +160,6 @@ public class HotelIssueFragment extends Fragment {
 							.findViewById(R.id.tv_name);
 					mNumberTextView = (TextView) itemView
 							.findViewById(R.id.tv_number);
-					mNumberView = itemView.findViewById(R.id.rl_number);
 				}
 			}
 
@@ -173,9 +168,9 @@ public class HotelIssueFragment extends Fragment {
 					mNameTextView.setText(checkData.getName());
 					int checkedIssueCount = checkData.getCheckedIssueCount();
 					if (checkedIssueCount <= 0 ) {
-						mNumberView.setVisibility(View.GONE);
+						mNumberTextView.setVisibility(View.GONE);
 					} else {
-						mNumberView.setVisibility(View.VISIBLE);
+						mNumberTextView.setVisibility(View.VISIBLE);
 						mNumberTextView.setText("" + checkedIssueCount);
 					}
 
@@ -186,7 +181,7 @@ public class HotelIssueFragment extends Fragment {
 			}
 			
 			public void setCheckNumber(int count) {
-				mNumberView.setVisibility(View.VISIBLE);
+				mNumberTextView.setVisibility(View.VISIBLE);
 				mNumberTextView.setText("" + count);
 			}
 
@@ -196,7 +191,7 @@ public class HotelIssueFragment extends Fragment {
 				public void onClick(View v) {
 					int checkDataPosition = (Integer) v.getTag();
 					CheckHotelIssueActivity.gotoCheckHotelIssue(mContext,
-							mPosition, checkDataPosition);
+							mPosition, checkDataPosition, Constance.CheckDataType.TYPE_NORMAL);
 					mCurrentCheckDataPosition = checkDataPosition;
 				}
 			};
@@ -235,10 +230,12 @@ public class HotelIssueFragment extends Fragment {
 				return;
 			}
 			int checkedIssueCount = 0;
-			if (checkData.isGetSublist()) {
-				checkedIssueCount = checkData.getSubCheckedCount();
+			if (checkData.getType() == CheckDataType.TYPE_ROOM) {
+				checkedIssueCount = mHotel.getDymicRoomCount();
+			} else if (checkData.getType() == CheckDataType.TYPE_PASSWAY) {
+				checkedIssueCount = mHotel.getDymicPasswayCount();
 			} else {
-				checkedIssueCount = checkData.getCheckedIssueCount();
+				checkedIssueCount = 0;
 			}
 			if (checkedIssueCount <= 0) {
 				mNumberTextView.setVisibility(View.GONE);
@@ -246,10 +243,13 @@ public class HotelIssueFragment extends Fragment {
 				mNumberTextView.setVisibility(View.VISIBLE);
 				mNumberTextView.setText("" + checkedIssueCount);
 			}
-			Log.d("lxk", "MultiFloorCheckDataItemHolder setData count = "
-					+ checkedIssueCount);
 			mNameTextView.setText(checkData.getName());
-			mSubFloorAdapter = new AddItemAdapter(checkData, checkDataPosition);
+			if (checkData.getId() == Constance.CHECK_DATA_ID_ROOM) {
+				mSubFloorAdapter = new AddItemAdapter(Constance.CheckDataType.TYPE_ROOM, checkDataPosition);
+			} else {
+				mSubFloorAdapter = new AddItemAdapter(Constance.CheckDataType.TYPE_PASSWAY, checkDataPosition);
+			}
+			
 			mGridView.setAdapter(mSubFloorAdapter);
 			mView.setTag(checkDataPosition);
 		}
@@ -264,44 +264,42 @@ public class HotelIssueFragment extends Fragment {
 
 		private AlertDialog mAlertDialog;
 		private EditText mEditText;
-		public static final int TYPE_ROOM = 1;
-		public static final int TYPE_CORRIDOR = 2;
+		private int mType;
 		private int mCheckDataPosition;
-		private CheckData mCheckData;
-		public AddItemAdapter(CheckData checkData, int checkDataPosition) {
+
+		public AddItemAdapter(int type, int checkDataPosition) {
 			super();
-			mCheckData = checkData;
+			this.mType = type;
 			mCheckDataPosition = checkDataPosition;
 		}
 
-		public void setCheckDataPositon(int checkDataPosition) {
-			mCheckDataPosition = checkDataPosition;
-		}
-
+		
+		
 		@Override
 		public long getItemId(int position) {
 			return 0;
 		}
 
+		
 		private OnClickListener mClickListener = new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				Hotel hotel = DataManager.getInstance().getHotel(mPosition);
-				if (hotel.isStatus()) {
+				if (mHotel.isStatus()) {
 					Toast.makeText(v.getContext(), "酒店已检查完成不能再修改", Toast.LENGTH_SHORT).show();
 					return;
 				}
-				switch (mCheckData.getId()) {
-				case Constance.CHECK_DATA_ID_FLOOR:
-					showDialog(TYPE_CORRIDOR);
-					break;
-				case Constance.CHECK_DATA_ID_ROOM:
-					showDialog(TYPE_ROOM);
-					break;
-				default:
-					break;
-				}
+				showDialog(mType);
+//				switch (mCheckData.getId()) {
+//				case Constance.CHECK_DATA_ID_FLOOR:
+//					showDialog(TYPE_CORRIDOR);
+//					break;
+//				case Constance.CHECK_DATA_ID_ROOM:
+//					showDialog(TYPE_ROOM);
+//					break;
+//				default:
+//					break;
+//				}
 				
 			}
 		};
@@ -309,7 +307,7 @@ public class HotelIssueFragment extends Fragment {
 		private void showDialog(final int type) {
 			if (mAlertDialog == null) {
 				LayoutInflater factory = LayoutInflater.from(mContext);// 提示框
-				View view = factory.inflate(R.layout.alert_dialog_edit, null);// 这里必须是final的
+				View view = factory.inflate(R.layout.alert_input, null);// 这里必须是final的
 				mEditText = (EditText) view.findViewById(R.id.et_content);// 获得输入框对象
 				mAlertDialog = new AlertDialog.Builder(mContext)
 						.setView(view)
@@ -321,27 +319,40 @@ public class HotelIssueFragment extends Fragment {
 											int which) {
 										String number = mEditText.getText()
 												.toString();
-										if (!TextUtils.isEmpty(number) && StringUtil.isNumeric(number)) {
+										CheckData checkData = null;
+										String name = null;
+										int areaId = 0;
 											switch (type) {
-											case TYPE_ROOM:
-												CheckData roomCheckData = HotelUtil.createRoomSubCheckData(mContext);
-												roomCheckData.setName("房间"+number);
-												update(roomCheckData);
+											case Constance.CheckDataType.TYPE_ROOM:
+												name = "客房"+number;
+												areaId = Math.abs(name.hashCode()+mHotel.getName().hashCode());
+												if (mHotel.hasRoom(areaId)) {
+													Toast.makeText(mContext, "房间名重复，请修改", Toast.LENGTH_SHORT).show();
+													return;
+												} else {
+													checkData = DataManager.getInstance().createRoomCheckData();
+													checkData.setName(name);
+													checkData.setType(Constance.CheckDataType.TYPE_ROOM);
+												}
 												break;
-											case TYPE_CORRIDOR:
-												CheckData corridorCheckData = HotelUtil.createCorridorSubCheckData(mContext);
-												corridorCheckData.setName(number+"楼走廊");
-												update(corridorCheckData);
+											case Constance.CheckDataType.TYPE_PASSWAY:
+												name = number+"楼走廊";
+												areaId = Math.abs(name.hashCode()+mHotel.getName().hashCode());
+												if (mHotel.hasPassway(areaId)) {
+													Toast.makeText(mContext, "走廊名重复，请修改", Toast.LENGTH_SHORT).show();
+												} else {
+													checkData = DataManager.getInstance().createPasswayCheckData();
+													checkData.setName(name);
+													checkData.setType(Constance.CheckDataType.TYPE_PASSWAY);
+												}
 												break;
 											default:
 												break;
 											}
-										} else {
-											Toast.makeText(mContext, "请输入数字",
-													Toast.LENGTH_SHORT).show();
-										}
-
-										mEditText.setText("");
+											checkData.setId((long) areaId);
+											checkData.setCheckId(mHotel.getCheckId());
+											update(checkData);
+											mEditText.setText("");
 									}
 								})
 						.setNegativeButton(
@@ -357,10 +368,10 @@ public class HotelIssueFragment extends Fragment {
 			}
 
 			switch (type) {
-			case TYPE_ROOM:
+			case Constance.CheckDataType.TYPE_ROOM:
 				mAlertDialog.setTitle("请输入房间号");
 				break;
-			case TYPE_CORRIDOR:
+			case Constance.CheckDataType.TYPE_PASSWAY:
 				mAlertDialog.setTitle("请输入走廊所在楼层");
 				break;
 			default:
@@ -370,39 +381,52 @@ public class HotelIssueFragment extends Fragment {
 			mAlertDialog.show();
 		}
 
-		public void update(CheckData subCheckData) {
-			if (mCheckData == null || subCheckData == null) {
-				return;
+		public void update(CheckData checkData) {
+			switch (mType) {
+			case Constance.CheckDataType.TYPE_ROOM:
+				mHotel.addRoom(checkData);
+				break;
+			case Constance.CheckDataType.TYPE_PASSWAY:
+				mHotel.addPassway(checkData);
+				break;
+			default:
+				break;
 			}
-			mCheckData.getSublist().add(0, subCheckData);
-			DataManager.getInstance().getHotel(mPosition).setCheckDatas(mCheckData, mCheckDataPosition);
+			
 			mAdapter.notifyItemChanged(mCheckDataPosition);
-//			notifyItemInserted(1);
-//			notifyDataSetChanged();
-//			Log.d("lxk", "mCheckDataPosition = "+mCheckDataPosition);
-//			ViewHolder viewHolder =  mExpandableListView.getChildViewHolder(mExpandableListView.getChildAt(mCheckDataPosition));
-//			if (viewHolder instanceof MultiCheckDataItemHolder) {
-//				int count = mCheckData.getSubCheckDataCount();
-//				Log.d("lxk", "update count = "+count);
-//				((MultiCheckDataItemHolder)viewHolder).setCheckNumber(count);
-//			}
 		}
 		
 		public void removeSubCheckedData(int position) {
-			if (mCheckData == null ) {
-				return;
+			switch (mType) {
+			case Constance.CheckDataType.TYPE_ROOM:
+				mHotel.removeDymicRoom(position);
+				break;
+			case Constance.CheckDataType.TYPE_PASSWAY:
+				mHotel.removeDymicPassway(position);
+				break;
+			default:
+				break;
 			}
-			mCheckData.getSublist().remove(position-1);
-			DataManager.getInstance().getHotel(mPosition).setCheckDatas(mCheckData, mCheckDataPosition);
-			notifyItemRemoved(position);
-			notifyDataSetChanged();
+			mAdapter.notifyItemChanged(mCheckDataPosition);
 		}
 
 		@Override
 		public int getItemCount() {
-			int count = mCheckData.getSubCheckDataCount() + 1;
+			int count = 0;
+			switch (mType) {
+			case Constance.CheckDataType.TYPE_ROOM:
+				count = mHotel.getDymicRoomCount() + 1;
+				break;
+			case Constance.CheckDataType.TYPE_PASSWAY:
+				count = mHotel.getDymicPasswayCount() + 1;
+				break;
+			default:
+				break;
+			}
 			return count;
 		}
+		
+		
 
 		@Override
 		public void onBindViewHolder(ViewHolder viewHolder, int arg1) {
@@ -410,7 +434,18 @@ public class HotelIssueFragment extends Fragment {
 				((ItemViewHolder) viewHolder).initAdd();
 				viewHolder.itemView.setOnClickListener(mClickListener);
 			} else {
-				((ItemViewHolder) viewHolder).setData(mCheckData.getSublist().get(arg1-1), arg1);
+				CheckData checkData = null;
+				switch (mType) {
+				case Constance.CheckDataType.TYPE_ROOM:
+					checkData = mHotel.getDymicRoomData(arg1-1);
+					break;
+				case Constance.CheckDataType.TYPE_PASSWAY:
+					checkData = mHotel.getDymicPasswayData(arg1-1);
+					break;
+				default:
+					break;
+				}
+				((ItemViewHolder) viewHolder).setData(checkData, arg1);
 			}
 
 		}
@@ -440,9 +475,7 @@ public class HotelIssueFragment extends Fragment {
 
 
 			public void setData(CheckData subCheckData, int positon) {
-				Log.d("lxk", "position = "+positon +" name = "+subCheckData.getName());
 				mButton.setTag(positon);
-				mButton.setText("");
 				mButton.setText(subCheckData.getName());
 				mButton.setBackgroundColor(getResources().getColor(
 						R.color.title_blue));
@@ -455,7 +488,8 @@ public class HotelIssueFragment extends Fragment {
 				@Override
 				public void onClick(View v) {
 					int position = (Integer) v.getTag();
-					CheckHotelIssueActivity.gotoCheckHotelIssue(v.getContext(), mPosition, mCheckDataPosition, position-1);
+					CheckHotelIssueActivity.gotoCheckHotelIssue(mContext,
+							mPosition, position - 1 , mType);
 					mCurrentCheckDataPosition = mCheckDataPosition;
 				}
 			};
@@ -465,12 +499,23 @@ public class HotelIssueFragment extends Fragment {
 				@Override
 				public boolean onLongClick(View v) {
 					int position = (Integer) v.getTag();
-					CheckData checkData = DataManager.getInstance().getHotel(mPosition).getCheckData(mCheckDataPosition).getSubCheckData(position-1);
-					if (checkData.getCheckedIssueCount() >0 ) {
+//					CheckData checkData = DataManager.getInstance().getHotel(mPosition).getCheckData(mCheckDataPosition).getSubCheckData(position-1);
+					CheckData checkData = null;
+					switch (mType) {
+					case Constance.CheckDataType.TYPE_ROOM:
+						checkData = mHotel.getDymicRoomData(position-1);
+						break;
+					case Constance.CheckDataType.TYPE_PASSWAY:
+						checkData = mHotel.getDymicPasswayData(position-1);
+						break;
+					default:
+						break;
+					}
+					if (checkData != null && checkData.getCheckedIssueCount() >0 ) {
 						Toast.makeText(v.getContext(), "已登记问题，不能删除", Toast.LENGTH_SHORT).show();
 						return true;
 					}
-					showDeleteAlert(v.getContext(), position, ((Button)v).getText().toString());
+					showDeleteAlert(v.getContext(), position-1, ((Button)v).getText().toString());
 					return true;
 				}
 			};

@@ -12,7 +12,6 @@
         android:layout_centerVertical="true"
         android:layout_marginLeft="20dp"
         android:paddingLeft="28dp"
-        android:text="test"
         android:gravity="center"
         android:textColor="@android:color/black"
         android:textSize="16sp" />
@@ -28,7 +27,7 @@
         android:drawablePadding="10dp"
         android:drawableRight="@drawable/arrow" />
 
-    <RelativeLayout
+  <!--   <RelativeLayout
         android:id="@+id/rl_number"
         android:layout_width="30dp"
         android:layout_height="30dp"
@@ -51,7 +50,18 @@
             android:gravity="center"
             android:textColor="@color/white"
             android:textSize="14sp" />
-    </RelativeLayout>
+    </RelativeLayout> -->
+    <TextView
+        android:id="@+id/tv_number"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@+id/tv_flag"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:textSize="14sp" 
+        android:background="@drawable/circle"/>
 	<ImageView
 	    android:layout_width="match_parent"
 	    android:layout_height="1dp"

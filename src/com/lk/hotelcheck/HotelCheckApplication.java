@@ -4,28 +4,40 @@ import java.io.File;
 
 import android.app.Application;
 
-import com.lk.hotelcheck.util.FileUtil;
 import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiskCache;
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
+import com.orm.SugarApp;
 
 import common.Constance;
 
-public class HotelCheckApplication extends Application{
+public class HotelCheckApplication extends SugarApp{
 
+	private String mWifiSpeed;
+	
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		File tempCacheFile = new File(Constance.Path.TEMP_IMAGE_PATH);
+		initImageLoader();
+//		CrashHandler crashHandler = CrashHandler.getInstance();  
+//        crashHandler.init(this);  
+        initDataFile();
+	}
+	
+	
+	private void initDataFile() {
+		File tempCacheFile = new File(Constance.Path.TEMP_IMAGE_FLOER_PATH);
 		if (!tempCacheFile.exists()) {
 			tempCacheFile.mkdirs();
 		}
-		initImageLoader();
-	}
-	
+		File imageFile = new File(Constance.Path.IMAGE_PATH);
+		if (!imageFile.exists()) {
+			imageFile.mkdirs();
+		}
+	} 
 	
 	
 	private void initImageLoader() {
@@ -59,6 +71,18 @@ public class HotelCheckApplication extends Application{
 				.defaultDisplayImageOptions(options).build();
 		// Initialize ImageLoader with configuration.
 		ImageLoader.getInstance().init(config);
+	}
+
+
+
+	public String getWifiSpeed() {
+		return mWifiSpeed;
+	}
+
+
+
+	public void setWifiSpeed(String mWifiSpeed) {
+		this.mWifiSpeed = mWifiSpeed;
 	}
 	
 	

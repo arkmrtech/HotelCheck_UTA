@@ -2,7 +2,53 @@ package common;
 
 public class NetConstance {
 
+	public static final String REQUEST_PARAM_USER_NAME = "userName";
+	public static final String REQUEST_PARAM_PASSWORD = "password";
+	public static final String REQUEST_PARAM_KEY = "key";
+	
+	public static final String BASE_URL = "http://203.195.172.191:8080/app/service/";
+
+	//for test
+//	public static final String BASE_URL = "http://192.168.1.154:8088/app/service/";
+	public static final String DEFAULT_SESSION = "91c399bb80c2a34824d4bed4c4c57ca8";
+	
+	public static final String METHOD_LOGIN = "login.html";
+	public static final String METHOD_GET_CHECK_DATA = "dimlist.html";
+	public static final String METHOD_GET_CHECK_HOTEL_LIST = "blist.html";
+	public static final String METHOD_UPDATE_HOTEL_STATUS = "updateBranchState.html";
+	public static final String METHOD_UPLOAD_HOTEL_DATA = "updateHotel.html";
+	public static final String METHOD_UPLOAD_IMAGE_STATUS = "updatePhoto.html";
+	
+	public static final String PARAM_AREA_ID = "area_id";
+	public static final String PARAM_AREA_NAME = "area_name";
+	public static final String PARAM_QUE_AREA_NAME = "que_area_name";
+	public static final String PARAM_DIM_TWO_ID = "dim_two_id";
+	public static final String PARAM_DIM_TWO_NAME = "dim_two_name";
+	public static final String PARAM_DIM_ONE_ID = "dim_one_id";
+	public static final String PARAM_DIM_ONE_NAME = "dim_one_name";
+	public static final String PARAM_DIM_LIST = "fixDimList";
+	public static final String PARAM_BRANCH_LIST = "branchResultList";
+	public static final String PARAM_BRANCH = "branch";
+	public static final String PARAM_BRANCH_NUMBER = "branch_number";
+	public static final String PARAM_BRANCH_NAME = "branch_name";
+	public static final String PARAM_BRANCH_CHECK_ID = "branch_check_id";
+	public static final String PARAM_CHECK_TYPE = "check_type";
+	public static final String PARAM_QUESTION_LIST = "questionList"; 
+	public static final String PARAM_ROOM_ADN_PASSWAY_LIST = "roomAndPasswayList";
+	public static final String PARAM_ADDRESS = "address";
+	public static final String PARAM_TELT = "tele";
+	public static final String PARAM_REGION = "region";
+	public static final String PARAM_OPEN_DATE = "opentime";
+	public static final String PARAM_LAST_CHECK_DATE = "lastchecktime";
+	public static final String PARAM_STATUS = "status";
+	public static final String PARAM_HOTEL = "hotel";
+	
+	public static final int ISSUE_TYPE_CONTENT = 1;
+	public static final int ISSUE_TYPE_IMAGE = 2;
+	public static final String PARAM_AREA_TYPE = "area_type";
 	public static final String PARAM_NAME = "name";
+	public static final String PARAM_IMAGE_LIST = "imagelist";
+	
 	
 	
 }

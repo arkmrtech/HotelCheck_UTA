@@ -1,37 +1,46 @@
 package com.lk.hotelcheck.manager;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.SparseArray;
 
 import com.google.gson.Gson;
 import com.lk.hotelcheck.bean.CheckData;
 import com.lk.hotelcheck.bean.Hotel;
-import com.lk.hotelcheck.bean.HotelList;
-import com.lk.hotelcheck.util.CommonUtil;
+import com.lk.hotelcheck.bean.HotelUploadQueneBean;
+import com.lk.hotelcheck.bean.ImageItem;
+import com.lk.hotelcheck.bean.IssueItem;
+import com.lk.hotelcheck.bean.UploadBean;
+import com.lk.hotelcheck.bean.User;
+import com.lk.hotelcheck.bean.dao.AreaIssue;
+import com.lk.hotelcheck.bean.dao.CheckIssue;
+import com.lk.hotelcheck.bean.dao.HotelCheck;
+import com.lk.hotelcheck.network.DataCallback;
+import com.lk.hotelcheck.network.HttpCallback;
+import com.lk.hotelcheck.network.HttpRequest;
 import com.lk.hotelcheck.util.FileUtil;
-import com.lk.hotelcheck.util.HotelUtil;
+import com.lk.hotelcheck.util.JsonParseHandler;
 
 import common.Constance;
+import common.Constance.CheckDataType;
+import common.Constance.DefQueType;
+import common.Constance.ImageUploadState;
+import common.Constance.PreQueType;
 import common.NetConstance;
 
 
 public class DataManager {
-//	private List<Hotel> mHotelList;
-	private HotelList mHotelList;
 	private List<Hotel> mCheckedHotelList;
 	private List<Hotel> mUnCheckedHoteList;
-//	private CheckData mTempRoomCheckData;
-//	private CheckData mTempCorridorCheckData;
+	private List<Hotel> mHotelDataList;
+	private User mUser;
 	
 	private static class SingleHolder {
 		private static DataManager mInstance = new DataManager();
@@ -46,63 +55,23 @@ public class DataManager {
 	}
 
 	public int getHotelCount() {
-		return mHotelList == null ? 0 : mHotelList.size();
-	}
-	
-	public void init(Context context) {
-		if (FileUtil.isFileExist(Constance.Path.DATA_PATH)) {
-			loadCache();
-		} else {
-			try {
-				InputStream inputStream = context.getAssets().open("hotel.json");
-				loadData(CommonUtil.InputStreamTOString(inputStream));
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-//		mTempRoomCheckData = HotelUtil.createRoomSubCheckData(context);
-//		mTempCorridorCheckData = HotelUtil.createCorridorSubCheckData(context);
-	}
-	
-	public void loadData(String hotelJson) {
-		if (TextUtils.isEmpty(hotelJson)) {
-			return;
-		}
-		Gson gson = new Gson();
-		mHotelList = gson.fromJson(hotelJson, HotelList.class);
-		if (mHotelList != null && mHotelList.size() > 0) {
-			for (Hotel hotel : mHotelList.getHotels()) {
-				if (hotel.isStatus()) {
-					if (mCheckedHotelList == null) {
-						mCheckedHotelList = new ArrayList<Hotel>();
-					}
-					mCheckedHotelList.add(hotel);
-				} else {
-					if (mUnCheckedHoteList == null) {
-						mUnCheckedHoteList = new ArrayList<Hotel>();
-					}
-					mUnCheckedHoteList.add(hotel);
-				}
-			}
-		}
+		return mHotelDataList == null ? 0 : mHotelDataList.size();
 	}
 	
 	
 	
 	public Hotel getHotel(int position) {
-		if (mHotelList == null || position >= mHotelList.size()) {
+		if (mHotelDataList == null || position >= mHotelDataList.size()) {
 			return null;
 		}
-		return mHotelList.getHotelByPosition(position);
+		return mHotelDataList.get(position);
 	}
 
 	public String getHotelName(int position) {
-		if (mHotelList == null || position >= mHotelList.size()) {
+		if (mHotelDataList == null || position >= mHotelDataList.size()) {
 			return "";
 		}
-		return mHotelList.getHotelByPosition(position).getName();
+		return mHotelDataList.get(position).getName();
 	}
 
 	public int getHotelListCount(int groupPosition) {
@@ -130,10 +99,10 @@ public class DataManager {
 	}
 
 	public int getHotelPosition(int id) {
-		if (mHotelList != null) {
+		if (mHotelDataList != null) {
 			int position = 0;
-			for (Hotel hotel : mHotelList.getHotels()) {
-				if(hotel.getId() == id) {
+			for (Hotel hotel : mHotelDataList) {
+				if(hotel.getCheckId() == id) {
 					return position;
 				};
 				position ++;
@@ -142,66 +111,27 @@ public class DataManager {
 		return -1;
 	}
 
-	public void loadCache() {
-		String hoteJson = FileUtil.readFileToString(Constance.Path.DATA_PATH);
-		loadData(hoteJson);
-	}
-	
-	public void saveDataCache() {
-		if (mHotelList != null) {
-			Gson gson = new Gson();
-			for (Hotel hotel : mHotelList.getHotels()) {
-			}
-			String jsonString = gson.toJson(mHotelList);
-			FileUtil.createFile(Constance.Path.DATA_PATH, false);
-			FileUtil.writeStringToSdCard(Constance.Path.DATA_PATH, jsonString);
-		}
-	}
-	
-//	public void clearData() {
-//		mHotelList = null;
-//		mCheckedHotelList.clear();
-//		mCheckedHotelList = null;
-//		mUnCheckedHoteList.clear();
-//		mUnCheckedHoteList = null;
-//	}
 
 	public void setHotel(int position, Hotel hotel) {
-		if (mHotelList == null) {
-			mHotelList = new HotelList();
+		if (mHotelDataList == null) {
+			mHotelDataList = new ArrayList<Hotel>();
 		}
-		mHotelList.setHotel(hotel, position);
-//		if (hotel.isDataStatus() && !isExistInCheckedList(hotel)) {
-//			 mCheckedHotelList.add(hotel);
-//			 mUnCheckedHoteList.remove(hotel);
-//		} 
+		mHotelDataList.set(position, hotel);
 	}
 	
 	public void setHotelChecked(int position, Hotel hotel) {
-		if (mHotelList == null) {
-			mHotelList = new HotelList();
+		if (mHotelDataList == null) {
+			mHotelDataList = new ArrayList<Hotel>();
 		}
-		mHotelList.setHotel(hotel, position);
+		mHotelDataList.set(position, hotel);
 		if (hotel.isStatus() && !isExistInCheckedList(hotel)) {
+			if (mCheckedHotelList == null) {
+				mCheckedHotelList = new ArrayList<Hotel>();
+			}
 			 mCheckedHotelList.add(hotel);
 			 mUnCheckedHoteList.remove(hotel);
-//			 removeUnCheckedHote(hotel);
 		} 
 	}
-	
-//	private void removeUnCheckedHote(Hotel hotel) {
-//		if (mUnCheckedHoteList == null) {
-//			return;
-//		}
-//		int count = 0;
-//		for (Hotel tempHotel : mUnCheckedHoteList) {
-//			if (tempHotel.getId() == hotel.getId()) {
-//				mUnCheckedHoteList.remove(count);
-//				return;
-//			}
-//			count++;
-//		}
-//	}
 	
 	private boolean isExistInCheckedList(Hotel hotel) {
 		boolean exist = false;
@@ -209,7 +139,7 @@ public class DataManager {
 			return false;
 		}
 		for (Hotel tempHotel : mCheckedHotelList) {
-			if (tempHotel.getId() == hotel.getId()) {
+			if (tempHotel.getCheckId() == hotel.getCheckId()) {
 				return true;
 			}
 		}
@@ -234,6 +164,402 @@ public class DataManager {
 		if (mUnCheckedHoteList != null) {
 			mUnCheckedHoteList.clear();
 		}
-		mHotelList = null;
+		if (mHotelDataList != null) {
+			mHotelDataList.clear();;
+		}
 	}
+
+	public List<Hotel> getCheckedHotelList() {
+		return mCheckedHotelList;
+	}
+
+	public void saveUploadData(HotelUploadQueneBean uploadQueneBean) {
+		if (uploadQueneBean != null) {
+			Gson gson = new Gson();
+			String jsonString = gson.toJson(uploadQueneBean);
+			FileUtil.createFile(Constance.Path.UPLOAD_TASK_DATA_PATH, false);
+			FileUtil.writeStringToSdCard(Constance.Path.UPLOAD_TASK_DATA_PATH, jsonString);
+		}
+		
+	}
+	
+	public HotelUploadQueneBean loadUploadData() {
+		String uploadTaskJson = FileUtil.readFileToString(Constance.Path.UPLOAD_TASK_DATA_PATH);
+		if (TextUtils.isEmpty(uploadTaskJson)) {
+			return null;
+		}
+		Gson gson = new Gson();
+		HotelUploadQueneBean bean = gson.fromJson(uploadTaskJson, HotelUploadQueneBean.class);
+		return bean;
+	}
+	
+	
+//	private void initData() {
+//		initCheckData();
+//	}
+	
+	private SparseArray<CheckData> initCheckData() {
+		List<AreaIssue> areaIssueList = AreaIssue.listAll(AreaIssue.class);
+//		if (mCheckModel == null) {
+//			mCheckModel = new SparseArray<CheckData>();
+//		}
+		SparseArray<CheckData> mCheckModel = new SparseArray<CheckData>();
+		for (AreaIssue areaIssue : areaIssueList) {
+			IssueItem issueItem = new IssueItem();
+			issueItem.setId(areaIssue.getIssueId());
+			issueItem.setName(areaIssue.getIssueName());
+			issueItem.setDimOneId(areaIssue.getDimOneId());
+			issueItem.setDimOneName(areaIssue.getDimOneName());
+			CheckData checkData;
+			if (mCheckModel.indexOfKey(areaIssue.getAreaId()) > -1) {
+				checkData = mCheckModel.get(areaIssue.getAreaId());
+			} else {
+				checkData = new CheckData();
+				checkData.setId((long) areaIssue.getAreaId());
+				checkData.setName(areaIssue.getAreaName());
+			}
+			checkData.addIssue(issueItem);
+			mCheckModel.put(areaIssue.getAreaId(), checkData);
+		}
+		return mCheckModel;
+	}
+	
+	public void initHotelData(List<Hotel> hoteList) {
+		if (hoteList == null ) {
+			return;
+		}
+		for (Hotel hotel : hoteList) {
+			SparseArray<CheckData> mCheckModel = initCheckData();
+			//init normal checkData
+			for (int i = 0; i < mCheckModel.size(); i++) {
+				CheckData checkData = mCheckModel.valueAt(i);
+				initCheckData(checkData, hotel.getCheckId());
+				hotel.addCheckData(checkData);
+			}
+			List<CheckData> dymicCheckData = CheckData.find(CheckData.class, "CHECK_ID = ?", String.valueOf(hotel.getCheckId()));
+			if (dymicCheckData != null) {
+				for (CheckData checkData : dymicCheckData) {
+					CheckData tempCheckData = null;
+					if (checkData.getType() == Constance.CheckDataType.TYPE_ROOM) {
+						tempCheckData = createRoomCheckData();
+					} else if (checkData.getType() == Constance.CheckDataType.TYPE_PASSWAY) {
+						tempCheckData = createPasswayCheckData();
+					}
+					if (tempCheckData != null) {
+						checkData.setIssuelist(tempCheckData.getIssuelist());
+						checkData.initCheckedIssue();
+						initCheckData(checkData, hotel.getCheckId());
+						if (checkData.getType() == Constance.CheckDataType.TYPE_ROOM) {
+							if (hotel.hasRoom(checkData.getId())) {
+								hotel.setRoom(checkData.getId(), checkData);
+							} else {
+								hotel.addRoom(checkData);
+							}
+						} else if (checkData.getType() == Constance.CheckDataType.TYPE_PASSWAY) {
+							if (hotel.hasRoom(checkData.getId())) {
+								hotel.setPassway(checkData.getId(), checkData);
+							} else {
+								hotel.addPassway(checkData);
+							}
+						}
+					}
+					
+				}
+			}
+			initQuestion(hotel);
+			if (mHotelDataList == null) {
+				mHotelDataList = new ArrayList<Hotel>();
+			}
+			mHotelDataList.add(hotel);
+			if (hotel.isStatus()) {
+				if (mCheckedHotelList == null) {
+					mCheckedHotelList = new ArrayList<Hotel>();
+				}
+				mCheckedHotelList.add(hotel);
+			} else {
+				if (mUnCheckedHoteList == null) {
+					mUnCheckedHoteList = new ArrayList<Hotel>();
+				}
+				mUnCheckedHoteList.add(hotel);
+			}
+		}
+	}
+	
+	
+	private void initCheckData(CheckData checkData , int checkId) {
+		if (checkData == null) {
+			return;
+		}
+		for (IssueItem issueItem : checkData.getIssuelist()) {
+			List<HotelCheck> hotelCheckList = HotelCheck.find(
+					HotelCheck.class,
+					"CHECK_ID = ? and AREA_ID = ? and ISSUE_ID = ?",
+					String.valueOf(checkId),
+					String.valueOf(checkData.getId()),
+					String.valueOf(issueItem.getId()));
+			for (HotelCheck hotelCheck : hotelCheckList) {
+				if (issueItem.getId() == hotelCheck.getIssueId()) {
+					ImageItem imageItem = new ImageItem();
+					imageItem.setLocalImagePath(hotelCheck
+							.getLocalImagePath());
+					imageItem.setServiceSavePath(hotelCheck
+							.getServiceImagePath());
+					issueItem.addImage(imageItem);
+				}
+				
+
+			}
+			CheckIssue checkIssue = getCheckIssue(checkId,
+					checkData.getId(), issueItem.getId());
+			if (checkIssue != null) {
+				issueItem.setCheck(checkIssue.isCheck());
+				issueItem.setContent(checkIssue.getContent());
+			}
+		}
+		checkData.initCheckedIssue();
+	}
+	
+	private void initQuestion(Hotel hotel) {
+		if (hotel.getQuestionList() != null) {
+			for (AreaIssue areaIssue : hotel.getQuestionList()) {
+				if (areaIssue.getType() == CheckDataType.TYPE_ROOM) {
+					initQuestionCheckData(areaIssue, hotel.getRoomList());
+				} else if (areaIssue.getType() == CheckDataType.TYPE_PASSWAY) {
+					initQuestionCheckData(areaIssue, hotel.getPasswayList());
+				} else {
+					initQuestionCheckData(areaIssue, hotel.getCheckDatas());
+				}
+				
+			}
+		}
+	}
+	
+	private void initQuestionCheckData(AreaIssue areaIssue, List<CheckData> dataList) {
+		if (dataList == null) {
+			return;
+		}
+		for (CheckData checkData : dataList) {
+			if (checkData.getId() == areaIssue.getAreaId()) {
+				if (areaIssue.getIsDefQue() == DefQueType.TYPE_DYMIC) {
+					IssueItem issueItem = new IssueItem();
+					issueItem.setId(areaIssue.getIssueId());
+					issueItem.setName(areaIssue.getIssueName());
+					issueItem.setIsPreQue(areaIssue.getIsPreQue());
+					issueItem.setIsDefQue(areaIssue.getIsDefQue());
+					checkData.addIssue(issueItem);
+				} else {
+					if (areaIssue.getIsPreQue() == PreQueType.TYPE_REVIEW) {
+						for (IssueItem issueItem : checkData.getIssuelist()) {
+							if (issueItem.getId() == areaIssue.getIssueId()) {
+								issueItem.setIsPreQue(areaIssue.getIsPreQue());
+								issueItem.setIsDefQue(areaIssue.getIsDefQue());
+							}
+						}
+					} 
+				}
+				
+			}
+		}
+	}
+	
+	
+	public void loadCheckData(Context context, final DataCallback callback) {
+		HttpRequest.getInstance().getCheckDataList(context, NetConstance.DEFAULT_SESSION, new HttpCallback() {
+			
+			@Override
+			public void onSuccess(JSONObject response) {
+				if (response != null) {
+					JSONArray jsonArray = response.optJSONArray(NetConstance.PARAM_DIM_LIST);
+					if (jsonArray != null) {
+						AreaIssue.deleteAll(AreaIssue.class);
+						for (int i = 0; i < jsonArray.length(); i++) {
+							JSONObject jsonObject = jsonArray.optJSONObject(i);
+							AreaIssue areaIssue = JsonParseHandler.parseAreaIssue(jsonObject);
+							if (areaIssue != null) {
+								areaIssue.save();
+							}
+						}
+						initCheckData();
+					}
+				}
+				callback.onSuccess();
+			}
+			
+			@Override
+			public void onError() {
+				callback.onFail();
+			}
+		});
+	}
+
+	public void loadHotelData(Context context, final DataCallback callback) {
+		HttpRequest.getInstance().getHotelList(context, NetConstance.DEFAULT_SESSION, new HttpCallback() {
+			
+			@Override
+			public void onSuccess(JSONObject response) {
+				if (response != null) {
+					JSONArray jsonArray = response.optJSONArray(NetConstance.PARAM_BRANCH_LIST);
+					if (jsonArray != null) {
+						List<Hotel> hotelList = new ArrayList<Hotel>();
+						for (int i = 0; i < jsonArray.length(); i++) {
+							JSONObject jsonObject = jsonArray.optJSONObject(i);
+							 Hotel hotelTemp = JsonParseHandler.parseHotel(jsonObject);
+							 if (hotelTemp != null) {
+								 Hotel hotel = Hotel.findById(Hotel.class, hotelTemp.getId());
+								 if (hotel != null) {
+									 hotelTemp.setBaseInfo(hotel);
+								} 
+								hotelList.add(hotelTemp);
+							}
+						}
+						initHotelData(hotelList);
+					}
+				}
+				callback.onSuccess();
+			}
+			
+			@Override
+			public void onError() {
+				callback.onFail();
+				
+			}
+		});
+	}
+	
+	
+	public void saveIssueImage(int checkId, int areaId, String areaName, int issueId, ImageItem imageItem) {
+		if (imageItem == null) {
+			return;
+		}
+		HotelCheck hotelCheck = new HotelCheck();
+		hotelCheck.setCheckId(checkId);
+		hotelCheck.setAreaId(areaId);
+		hotelCheck.setAreaName(areaName);
+		hotelCheck.setIssueId(issueId);
+		hotelCheck.setLocalImagePath(imageItem.getLocalImagePath());
+		hotelCheck.setServiceImagePath(imageItem.getServiceSavePath());
+		hotelCheck.save();
+	}
+	
+	public void saveIssueContent(int checkId, int areaId, int issueId, String content) {
+		if (content == null) {
+			return;
+		}
+		long id = Long.valueOf(checkId+""+areaId+""+issueId);
+		CheckIssue checkIssue = CheckIssue.findById(CheckIssue.class, id);
+		if (checkIssue == null) {
+			checkIssue = new CheckIssue();
+			checkIssue.setId(id);
+		} 
+		checkIssue.setContent(content);
+		checkIssue.save();
+	}
+	
+	
+	public void saveIssueCheck(int checkId, int areaId, int issueId, boolean isCheck) {
+		long id = Long.valueOf(checkId+""+areaId+""+issueId);
+		CheckIssue checkIssue = CheckIssue.findById(CheckIssue.class, id);
+		if (checkIssue == null) {
+			checkIssue = new CheckIssue();
+			checkIssue.setId(id);
+		} 
+		checkIssue.setCheck(isCheck);
+		checkIssue.save();
+	}
+	
+	public boolean isIssueCheck(int checkId, int areaId, int issueId ) {
+		long id = Long.valueOf(checkId+""+areaId+""+issueId);
+		CheckIssue checkIssue = CheckIssue.findById(CheckIssue.class, id);
+		if (checkIssue == null) {
+			return false;
+		} 
+		return checkIssue.isCheck();
+	}
+	
+	public String getIssueContent(int checkId, long areaId, int issueId ) {
+		long id = Long.valueOf(checkId+""+areaId+""+issueId);
+		CheckIssue checkIssue = CheckIssue.findById(CheckIssue.class, id);
+		if (checkIssue == null) {
+			return null;
+		} 
+		return checkIssue.getContent();
+	}
+	
+	public CheckIssue getCheckIssue(int checkId, long areaId, int issueId ) {
+		long id = Long.valueOf(checkId+""+areaId+""+issueId);
+		return CheckIssue.findById(CheckIssue.class, id);
+	}
+
+	public CheckData createRoomCheckData() {
+		return createDymicCheckData(Constance.CHECK_DATA_ID_ROOM);
+	}
+	
+	public CheckData createPasswayCheckData() {
+		return createDymicCheckData(Constance.CHECK_DATA_ID_PASSWAY);
+	}
+	
+	public CheckData createDymicCheckData(int checkDataId) {
+		CheckData checkData = null;
+		List<AreaIssue> areaIssueList = AreaIssue.find(AreaIssue.class, "AREA_ID = ? ", String.valueOf(checkDataId));
+		if (areaIssueList != null && areaIssueList.size() > 0) {
+			checkData = new CheckData();
+			for (AreaIssue areaIssue : areaIssueList) {
+				IssueItem issueItem = new IssueItem();
+				issueItem.setId(areaIssue.getIssueId());
+				issueItem.setName(areaIssue.getIssueName());
+				checkData.addIssue(issueItem);
+			}
+
+		}
+//		checkData.setId(System.currentTimeMillis());
+		return checkData;
+	}
+
+	public List<UploadBean> getUploadingList(long checkId) {
+		List<UploadBean> dataList = UploadBean.find(UploadBean.class,
+				"CHECK_ID = ? and IMAGE_STATE != ?", String.valueOf(checkId),
+				String.valueOf(ImageUploadState.STATE_FINISH));
+		return dataList;
+	}
+
+	public List<UploadBean> getUploadTaskList(long checkId) {
+		return UploadBean.find(UploadBean.class, "CHECK_ID = ?", String.valueOf(checkId));
+	}
+
+	public List<UploadBean> getUploadCompleteList(long checkId) {
+		List<UploadBean> dataList = UploadBean.find(UploadBean.class,
+				"CHECK_ID = ? and IMAGE_STATE = ?", String.valueOf(checkId),
+				String.valueOf(ImageUploadState.STATE_FINISH));
+		return dataList;
+	}
+
+	public void updateImageStatus(Context context) {
+		List<UploadBean> uploadBean = UploadBean.listAll(UploadBean.class);
+		if (uploadBean != null) {
+			HttpRequest.getInstance().updateImageStatus(context, uploadBean, NetConstance.DEFAULT_SESSION, new HttpCallback() {
+				
+				@Override
+				public void onSuccess(JSONObject response) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+				@Override
+				public void onError() {
+					// TODO Auto-generated method stub
+					
+				}
+			});
+		}
+		
+	}
+
+	public User getUser() {
+		return mUser;
+	}
+
+	public void setUser(User user) {
+		this.mUser = user;
+	}
+	
 }
