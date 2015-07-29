@@ -44,10 +44,6 @@ public class LoginActivity extends Activity{
 			
 			@Override
 			public void onClick(View v) {
-//				Intent intent = new Intent();
-//				intent.setClass(LoginActivity.this, MainActivity.class);
-//				startActivity(intent);
-//				finish();
 				login();
 			}
 		});
@@ -85,7 +81,7 @@ public class LoginActivity extends Activity{
 			
 			@Override
 			public void onError() {
-				Toast.makeText(LoginActivity.this, "登录失败，请稍后再试", Toast.LENGTH_SHORT).show();
+				Toast.makeText(LoginActivity.this, "登录失败，用户名密码错误", Toast.LENGTH_SHORT).show();
 				mLoadingGroup.setVisibility(View.GONE);
 			}
 		});

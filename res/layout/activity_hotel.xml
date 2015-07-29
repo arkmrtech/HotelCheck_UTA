@@ -49,7 +49,7 @@
             android:layout_below="@+id/pb_loading"
             android:layout_centerHorizontal="true"
             android:textColor="@color/white"
-            android:text="数据加载中" />
+            android:text="数据上传中" />
     </RelativeLayout>
 
 </RelativeLayout>

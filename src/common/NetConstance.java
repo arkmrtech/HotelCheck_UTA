@@ -16,7 +16,7 @@ public class NetConstance {
 	public static final String METHOD_GET_CHECK_DATA = "dimlist.html";
 	public static final String METHOD_GET_CHECK_HOTEL_LIST = "blist.html";
 	public static final String METHOD_UPDATE_HOTEL_STATUS = "updateBranchState.html";
-	public static final String METHOD_UPLOAD_HOTEL_DATA = "updateHotel.html";
+	public static final String METHOD_UPLOAD_HOTEL_DATA = "updateProblem.html";
 	public static final String METHOD_UPLOAD_IMAGE_STATUS = "updatePhoto.html";
 	
 	public static final String PARAM_AREA_ID = "area_id";
@@ -42,12 +42,29 @@ public class NetConstance {
 	public static final String PARAM_LAST_CHECK_DATE = "lastchecktime";
 	public static final String PARAM_STATUS = "status";
 	public static final String PARAM_HOTEL = "hotel";
+	public static final String PARAM_STATE = "state";
 	
 	public static final int ISSUE_TYPE_CONTENT = 1;
 	public static final int ISSUE_TYPE_IMAGE = 2;
 	public static final String PARAM_AREA_TYPE = "area_type";
 	public static final String PARAM_NAME = "name";
 	public static final String PARAM_IMAGE_LIST = "imagelist";
+	public static final String PARAM_CHECK_ID = "checkid";
+	public static final String PARAM_DEF_QUE = "is_def_que";
+	public static final String PARAM_PRE_QUE = "is_pre_que";
+	public static final String PARAM_IS_CHECK = "isCheck";
+	public static final String PARAM_CONTENT = "content";
+	public static final String PARAM_FILE_PATH = "filePath";
+	public static final String PARAM_IS_WIDTH = "isWidth";
+	public static final String PARAM_ISSUE_LIST = "issueList";
+	public static final String PARAM_CHECK_DATA_LIST = "checkDataList";
+	public static final String PARAM_ROOM_LIST = "roomList";
+	public static final String PARAM_PASSWAY_LIST = "passwayList";
+	
+	
+	public static final int ERROR_CODE_SUCCESS = 1;
+	public static final int ERROR_CODE_FAIL = 0;
+	public static final String PARAM_REFORM_STATE = "reformState";
 	
 	
 	

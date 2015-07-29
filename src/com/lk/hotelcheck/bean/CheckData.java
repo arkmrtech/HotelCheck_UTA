@@ -199,9 +199,7 @@ public class CheckData extends SugarRecord<CheckData> implements Serializable{
 		List<IssueItem> data = new ArrayList<IssueItem>();
 		for (int i = 0; i < checkedIssueArray.size(); i++) {
 			IssueItem issueItem = checkedIssueArray.valueAt(i);
-			if (issueItem.getImageCount() > 0) {
-				data.add(issueItem);
-			}
+			data.add(issueItem);
 		}
 		return data;
 	}

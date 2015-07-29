@@ -1,8 +1,5 @@
 package common;
 
-import com.lk.hotelcheck.R;
-
-import android.R.string;
 import android.os.Environment;
 
 public class Constance {

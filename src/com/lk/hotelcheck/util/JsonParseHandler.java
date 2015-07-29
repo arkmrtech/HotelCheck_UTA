@@ -1,20 +1,20 @@
 package com.lk.hotelcheck.util;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.google.gson.JsonObject;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.lk.hotelcheck.bean.CheckData;
 import com.lk.hotelcheck.bean.Hotel;
+import com.lk.hotelcheck.bean.ImageItem;
 import com.lk.hotelcheck.bean.IssueItem;
 import com.lk.hotelcheck.bean.dao.AreaIssue;
 import com.lk.hotelcheck.manager.DataManager;
-
 import common.Constance;
 import common.NetConstance;
 
@@ -98,6 +98,8 @@ public class JsonParseHandler {
 		areaIssue.setIssueName(jsonObject.optString(NetConstance.PARAM_DIM_TWO_NAME));
 		areaIssue.setDimOneId(jsonObject.optInt(NetConstance.PARAM_DIM_ONE_ID));
 		areaIssue.setDimOneName(jsonObject.optString(NetConstance.PARAM_DIM_ONE_NAME));
+		areaIssue.setIsDefQue(jsonObject.optInt(NetConstance.PARAM_DEF_QUE));
+		areaIssue.setIsPreQue(jsonObject.optInt(NetConstance.PARAM_PRE_QUE));
 		return areaIssue;
 	}
 	
@@ -128,14 +130,144 @@ public class JsonParseHandler {
 		return checkData;
 	}
 	
+	
+	
 
-	public static JsonObject parseHotelToJson(Hotel hotel) {
+	public static JSONObject parseHotelToJson(Hotel hotel) {
 		if (hotel == null) {
 			return null;
 		}
-		JsonObject hotelJsonObject = new JsonObject();
-		return null;
+		JSONObject hotelJsonObject = null;
+		try {
+			 hotelJsonObject = new JSONObject(new Gson().toJson(hotel));
+			 if (hotel.getCheckDatas() != null) {
+				JSONArray jsonArray = new JSONArray();
+				for (CheckData checkData : hotel.getCheckDatas()) {
+					JSONObject checkDataObject = parseCheckDataToJson(checkData);
+					if (checkDataObject != null) {
+						jsonArray.put(checkDataObject);
+					}
+				}
+				hotelJsonObject.put(NetConstance.PARAM_CHECK_DATA_LIST, jsonArray);
+			}
+			 if (hotel.getRoomList() != null) {
+				 JSONArray jsonArray = new JSONArray();
+					for (CheckData checkData : hotel.getRoomList()) {
+						JSONObject checkDataObject = parseCheckDataToJson(checkData);
+						if (checkDataObject != null) {
+							jsonArray.put(checkDataObject);
+						}
+					}
+					hotelJsonObject.put(NetConstance.PARAM_ROOM_LIST, jsonArray);
+			}
+			 if (hotel.getPasswayList() != null) {
+				 JSONArray jsonArray = new JSONArray();
+					for (CheckData checkData : hotel.getPasswayList()) {
+						JSONObject checkDataObject = parseCheckDataToJson(checkData);
+						if (checkDataObject != null) {
+							jsonArray.put(checkDataObject);
+						}
+					}
+					hotelJsonObject.put(NetConstance.PARAM_PASSWAY_LIST, jsonArray);
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		
+		return hotelJsonObject;
 	}
 	
+	public static JSONObject parseCheckDataToJson(CheckData checkData) {
+		if (checkData == null) {
+			return null;
+		}
+		JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject.put(NetConstance.PARAM_AREA_ID, checkData.getId());
+			jsonObject.put(NetConstance.PARAM_AREA_NAME, checkData.getName());
+			if (checkData.getCheckedIssue() != null) {
+				JSONArray jsonArray = new JSONArray();
+				for (IssueItem issueItem : checkData.getCheckedIssue()) {
+					JSONObject issueObject = parseIssueItemToJson(issueItem);
+					if (issueObject != null) {
+						jsonArray.put(issueObject);
+					}
+				}
+				if (jsonArray.length() == 0) {
+					jsonObject.put(NetConstance.PARAM_ISSUE_LIST, JSONObject.NULL);
+				} else {
+					jsonObject.put(NetConstance.PARAM_ISSUE_LIST, jsonArray);
+				}
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		
+		
+		return jsonObject;
+	}
+	
+	public static JSONObject parseIssueItemToJson(IssueItem issueItem) {
+		if (issueItem == null) {
+			return null;
+		}
+		JSONObject jsonObject = null;
+		try {
+			jsonObject = new JSONObject( new GsonBuilder().serializeNulls().create().toJson(issueItem));
+			if (issueItem.getImagelist() != null) {
+				JSONArray jsonArray = new JSONArray();
+				for (ImageItem imageItem : issueItem.getImagelist()) {
+					JSONObject imageObject = new JSONObject(new GsonBuilder().serializeNulls().create().toJson(imageItem));
+//					imageObject.put(NetConstance.PARAM_FILE_PATH, imageItem.getServiceSavePath());
+//					imageObject.put(NetConstance.PARAM_IS_WIDTH, imageItem.isWidth());
+					jsonArray.put(imageObject);
+				}
+				if (jsonArray.length() == 0) {
+					jsonObject.put(NetConstance.PARAM_IMAGE_LIST, JSONObject.NULL);
+				} else {
+					jsonObject.put(NetConstance.PARAM_IMAGE_LIST, jsonArray);
+				}
+				
+			} else {
+				jsonObject.put(NetConstance.PARAM_IMAGE_LIST, JSONObject.NULL);
+			}
+			
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return jsonObject;
+	}
+	
+//	public static JSONObject parseIssueItemToJson(IssueItem issueItem) {
+//		if (issueItem == null) {
+//			return null;
+//		}
+//		JSONObject jsonObject = new JSONObject();
+//		try {
+//			jsonObject.put(NetConstance.PARAM_DIM_ONE_ID, issueItem.getDimOneId());
+//			jsonObject.put(NetConstance.PARAM_DIM_ONE_NAME, issueItem.getDimOneName());
+//			jsonObject.put(NetConstance.PARAM_DIM_TWO_ID, issueItem.getId());
+//			jsonObject.put(NetConstance.PARAM_DIM_TWO_NAME, issueItem.getName());
+//			jsonObject.put(NetConstance.PARAM_DEF_QUE, issueItem.getIsDefQue());
+//			jsonObject.put(NetConstance.PARAM_PRE_QUE, issueItem.getIsPreQue());
+//			jsonObject.put(NetConstance.PARAM_IS_CHECK, issueItem.isCheck());
+//			jsonObject.put(NetConstance.PARAM_CONTENT, issueItem.getContent());
+//			jsonObject.put(NetConstance.PARAM_REFORM_STATE, issueItem.getReformState());
+//			if (issueItem.getImagelist() != null) {
+//				JSONArray jsonArray = new JSONArray();
+//				for (ImageItem imageItem : issueItem.getImagelist()) {
+//					JSONObject imageObject = new JSONObject();
+//					imageObject.put(NetConstance.PARAM_FILE_PATH, imageItem.getServiceSavePath());
+//					imageObject.put(NetConstance.PARAM_IS_WIDTH, imageItem.isWidth());
+//					jsonArray.put(imageObject);
+//				}
+//				jsonObject.put(NetConstance.PARAM_IMAGE_LIST, jsonArray);
+//			}
+//			
+//		} catch (JSONException e) {
+//			e.printStackTrace();
+//		}
+//		return jsonObject;
+//	}
 	
 }

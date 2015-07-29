@@ -10,7 +10,7 @@ public class IssueItem {
 	private int id;
 	private String name;
 	private String content;
-	private List<ImageItem> imagelist;
+	private transient List<ImageItem> imagelist;
 	private boolean isCheck;
 	private int isDefQue;//是否自定义问题，0=固定问题，1=自定义问题
 	private int isPreQue;

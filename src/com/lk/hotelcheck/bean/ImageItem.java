@@ -7,10 +7,9 @@ import android.R.string;
 public class ImageItem implements Serializable{
 	private String localImagePath;
 	private String serviceSavePath;
-//	private String imageUrl;
-	private boolean isSelected;
-	private boolean isUpload;
-	private int imageState;
+	private transient boolean isSelected;
+	private transient boolean isUpload;
+	private transient int imageState;
 	private boolean isWidth;
 	private int type;
 	

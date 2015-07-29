@@ -1,8 +1,8 @@
 package com.lk.hotelcheck.bean;
 
 import java.io.Serializable;
-import java.util.List;
 
+import com.google.gson.annotations.Expose;
 import com.orm.SugarRecord;
 
 public class UploadBean extends SugarRecord<UploadBean> implements Serializable{
@@ -10,21 +10,35 @@ public class UploadBean extends SugarRecord<UploadBean> implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = -8442111964479258123L;
-	
+	@Expose
 	private long checkId;
+	@Expose
 	private long areaid;
+	@Expose
 	private int issueId;
+	@Expose
 	private String areaName;
+	@Expose
 	private String issueName;
+	@Expose
 	private int dimOneId;
+	@Expose
 	private String dimOneName;
+	@Expose
 	private String localImagePath;
+	@Expose
 	private String serviceImageSavePath;
+	@Expose
 	private String fileName;
+	@Expose
 	private long transferedBytes;
+	@Expose
 	private long totalBytes;
+	@Expose
 	private int imageState;
+	@Expose
 	private int isWidth;
+	@Expose
 	private int type;
 	
 	

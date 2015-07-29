@@ -255,7 +255,7 @@ public class HotelInfoDetailActivity extends BaseActivity{
 			return;
 		}
 		 mLoadingGroup.setVisibility(View.VISIBLE);
-			HttpRequest.getInstance().updateHotelData(this, mHotel, NetConstance.DEFAULT_SESSION, new HttpCallback() {
+			HttpRequest.getInstance().uploadHotelData(this, mHotel, NetConstance.DEFAULT_SESSION, new HttpCallback() {
 				
 				@Override
 				public void onSuccess(JSONObject response) {

@@ -46,23 +46,21 @@ import com.lk.hotelcheck.util.ImageUtil;
 import com.lk.hotelcheck.util.PictureUtil;
 
 import common.Constance;
+import common.Constance.DefQueType;
 import common.Constance.IntentKey;
+import common.Constance.PreQueType;
 
 public class CheckHotelIssueActivity extends BaseActivity implements CallBackListener{
 	
 	private static final String BUNDLE_POSITION_ID = "position";
 	private static final String BUNDLE_CHECK_DATA_POSITION = "dataPosition";
 	private static final String BUNDLE_TYPE = "type";
-//	private static final String BUNDLE_CHECK_DATA_SUB_POSITION = "subDataPosition";
-//	private static final String BUNDLE_IS_SUB_CHECKED_DATA = "isSubCheckData";
 	private int mHotelPosition;
 	private int mCheckDataPosition;
-//	private int mSubCheckDataPosition;
 	private Hotel mHotel;
 	private CheckData mCheckData;
 	public static final int CAMMER_REQUEST_CODE = 1000;
 	private int mCurrentIssuePosition;
-//	private boolean mIsSubCheckedData;
 	private HotelIssueAdapter mAdapter;
 	private AlertDialog mAlertDialog;
 	private EditText mEditText;
@@ -226,6 +224,7 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 //			mCheckData.updateIssueCheck(issueItem);
 //			mCheckData.setIssueItem(mCurrentIssuePosition, issueItem);
 			mAdapter.notifyItem(mCurrentIssuePosition, mCheckData.getIssue(mCurrentIssuePosition));
+			mCheckData.updateIssueCheck(issueItem);
 		}
 		
 	}
@@ -264,12 +263,8 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 		if (issueItem.getId() == Constance.ISSUE_ITEM_WIFI) {
 			issueItem.setContent(((HotelCheckApplication)getApplication()).getWifiSpeed());
 		}
-//		mCheckData.setIssueItem(mCurrentIssuePosition, issueItem);
 		mCheckData.updateIssueCheck(issueItem);
 		DataManager.getInstance().saveIssueCheck(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), isChecked);
-//		saveData();
-//		mHotel.setCheckDatas(mCheckData, mCheckDataPosition);
-//		DataManager.getInstance().setHotel(mHotelPosition, mHotel);
 	}
 
 	@Override
@@ -283,13 +278,9 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 		} else {
 			issueItem.setCheck(true);
 		} 
+		mCheckData.updateIssueCheck(issueItem);
 		DataManager.getInstance().saveIssueContent(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), content);
-//		mCheckData.setIssueItem(mCurrentIssuePosition, issueItem);
-//		mCheckData.updateIssueCheck(issueItem);
 		mAdapter.notifyItem(position, issueItem);
-		
-//		saveData();
-		
 	}
 	
 	@Override
@@ -346,8 +337,14 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 										Toast.makeText(CheckHotelIssueActivity.this, "请输入问题名称", Toast.LENGTH_SHORT).show();
 										return;
 									}
-									addIssue(content);
-									mEditText.setText("");
+									if (hasIssue(content)) {
+										Toast.makeText(CheckHotelIssueActivity.this, "问题已存在，请修改", Toast.LENGTH_SHORT).show();
+										return;
+									} else {
+										addIssue(content);
+										mEditText.setText("");
+									}
+									
 								}
 							})
 					.setNegativeButton(
@@ -371,10 +368,21 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 		IssueItem issueItem = new IssueItem();
 		issueItem.setName(name);
 		issueItem.setContent("");
-		int id = (int) System.currentTimeMillis();
+		issueItem.setIsDefQue(DefQueType.TYPE_DYMIC);
+		issueItem.setIsPreQue(PreQueType.TYPE_NEW);
+		int id = Math.abs(name.hashCode());
 		issueItem.setId(id);
 //		mCheckData.addIssue(issueItem);
 		mAdapter.addIssue(issueItem);
+	}
+	
+	private boolean hasIssue(String name) {
+		for (IssueItem issueItem : mCheckData.getIssuelist()) {
+			if (issueItem.getName().equals(name)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	

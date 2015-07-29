@@ -10,6 +10,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.LayoutManager;
 import android.support.v7.widget.RecyclerView.ViewHolder;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -324,6 +325,10 @@ public class HotelIssueFragment extends Fragment {
 										int areaId = 0;
 											switch (type) {
 											case Constance.CheckDataType.TYPE_ROOM:
+												if (TextUtils.isEmpty(number)) {
+													Toast.makeText(mContext, "请输入房间名", Toast.LENGTH_SHORT).show();
+													return;
+												}
 												name = "客房"+number;
 												areaId = Math.abs(name.hashCode()+mHotel.getName().hashCode());
 												if (mHotel.hasRoom(areaId)) {
@@ -336,6 +341,10 @@ public class HotelIssueFragment extends Fragment {
 												}
 												break;
 											case Constance.CheckDataType.TYPE_PASSWAY:
+												if (TextUtils.isEmpty(number)) {
+													Toast.makeText(mContext, "请输入走廊名", Toast.LENGTH_SHORT).show();
+													return;
+												}
 												name = number+"楼走廊";
 												areaId = Math.abs(name.hashCode()+mHotel.getName().hashCode());
 												if (mHotel.hasPassway(areaId)) {

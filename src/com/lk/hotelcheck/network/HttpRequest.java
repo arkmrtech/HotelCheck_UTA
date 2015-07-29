@@ -1,15 +1,9 @@
 package com.lk.hotelcheck.network;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URL;
 import java.util.List;
 
 import org.apache.http.Header;
-import org.apache.http.HttpResponse;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
@@ -18,21 +12,18 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import com.google.gson.GsonBuilder;
 import com.lk.hotelcheck.bean.Hotel;
 import com.lk.hotelcheck.bean.UploadBean;
+import com.lk.hotelcheck.manager.DataManager;
+import com.lk.hotelcheck.util.FileUtil;
 import com.lk.hotelcheck.util.JsonParseHandler;
 import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.FileAsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
-import com.loopj.android.http.ResponseHandlerInterface;
-import com.upyun.block.api.main.UploaderManager;
 
 import common.NetConstance;
 
@@ -65,7 +56,6 @@ public class HttpRequest {
 	 */
 	public void login(Context context, String userId, String password, HttpCallback callback) {
 		String url = getRequestURL(NetConstance.METHOD_LOGIN);
-//		String url = "http://182.254.157.92:8080//app/service/login.html";
 		Log.d("lxk", "url = "+url);
 		JSONObject jsonObject = new JSONObject();
 		try {
@@ -106,23 +96,25 @@ public class HttpRequest {
 	public void updateHotelCheckStatus(Context context, int checkId, boolean status, String session, final HttpCallback callback) {
 		String url = getRequestURL(NetConstance.METHOD_UPDATE_HOTEL_STATUS);
 		JSONObject jsonObject = new JSONObject();
+		int state = 0;
+		if (status) {
+			state = 1;
+		}
 		try {
-			jsonObject.put(NetConstance.PARAM_BRANCH_CHECK_ID, checkId);
-			jsonObject.put(NetConstance.PARAM_STATUS, status);
+			jsonObject.put(NetConstance.PARAM_CHECK_ID, checkId);
+			jsonObject.put(NetConstance.PARAM_STATE, state);
 			jsonObject.put(NetConstance.REQUEST_PARAM_KEY, session);
 		} catch (JSONException e1) {
 			e1.printStackTrace();
 		}
 		
-		
 		postRequest(context, url, jsonObject, callback);
-		
 	}
 	
 	
 	
 	
-	public void updateHotelData(Context context, Hotel hotel, String session, final HttpCallback callback) {
+	public void uploadHotelData(Context context, Hotel hotel, String session, final HttpCallback callback) {
 		if (hotel == null) {
 			Log.d("lxk", "updateHotelData hotel is null");
 			return;
@@ -130,13 +122,14 @@ public class HttpRequest {
 		String url = getRequestURL(NetConstance.METHOD_GET_CHECK_DATA);
 		JSONObject jsonObject = new JSONObject();
 		try {
-			JSONObject json = new JSONObject(new Gson().toJson(hotel));
+			JSONObject json = JsonParseHandler.parseHotelToJson(hotel);
 			jsonObject.put(NetConstance.PARAM_HOTEL, json);
 			jsonObject.put(NetConstance.REQUEST_PARAM_KEY, session);
+			jsonObject.put(NetConstance.REQUEST_PARAM_USER_NAME, DataManager.getInstance().getUser().getUserName());
 		} catch (JSONException e1) {
 			e1.printStackTrace();
 		}
-		
+		FileUtil.writeStringToSdCard(common.Constance.Path.DATA_PATH, jsonObject.toString());
 		postRequest(context, url, jsonObject, callback);
 		
 	}
@@ -150,8 +143,11 @@ public class HttpRequest {
 		JSONObject jsonObject = new JSONObject();
 		try {
 			JSONArray json = new JSONArray();
+			 Gson gson = new GsonBuilder()
+			    .excludeFieldsWithoutExposeAnnotation() // <---
+			    .create();
 			for (UploadBean uploadBean : uploadBeans) {
-				JSONObject temp = new JSONObject(new Gson().toJson(uploadBean));
+				JSONObject temp = new JSONObject(gson.toJson(uploadBean));
 				json.put(temp);
 			}
 			jsonObject.put(NetConstance.PARAM_IMAGE_LIST, json);
@@ -170,6 +166,8 @@ public class HttpRequest {
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
+		Log.d("lxk", "url = "+url);
+		Log.d("lxk", "param = "+jsonObject.toString());
 		entity.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
 		mHttpClient.post(context, url, entity, "application/json", new JsonHttpResponseHandler() {
 
@@ -203,7 +201,13 @@ public class HttpRequest {
 			public void onSuccess(int statusCode, Header[] headers,
 					JSONObject response) {
 				super.onSuccess(statusCode, headers, response);
-				callback.onSuccess(response);
+				int state = response.optInt(NetConstance.PARAM_STATE);
+//				if (state == NetConstance.ERROR_CODE_SUCCESS) {
+					callback.onSuccess(response);
+//				} else {
+//					callback.onError();
+//				}
+				
 			}
 			
 		});

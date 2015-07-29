@@ -2,8 +2,6 @@ package com.lk.hotelcheck;
 
 import java.io.File;
 
-import android.app.Application;
-
 import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiskCache;
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -11,7 +9,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.orm.SugarApp;
-
+import com.tencent.bugly.crashreport.CrashReport;
 import common.Constance;
 
 public class HotelCheckApplication extends SugarApp{
@@ -25,6 +23,10 @@ public class HotelCheckApplication extends SugarApp{
 //		CrashHandler crashHandler = CrashHandler.getInstance();  
 //        crashHandler.init(this);  
         initDataFile();
+        //bugly
+        String appId = "XXXXXMYAPPIDXXXX";   //上Bugly(bugly.qq.com)注册产品获取的AppId
+        boolean isDebug = true ;  //true代表App处于调试阶段，false代表App发布阶段
+        CrashReport.initCrashReport(this, appId ,isDebug);  //初始化SDK     
 	}
 	
 	

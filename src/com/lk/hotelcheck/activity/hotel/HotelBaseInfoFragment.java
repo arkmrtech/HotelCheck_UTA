@@ -188,21 +188,38 @@ public class HotelBaseInfoFragment extends Fragment {
 
 				@Override
 				public void onClick(View v) {
-					Calendar cal = Calendar.getInstance();
-					cal.setTimeInMillis(System.currentTimeMillis());
-					mDatePickerDialog = new DatePickerDialog(mContext,
-							new OnDateSetListener() {
-
-								@Override
-								public void onDateSet(DatePicker view, int year,
-										int monthOfYear, int dayOfMonth) {
-									String date = year + "-" + (monthOfYear + 1)
-											+ "-" + dayOfMonth;
-									mCheckedDateTextView.setText(date);
-									mHotel.setCheckDate(date);
-								}
-							}, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal
-									.get(Calendar.DAY_OF_MONTH));
+					if (mDatePickerDialog == null) {
+						Calendar cal = Calendar.getInstance();
+						cal.setTimeInMillis(System.currentTimeMillis());
+						mDatePickerDialog = new DatePickerDialog(mContext,
+								null, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal
+										.get(Calendar.DAY_OF_MONTH));
+					}
+					//手动设置按钮  
+					mDatePickerDialog.setButton(DialogInterface.BUTTON_POSITIVE, "完成", new DialogInterface.OnClickListener() {  
+			            @Override  
+			            public void onClick(DialogInterface dialog, int which) {  
+			                //通过mDialog.getDatePicker()获得dialog上的DatePicker组件，然后可以获取日期信息  
+			                DatePicker datePicker = mDatePickerDialog.getDatePicker();  
+			                int year = datePicker.getYear();  
+			                int month = datePicker.getMonth();  
+			                int day = datePicker.getDayOfMonth();  
+			                String date = year + "-" + (month + 1)
+									+ "-" + day;
+							mCheckedDateTextView.setText(date);
+							mHotel.setCheckDate(date);
+			            }  
+			        });  
+			        //取消按钮，如果不需要直接不设置即可  
+					mDatePickerDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "取消", new DialogInterface.OnClickListener() {  
+			            @Override  
+			            public void onClick(DialogInterface dialog, int which) {  
+			                System.out.println("BUTTON_NEGATIVE~~");  
+			            }  
+			        }); 
+					
+					
+					
 					mDatePickerDialog.show();
 				}
 			});

@@ -15,6 +15,7 @@ import common.Constance;
 public class Hotel extends SugarRecord<Hotel>{
 
 //	private int id;/
+	private int branchNumber;
 	private String name;
 	private String address;
 	private String phone;
@@ -32,11 +33,7 @@ public class Hotel extends SugarRecord<Hotel>{
 	private String guardianNumber;
 	private int checkType;
 	@Ignore
-	private List<CheckData> checkDatas;
-//	@Ignore
-//	private transient SparseArray<CheckData> roomArray;
-//	@Ignore
-//	private transient SparseArray<CheckData> passwayArray;
+	private transient List<CheckData> checkDatas;
 	@Ignore
 	private transient List<CheckData> roomArray;
 	@Ignore
@@ -100,18 +97,6 @@ public class Hotel extends SugarRecord<Hotel>{
 	public void setRoomCheckedCount(int roomCheckedCount) {
 		this.roomCheckedCount = roomCheckedCount;
 	}
-//	public int getFloorStart() {
-//		return floorStart;
-//	}
-//	public void setFloorStart(int floorStart) {
-//		this.floorStart = floorStart;
-//	}
-//	public int getFloorEnd() {
-//		return floorEnd;
-//	}
-//	public void setFloorEnd(int floorEnd) {
-//		this.floorEnd = floorEnd;
-//	}
 	public boolean isImageStatus() {
 		return imageStatus;
 	}
@@ -165,58 +150,6 @@ public class Hotel extends SugarRecord<Hotel>{
 	public int getRoomHadCheckedCount() {
 		return roomArray == null ? 0 : roomArray.size();
 	}
-	
-//	public int getIssueCount() {
-//		int count = 0;
-//		for (CheckData checkData : checkDatas) {
-//				count += checkData.getCheckedIssueCount();
-//		}
-//		if (roomArray != null) {
-//			for (int i = 0; i < roomArray.size() ; i++) {
-//				CheckData checkData = roomArray.valueAt(i);
-//				count += checkData.getCheckedIssueCount();
-//			}
-//		}
-//		if (passwayArray != null) {
-//			for (int i = 0; i < passwayArray.size() ; i++) {
-//				CheckData checkData = passwayArray.valueAt(i);
-//				count += checkData.getCheckedIssueCount();
-//			}
-//		}
-//		return count;
-//	}
-//	
-//	public int getImageCount() {
-//		int count = 0;
-//		for (CheckData checkData : checkDatas) {
-//				for (IssueItem issueItem : checkData.getIssuelist()) {
-//					if (issueItem.isCheck()) {
-//						count += issueItem.getImageCount();
-//					}
-//				}
-//		}
-//		if (roomArray != null) {
-//			for (int i = 0; i < roomArray.size() ; i++) {
-//				CheckData checkData = roomArray.valueAt(i);
-//				for (IssueItem issueItem : checkData.getIssuelist()) {
-//					if (issueItem.isCheck()) {
-//						count += issueItem.getImageCount();
-//					}
-//				}
-//			}
-//		}
-//		if (passwayArray != null) {
-//			for (int i = 0; i < passwayArray.size() ; i++) {
-//				CheckData checkData = passwayArray.valueAt(i);
-//				for (IssueItem issueItem : checkData.getIssuelist()) {
-//					if (issueItem.isCheck()) {
-//						count += issueItem.getImageCount();
-//					}
-//				}
-//			}
-//		}
-//		return count;
-//	}
 	
 	public int getIssueCount() {
 		int count = 0;
@@ -309,56 +242,6 @@ public class Hotel extends SugarRecord<Hotel>{
 		checkDatas.add(checkData);
 	}
 	
-	
-//	public void addRoom(CheckData checkData) {
-//		if (checkData == null) {
-//			return;
-//		}
-//		if (roomArray == null) {
-//			roomArray = new SparseArray<CheckData>();
-//		}
-//		roomArray.
-//		roomArray.put(checkData.getId().intValue(), checkData);
-//	}
-//	
-//	public CheckData getRoom(String areaName) {
-//		if (roomArray != null && roomArray.indexOfKey(areaName.hashCode()) > -1) {
-//			return roomArray.get(areaName.hashCode());
-//		}
-//		return null;
-//	}
-//	
-//	public boolean hasRoom(int areaId) {
-//		if (roomArray != null && roomArray.indexOfKey(areaId) > -1) {
-//			return true;
-//		}
-//		return false;
-//	}
-//	
-//	public void addPassway(CheckData checkData) {
-//		if (checkData == null) {
-//			return;
-//		}
-//		if (passwayArray == null) {
-//			passwayArray = new SparseArray<CheckData>();
-//		}
-//		passwayArray.put(checkData.getId().intValue(), checkData);
-//	}
-//	
-//	public boolean hasPassway(int areaId) {
-//		if (passwayArray != null && passwayArray.indexOfKey(areaId) > -1) {
-//			return true;
-//		}
-//		return false;
-//	}
-//	
-//	public CheckData getPassway(String areaName) {
-//		if (passwayArray != null && passwayArray.indexOfKey(areaName.hashCode()) > -1) {
-//			return passwayArray.get(areaName.hashCode());
-//		}
-//		return null;
-//	}
-	
 	public void addRoom(CheckData checkData) {
 		if (checkData == null) {
 			return;
@@ -408,12 +291,6 @@ public class Hotel extends SugarRecord<Hotel>{
 		return false;
 	}
 	
-//	public CheckData getPassway(String areaName) {
-//		if (passwayArray != null && passwayArray.indexOfKey(areaName.hashCode()) > -1) {
-//			return passwayArray.get(areaName.hashCode());
-//		}
-//		return null;
-//	}
 	
 	public int getDymicRoomCount() {
 		return roomArray == null ? 0 : roomArray.size();
@@ -632,6 +509,12 @@ public class Hotel extends SugarRecord<Hotel>{
 			percent = String.format(Locale.CHINA, "%.2f%s", (count*1.00) /total * 100, "%");
 		}
 		return percent ;
+	}
+	public int getBranchNumber() {
+		return branchNumber;
+	}
+	public void setBranchNumber(int branchNumber) {
+		this.branchNumber = branchNumber;
 	}
 	
 	
