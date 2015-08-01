@@ -6,8 +6,9 @@ import java.util.List;
 
 import com.lk.hotelcheck.bean.dao.DymicIssue;
 import com.orm.SugarRecord;
-import common.Constance.DefQueType;
 
+import common.Constance.DefQueType;
+import common.Constance.PreQueType;
 import android.provider.MediaStore.Images;
 
 public class IssueItem{
@@ -22,8 +23,8 @@ public class IssueItem{
 	private int dimOneId;
 	private String dimOneName;
 	private int reformState;//整改状态：0.未整改，1整改中，2完成整改
-	
-	
+	private final int REFORM_STATE_FINISH = 2;
+	private final int REFORM_STATE_UN_FINISH = 0;
 	
 	public IssueItem() {
 		super();
@@ -75,6 +76,13 @@ public class IssueItem{
 	}
 	public void setCheck(boolean isCheck) {
 		this.isCheck = isCheck;
+		if (isPreQue == PreQueType.TYPE_REVIEW) {
+			if (isCheck) {
+				this.reformState = REFORM_STATE_UN_FINISH;
+			} else {
+				this.reformState = REFORM_STATE_FINISH;
+			}
+		}
 	}
 	public ImageItem getImageItem(int i) {
 		if (imagelist == null) {
