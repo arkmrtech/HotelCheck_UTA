@@ -26,6 +26,8 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -38,6 +40,7 @@ import com.lk.hotelcheck.bean.CheckData;
 import com.lk.hotelcheck.bean.Hotel;
 import com.lk.hotelcheck.bean.ImageItem;
 import com.lk.hotelcheck.bean.IssueItem;
+import com.lk.hotelcheck.bean.dao.DymicIssue;
 import com.lk.hotelcheck.bean.dao.HotelCheck;
 import com.lk.hotelcheck.manager.DataManager;
 import com.lk.hotelcheck.util.BitmapUtil;
@@ -209,8 +212,6 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 			}
 			HotelCheck hotelCheck = new HotelCheck(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), imageItem);
 			hotelCheck.save();
-//			mCheckData.updateIssueCheck(issueItem);
-//			mCheckData.setIssueItem(mCurrentIssuePosition, issueItem);
 			mAdapter.notifyItem(mCurrentIssuePosition, mCheckData.getIssue(mCurrentIssuePosition));
 			mCheckData.updateIssueCheck(issueItem);
 		}
@@ -290,19 +291,6 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 		startActivityForResult(intent, Constance.REQUEST_CODE_WIFI);
 	}
 	
-//	private void saveData() {
-////		if (mIsSubCheckedData) {
-////			CheckData checkData = mHotel.getCheckData(mCheckDataPosition);
-////			checkData.setSubCheckData(mSubCheckDataPosition, mCheckData);
-////			mHotel.setCheckDatas(checkData, mCheckDataPosition);
-////			DataManager.getInstance().setHotel(mHotelPosition, mHotel);
-////		} else {
-//			mHotel.setCheckDatas(mCheckData, mCheckDataPosition);
-////			DataManager.getInstance().setHotel(mHotelPosition, mHotel);
-////		}
-//		
-//	}
-	
 	private void showAddIssue() {
 		if (mAlertDialog == null) {
 			LayoutInflater factory = LayoutInflater.from(this);// 提示框
@@ -349,14 +337,19 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 		}
 	}
 	
+	
 	private void addIssue(String name) {
 		IssueItem issueItem = new IssueItem();
 		issueItem.setName(name);
 		issueItem.setContent("");
 		issueItem.setIsDefQue(DefQueType.TYPE_DYMIC);
 		issueItem.setIsPreQue(PreQueType.TYPE_NEW);
+		issueItem.setDimOneId(mCheckData.getId().intValue());
+		issueItem.setDimOneName(mCheckData.getName());
 		int id = Math.abs(name.hashCode());
 		issueItem.setId(id);
+		DymicIssue dymicIssue = new DymicIssue(mHotel.getId(), mCheckData.getId(), issueItem);
+		dymicIssue.save();
 //		mCheckData.addIssue(issueItem);
 		mAdapter.addIssue(issueItem);
 	}

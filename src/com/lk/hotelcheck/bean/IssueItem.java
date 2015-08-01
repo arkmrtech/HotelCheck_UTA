@@ -4,9 +4,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.lk.hotelcheck.bean.dao.DymicIssue;
+import com.orm.SugarRecord;
+import common.Constance.DefQueType;
+
 import android.provider.MediaStore.Images;
 
-public class IssueItem {
+public class IssueItem{
+	
 	private int id;
 	private String name;
 	private String content;
@@ -18,6 +23,19 @@ public class IssueItem {
 	private String dimOneName;
 	private int reformState;//整改状态：0.未整改，1整改中，2完成整改
 	
+	
+	
+	public IssueItem() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	public IssueItem(DymicIssue dymicIssue) {
+		this.id = dymicIssue.getId().intValue();
+		this.name = dymicIssue.getName();
+		this.dimOneId = dymicIssue.getDimOneId();
+		this.dimOneName = dymicIssue.getDimOneName();
+		this.isDefQue = DefQueType.TYPE_DYMIC;
+	}
 	public int getId() {
 		return id;
 	}

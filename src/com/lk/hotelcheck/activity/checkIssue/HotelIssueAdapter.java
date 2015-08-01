@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -32,41 +33,45 @@ import com.lk.hotelcheck.HotelCheckApplication;
 import com.lk.hotelcheck.R;
 import com.lk.hotelcheck.activity.photochosen.PhotoPickerActivity;
 import com.lk.hotelcheck.bean.IssueItem;
+import com.lk.hotelcheck.bean.dao.DymicIssue;
 import com.lk.hotelcheck.util.NetWorkSpeedInfo;
 import com.lk.hotelcheck.util.ReadFile;
+import com.tencent.bugly.proguard.al;
+import com.tencent.bugly.proguard.m;
 
 import common.Constance;
+import common.Constance.DefQueType;
 import common.Constance.IntentKey;
 import common.Constance.PreQueType;
 
 public class HotelIssueAdapter extends RecyclerView.Adapter<ViewHolder>{
 	
-	private List<IssueItem> dataList;
-	private CallBackListener listener;
+	private List<IssueItem> mDataList;
+	private CallBackListener mListener;
 	private AlertDialog mAlertDialog;
 	private boolean mIsChecked;
 	private static final int WIFI_VIEW_TYPE = 0X10086;
 	private static final int NORMAL_VIEW_TYPE = 0X10087;
-	
+	private  EditText mAlertEditText;
 	
 	public HotelIssueAdapter(List<IssueItem> dataList, CallBackListener listener, boolean isChecked) {
 		super();
-		this.dataList = dataList;
-		this.listener = listener;
+		this.mDataList = dataList;
+		this.mListener = listener;
 		this.mIsChecked = isChecked;
 	}
 
 	@Override
 	public int getItemCount() {
-		return dataList == null ? 0 : dataList.size();
+		return mDataList == null ? 0 : mDataList.size();
 	}
 	
 	public void setDataList(List<IssueItem> dataList) {
-		this.dataList = dataList;
+		this.mDataList = dataList;
 	}
 	
 	public void notifyItem(int position, IssueItem issueItem) {
-		this.dataList.set(position, issueItem);
+		this.mDataList.set(position, issueItem);
 		notifyItemChanged(position);
 	}
 	
@@ -74,7 +79,7 @@ public class HotelIssueAdapter extends RecyclerView.Adapter<ViewHolder>{
 	@Override
 	public int getItemViewType(int position) {
 		int viewType = 0;
-		IssueItem issueItem = dataList.get(position);
+		IssueItem issueItem = mDataList.get(position);
 		if (issueItem.getId() == Constance.ISSUE_ITEM_WIFI) {
 			viewType = WIFI_VIEW_TYPE;
 		} else {
@@ -85,7 +90,7 @@ public class HotelIssueAdapter extends RecyclerView.Adapter<ViewHolder>{
 	
 	@Override
 	public void onBindViewHolder(ViewHolder arg0, int arg1) {
-		IssueItem item = dataList.get(arg1);
+		IssueItem item = mDataList.get(arg1);
 		((ItemViewHolder)arg0).setData(item, arg1);
 		
 	}
@@ -106,11 +111,11 @@ public class HotelIssueAdapter extends RecyclerView.Adapter<ViewHolder>{
 		@Override
 		public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 			int position = (Integer) buttonView.getTag();
-			listener.onCheckedChangeListener(position, isChecked);
+			mListener.onCheckedChangeListener(position, isChecked);
 		}
 	};
 
-	private OnClickListener photoOnClickListener = new OnClickListener() {
+	private OnClickListener mPhotoOnClickListener = new OnClickListener() {
 		
 		@Override
 		public void onClick(View v) {
@@ -118,9 +123,9 @@ public class HotelIssueAdapter extends RecyclerView.Adapter<ViewHolder>{
 				Toast.makeText(v.getContext(), "酒店已检查完成不能再修改", Toast.LENGTH_SHORT).show();
 				return;
 			} 
-			if (listener != null) {
+			if (mListener != null) {
 				int position = (Integer) v.getTag();
-				listener.onPhotoClick(position);
+				mListener.onPhotoClick(position);
 			}
 		}
 	};
@@ -139,7 +144,7 @@ public class HotelIssueAdapter extends RecyclerView.Adapter<ViewHolder>{
 		}
 	};
 	
-	private OnClickListener wifiOnClickListener = new OnClickListener() {
+	private OnClickListener mWifiOnClickListener = new OnClickListener() {
 		
 		@Override
 		public void onClick(View v) {
@@ -148,32 +153,31 @@ public class HotelIssueAdapter extends RecyclerView.Adapter<ViewHolder>{
 				return;
 			} 
 			int position = (Integer) v.getTag();
-			listener.onWifiClick(position);
+			mListener.onWifiClick(position);
 		}
 	};
 	
-	private  EditText alertEditText;
+	private OnLongClickListener mLongClickListener = new OnLongClickListener() {
+		
+		@Override
+		public boolean onLongClick(View v) {
+			int position = (Integer) v.getTag();
+			IssueItem issueItem = mDataList.get(position);
+			showDeleteDialog(v.getContext(), position, issueItem.getName());
+			return true;
+		}
+	};
+
 	
-	private void showDialog( int issuePositon, Context context){
-		final IssueItem issueItem = dataList.get(issuePositon);
-		if (mAlertDialog == null) {
-			LayoutInflater factory = LayoutInflater.from(context);// 提示框
-			View view = factory.inflate(R.layout.alert_dialog_edit, null);// 这里必须是final的
-			alertEditText = (EditText) view.findViewById(R.id.et_content);// 获得输入框对象
-			alertEditText.setInputType(InputType.TYPE_CLASS_TEXT);
-			mAlertDialog = new AlertDialog.Builder(context)
-					 .setTitle("问题描述")//提示框标题
-					.setView(view)
-					.setPositiveButton("确定",// 提示框的两个按钮
+	private void showDeleteDialog(Context context, final int position, String name) {
+		AlertDialog alertDialog = new AlertDialog.Builder(context).setTitle("删除自定义问题")
+									.setMessage("确定要删除问题"+name+"?")
+									.setPositiveButton("确定",// 提示框的两个按钮
 							new android.content.DialogInterface.OnClickListener() {
 								@Override
 								public void onClick(DialogInterface dialog,
 										int which) {
-									String content = alertEditText.getText().toString();
-									issueItem.setContent(content);
-									int position = (Integer) alertEditText.getTag();
-									listener.setContent(position, content);
-									alertEditText.setText("");
+									deleteIssue(position);
 								}
 							})
 					.setNegativeButton("取消",
@@ -182,18 +186,51 @@ public class HotelIssueAdapter extends RecyclerView.Adapter<ViewHolder>{
 								@Override
 								public void onClick(DialogInterface dialog,
 										int which) {
-									alertEditText.setText("");
+								}
+							}).create();
+		alertDialog.show();
+	}
+	
+	
+	
+	private void showDialog( int issuePositon, Context context){
+		final IssueItem issueItem = mDataList.get(issuePositon);
+		if (mAlertDialog == null) {
+			LayoutInflater factory = LayoutInflater.from(context);// 提示框
+			View view = factory.inflate(R.layout.alert_dialog_edit, null);// 这里必须是final的
+			mAlertEditText = (EditText) view.findViewById(R.id.et_content);// 获得输入框对象
+			mAlertEditText.setInputType(InputType.TYPE_CLASS_TEXT);
+			mAlertDialog = new AlertDialog.Builder(context)
+					 .setTitle("问题描述")//提示框标题
+					.setView(view)
+					.setPositiveButton("确定",// 提示框的两个按钮
+							new android.content.DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									String content = mAlertEditText.getText().toString();
+									issueItem.setContent(content);
+									int position = (Integer) mAlertEditText.getTag();
+									mListener.setContent(position, content);
+									mAlertEditText.setText("");
+								}
+							})
+					.setNegativeButton("取消",
+							new android.content.DialogInterface.OnClickListener() {
+
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									mAlertEditText.setText("");
 
 								}
 							}).create();
 		} 
-//		if (!TextUtils.isEmpty(issueItem.getContent())) {
-		alertEditText.setTag(issuePositon);
-		int index = alertEditText.getSelectionStart();
+		mAlertEditText.setTag(issuePositon);
+		int index = mAlertEditText.getSelectionStart();
 		if (issueItem.getContent() != null) {
-			alertEditText.getText().insert(index, issueItem.getContent());
+			mAlertEditText.getText().insert(index, issueItem.getContent());
 		}
-//		}
 		mAlertDialog.show();
 	}
 	
@@ -206,6 +243,7 @@ public class HotelIssueAdapter extends RecyclerView.Adapter<ViewHolder>{
 		private View mContentRedDot;
 		private View mContentView;
 		private CheckBox mCheckBox;
+		private View mView;
 		
 		public ItemViewHolder(View view) {
 			super(view);
@@ -217,6 +255,7 @@ public class HotelIssueAdapter extends RecyclerView.Adapter<ViewHolder>{
 				mNumberTextView = (TextView) view.findViewById(R.id.tv_number);
 				mReviewTextView = (TextView) view.findViewById(R.id.tv_review);
 				mContentRedDot = view.findViewById(R.id.iv_content_red_dot);
+				mView = view;
 			}
 		}
 		
@@ -231,16 +270,17 @@ public class HotelIssueAdapter extends RecyclerView.Adapter<ViewHolder>{
 			mContentView.setTag(position);
 			mContentView.setOnClickListener(mContentClickListener);
 			if (item.getId() == Constance.ISSUE_ITEM_WIFI) {
-				canmerImageView.setOnClickListener(wifiOnClickListener);
+				canmerImageView.setOnClickListener(mWifiOnClickListener);
 			} else {
-				canmerImageView.setOnClickListener(photoOnClickListener);
+				canmerImageView.setOnClickListener(mPhotoOnClickListener);
+			}
+			mView.setTag(position);
+			if (item.getIsDefQue() == DefQueType.TYPE_DYMIC && !item.isCheck()) {
+				mView.setOnLongClickListener(mLongClickListener);
+			} else {
+				mView.setOnLongClickListener(null);
 			}
 			mCheckBox.setOnCheckedChangeListener(mOnCheckedChangeListener);
-//			if (mIsChecked || item.getImageCount() > 0 || !TextUtils.isEmpty(item.getContent())) {
-//				mCheckBox.setEnabled(false);
-//			} else {
-//				mCheckBox.setEnabled(true);
-//			}
 			if (item.getIsPreQue() == PreQueType.TYPE_REVIEW) {
 				mReviewTextView.setVisibility(View.VISIBLE);
 				nameTextView.setTextColor(nameTextView.getContext().getResources().getColor(R.color.content_orange));
@@ -271,74 +311,7 @@ public class HotelIssueAdapter extends RecyclerView.Adapter<ViewHolder>{
 		
 	}
 	
-//	class WIFIViewHolder extends ViewHolder {
-//
-//		private View mView;
-//		private ImageView canmerImageView;
-//		private TextView mNumberTextView;
-//		private View mContentView;
-//		private CheckBox mCheckBox;
-//		private TextView nameTextView;
-//		private TextView mReviewTextView;
-//		
-//		public WIFIViewHolder(View view) {
-//			super(view);
-//			if (view != null) {
-//				mView = view;
-//				nameTextView = (TextView) view.findViewById(R.id.tv_name);
-//				mCheckBox = (CheckBox) view.findViewById(R.id.cb);
-//				mContentView = view.findViewById(R.id.iv_edit);
-//				canmerImageView = (ImageView) view.findViewById(R.id.iv_photo);
-//				mNumberTextView = (TextView) view.findViewById(R.id.tv_number);
-//				mReviewTextView = (TextView) view.findViewById(R.id.tv_review);
-//			}
-//		}
-//		
-//		public void setData(IssueItem item, final int position) {
-//			if (item == null) {
-//				return;
-//			}
-//			String name = item.getName();
-//			nameTextView.setText(name);
-//			mCheckBox.setTag(position);
-//			mContentView.setTag(position);
-//			mCheckBox.setOnCheckedChangeListener(mOnCheckedChangeListener);
-//			if (item.getImageCount() > 0 || !TextUtils.isEmpty(item.getContent())) {
-//				mCheckBox.setEnabled(false);
-//			} else {
-//				mCheckBox.setEnabled(true);
-//			}
-//			mCheckBox.setChecked(item.isCheck());
-//			if (item.getImageCount() <= 0) {
-//				mNumberTextView.setVisibility(View.GONE);
-//			} else {
-//				mNumberTextView.setVisibility(View.VISIBLE);
-//				mNumberTextView.setText(""+item.getImageCount());
-//			}
-//			if (item.getIsPreQue() == PreQueType.TYPE_REVIEW) {
-//				mReviewTextView.setVisibility(View.VISIBLE);
-//				nameTextView.setTextColor(nameTextView.getContext().getResources().getColor(R.color.content_orange));
-//			} else {
-//				mReviewTextView.setVisibility(View.GONE);
-//				nameTextView.setTextColor(Color.BLACK);
-//			}
-////			mView.setOnClickListener(new OnClickListener() {
-////				
-////				@Override
-////				public void onClick(View v) {
-////					listener.onWifiClick(position);
-////				}
-////			});
-//			canmerImageView.setTag(position);
-//			canmerImageView.setOnClickListener(wifiOnClickListener);
-//			mContentView.setOnClickListener(mContentClickListener);
-//		}
-//		
-//		
-//		
-//	
-//		
-//	}
+
 	
 	public interface CallBackListener {
 		void onPhotoClick(int position);
@@ -351,8 +324,18 @@ public class HotelIssueAdapter extends RecyclerView.Adapter<ViewHolder>{
 		if (issueItem == null) {
 			return;
 		}
-		dataList.add(issueItem);
-		notifyItemInserted(dataList.size()-1);
+		mDataList.add(issueItem);
+		notifyItemInserted(mDataList.size()-1);
+	}
+	
+	public void deleteIssue(int position) {
+		IssueItem issueItem = mDataList.get(position);
+		DymicIssue dymicIssue = DymicIssue.findById(DymicIssue.class, issueItem.getId());
+		if (dymicIssue != null) {
+			dymicIssue.delete();
+		}
+		mDataList.remove(position);
+		notifyItemRemoved(position);
 	}
 
 	

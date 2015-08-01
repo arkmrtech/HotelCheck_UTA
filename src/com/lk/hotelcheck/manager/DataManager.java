@@ -21,6 +21,7 @@ import com.lk.hotelcheck.bean.UploadBean;
 import com.lk.hotelcheck.bean.User;
 import com.lk.hotelcheck.bean.dao.AreaIssue;
 import com.lk.hotelcheck.bean.dao.CheckIssue;
+import com.lk.hotelcheck.bean.dao.DymicIssue;
 import com.lk.hotelcheck.bean.dao.HotelCheck;
 import com.lk.hotelcheck.network.DataCallback;
 import com.lk.hotelcheck.network.HttpCallback;
@@ -209,9 +210,6 @@ public class DataManager {
 	
 	private SparseArray<CheckData> initCheckData() {
 		List<AreaIssue> areaIssueList = AreaIssue.listAll(AreaIssue.class);
-//		if (mCheckModel == null) {
-//			mCheckModel = new SparseArray<CheckData>();
-//		}
 		SparseArray<CheckData> mCheckModel = new SparseArray<CheckData>();
 		for (AreaIssue areaIssue : areaIssueList) {
 			IssueItem issueItem = new IssueItem();
@@ -248,7 +246,7 @@ public class DataManager {
 			//init normal checkData
 			for (int i = 0; i < mCheckModel.size(); i++) {
 				CheckData checkData = mCheckModel.valueAt(i);
-				initCheckData(checkData, hotel.getCheckId());
+				initCheckDataIssue(checkData, hotel.getCheckId());
 				hotel.addCheckData(checkData);
 			}
 			List<CheckData> dymicCheckData = CheckData.find(CheckData.class, "CHECK_ID = ?", String.valueOf(hotel.getCheckId()));
@@ -263,7 +261,7 @@ public class DataManager {
 					if (tempCheckData != null) {
 						checkData.setIssuelist(tempCheckData.getIssuelist());
 						checkData.initCheckedIssue();
-						initCheckData(checkData, hotel.getCheckId());
+						initCheckDataIssue(checkData, hotel.getCheckId());
 						if (checkData.getType() == Constance.CheckDataType.TYPE_ROOM) {
 							if (hotel.hasRoom(checkData.getId())) {
 								hotel.setRoom(checkData.getId(), checkData);
@@ -301,9 +299,16 @@ public class DataManager {
 	}
 	
 	
-	private void initCheckData(CheckData checkData , int checkId) {
+	private void initCheckDataIssue(CheckData checkData , int checkId) {
 		if (checkData == null) {
 			return;
+		}
+		List<DymicIssue> dataList = DymicIssue.find(DymicIssue.class, "CHECK_ID = ? and AREA_ID = ?", String.valueOf(checkId), String.valueOf(checkData.getId()));
+		if (dataList != null) {
+			for (DymicIssue dymicIssue : dataList) {
+				IssueItem issueItem = new IssueItem(dymicIssue);
+				checkData.addIssue(issueItem);
+			}
 		}
 		for (IssueItem issueItem : checkData.getIssuelist()) {
 			List<HotelCheck> hotelCheckList = HotelCheck.find(

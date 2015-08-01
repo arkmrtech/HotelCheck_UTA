@@ -2,6 +2,8 @@ package com.lk.hotelcheck.activity.main;
 
 import java.util.List;
 
+import org.json.JSONObject;
+
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -28,9 +30,13 @@ import com.lk.hotelcheck.bean.Hotel;
 import com.lk.hotelcheck.bean.dao.HotelCheck;
 import com.lk.hotelcheck.manager.DataManager;
 import com.lk.hotelcheck.network.DataCallback;
+import com.lk.hotelcheck.network.HttpCallback;
+import com.lk.hotelcheck.network.HttpRequest;
 import com.lk.hotelcheck.upload.UploadProxy;
 import com.lk.hotelcheck.util.DrawUtil;
 import com.lk.hotelcheck.util.Machine;
+
+import common.NetConstance;
 
 
 
@@ -103,7 +109,7 @@ public class MainActivity extends BaseActivity {
         int id = item.getItemId();
         switch (id) {
 		case R.id.upload_all_data:
-			
+			uploadAllData();
 			break;
 		case R.id.upload_all_image:
 			uploadAllImage();
@@ -188,6 +194,34 @@ public class MainActivity extends BaseActivity {
 					DataManager.getInstance().setHotel(i, hotel);
 				}
 				i++;
+			}
+		}
+	}
+	
+	private void uploadAllData() {
+		if (!Machine.isNetworkOK(this)) {
+			Toast.makeText(this, "网络未链接，请检查网络链接", Toast.LENGTH_SHORT).show();
+			return;
+		}
+		List<Hotel> hotelList = DataManager.getInstance().getCheckedHotelList();
+		if (hotelList != null) {
+			for (final Hotel hotel : hotelList) {
+				if (hotel.isStatus() && !hotel.isDataStatus()) {
+					HttpRequest.getInstance().uploadHotelData(this, hotel, NetConstance.DEFAULT_SESSION, new HttpCallback() {
+						
+						@Override
+						public void onSuccess(JSONObject response) {
+							hotel.setDataStatus(true);
+							hotel.save();
+						}
+						
+						@Override
+						public void onError() {
+							// TODO Auto-generated method stub
+							
+						}
+					});
+				}
 			}
 		}
 	}

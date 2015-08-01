@@ -186,6 +186,10 @@ public class HotelBaseInfoFragment extends Fragment {
 
 				@Override
 				public void onClick(View v) {
+					if (mHotel.getRoomCount() == 0) {
+						Toast.makeText(mContext, "请先输入酒店房间数量", Toast.LENGTH_SHORT).show();
+						return;
+					}
 					showDialog(ALERT_DIALOG_ROOM_CHECKED_NUMBER);
 				}
 			});
@@ -260,6 +264,10 @@ public class HotelBaseInfoFragment extends Fragment {
 									mHotel.setRoomCount(Integer.valueOf(number));
 									break;
 								case ALERT_DIALOG_ROOM_CHECKED_NUMBER:
+									if (Integer.valueOf(number) > mHotel.getRoomCount()) {
+										Toast.makeText(mContext, "在住房数不能大于房间数量", Toast.LENGTH_SHORT).show();
+										return;
+									}
 									mRoomCheckedNumberTextView.setText(number);
 									mHotel.setRoomCheckedCount(Integer
 											.valueOf(number));
