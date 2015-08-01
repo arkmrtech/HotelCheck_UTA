@@ -74,9 +74,9 @@ public class LoginActivity extends Activity{
 				Intent intent = new Intent();
 				intent.setClass(LoginActivity.this, MainActivity.class);
 				startActivity(intent);
-				finish();
 				Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
 				mLoadingGroup.setVisibility(View.GONE);
+				finish();
 			}
 			
 			@Override

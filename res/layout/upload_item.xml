@@ -21,8 +21,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
+        android:paddingRight="10dp"
         android:layout_alignTop="@+id/iv_issue"
-        android:layout_toRightOf="@+id/iv_issue" />
+        android:layout_toRightOf="@+id/iv_issue"
+        android:singleLine="true"
+         />
 
     <TextView
         android:id="@+id/tv_state"

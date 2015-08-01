@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.provider.ContactsContract.Contacts.Data;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -123,7 +124,8 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
     	super.onDestroy();
-//    	DataManager.getInstance().saveDataCache();
+    	Log.d("lxk", "mainActivity onDestroy");
+    	UploadProxy.initInstance(this).doUnbindService();
     	DataManager.getInstance().clear();
     }
     
@@ -164,13 +166,12 @@ public class MainActivity extends BaseActivity {
     }
     
     private void exit() {
+//    	UploadProxy.initInstance(this).doUnbindService();
+//    	DataManager.getInstance().clear();
+    	UploadProxy.initInstance(this).saveData();
     	finish();
-    	System.exit(1);
+    	System.exit(0);
     }
-    
-    private void logout() {
-    }
-    
 	
 	private void uploadAllImage() {
 		if (!Machine.isNetworkOK(this)) {

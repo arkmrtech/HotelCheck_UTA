@@ -61,62 +61,38 @@ public class UploadService extends Service {
 	
 	@Override
 	public boolean onUnbind(Intent intent) {
-//		saveData();
 		return super.onUnbind(intent);
 	}
 	
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		
+		saveUnFinishData();
+	}
+	
+	public void saveUnFinishData() {
+		for (UploadBean bean : mWaitTaskQueue) {
+			bean.setImageState(ImageUploadState.STATE_FAIL);
+			bean.save();
+		}
+		for (UploadBean bean : mRuningTaskQueue) {
+			bean.setImageState(ImageUploadState.STATE_FAIL);
+			bean.save();
+		}
+		for (UploadBean bean : mExceptionQueue) {
+			bean.setImageState(ImageUploadState.STATE_FAIL);
+			bean.save();
+		}
 	}
 
-//	private void loadCacheData() {
-//		HotelUploadQueneBean bean = DataManager.getInstance().loadUploadData();
-//		if (bean != null) {
-//			for (HotelUploadTask task : bean.getHotelUploadTaskList()) {
-//				if (task != null) {
-//					SparseArray<UploadBean> array = new SparseArray<UploadBean>();
-//					for (UploadBean uploadBean : task.getUploadBeanList()) {
-//						array.put(uploadBean.getId(), uploadBean);
-//					}
-//					mUploadTaskArray.put(task.getHotelId(), array);
-//				}
-//			}
-//		}
-//	}
-	
-//	public void saveData() {
-//		if (mUploadTaskArray.size() >0 ) {
-//			HotelUploadQueneBean uploadQueneBean = new HotelUploadQueneBean();
-//			for (int i = 0; i < mUploadTaskArray.size(); i++) {
-//				int key = mUploadTaskArray.keyAt(i);
-//				SparseArray<UploadBean> mdataArray = mUploadTaskArray.get(key);
-//				if (mdataArray != null && mdataArray.size() >0 ) {
-//					HotelUploadTask task = new HotelUploadTask();
-//					task.setHotelId(key);
-//					for (int j = 0; j < mdataArray.size(); j++) {
-//						UploadBean bean = mdataArray.valueAt(j);
-//						if (bean.getImageState() != ImageUploadState.STATE_FINISH) {
-//							bean.setImageState(ImageUploadState.STATE_FAIL);
-//						}
-//						task.addUploadBean(bean);
-//					}
-//					uploadQueneBean.addHotelTask(task);
-//				}
-//			}
-//			DataManager.getInstance().saveUploadData(uploadQueneBean);
-//		}
-//	}
-	
 	
 	public synchronized void addUploadTask(UploadBean uploadBean) {
 		uploadBean.setImageState(ImageUploadState.STATE_WAIT);
 		mWaitTaskQueue.add(uploadBean);
+		sendBroadcast(uploadBean);
 		if (mRuningTaskQueue.size() < MAX_DOWNLOAD_SIZE) {
 			startNext();
 		}
-		sendBroadcast(uploadBean);
 	}
 	
 	public synchronized void restart(UploadBean uploadBean) {
@@ -126,7 +102,8 @@ public class UploadService extends Service {
 				UploadBean tmp = mExceptionQueue.get(i);
 				if (tmp.getId() == uploadBean.getId()) {
 					mExceptionQueue.remove(i);
-					result = startTask(uploadBean);
+//					result = startTask(uploadBean);
+					addUploadTask(uploadBean);
 					return;
 				}
 			}

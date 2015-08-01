@@ -45,13 +45,6 @@ public class UploadProxy {
 	private ServiceConnection mConnection = new ServiceConnection() {
 		public void onServiceConnected(ComponentName className, IBinder service) {
 			mBinder = ((UploadService.ServiceBinder)service).getService();
-			
-//			Runnable runable = mRunnableList.poll();
-//			while (null != runable) {
-//				runable.run();
-//				Thread.yield();
-//				runable = mRunnableList.poll();
-//			}
 		}
 
 		public void onServiceDisconnected(ComponentName className) {
@@ -70,7 +63,7 @@ public class UploadProxy {
 		}
 	}
 
-	private void doUnbindService() {
+	public void doUnbindService() {
 		try {
 			mContext.unbindService(mConnection);
 		} catch (Exception e) {
@@ -97,6 +90,10 @@ public class UploadProxy {
 	
 	public static void restart(UploadBean bean) {
 		sInstance.mBinder.restart(bean);
+	}
+
+	public void saveData() {
+		sInstance.mBinder.saveUnFinishData();
 	}
 
 //	public static void saveData() {
