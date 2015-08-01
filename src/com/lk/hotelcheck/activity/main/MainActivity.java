@@ -60,7 +60,7 @@ public class MainActivity extends BaseActivity {
 //		DataManager.getInstance().init(this);
 		ExpandableListView listView = (ExpandableListView) findViewById(R.id.elv_hotel);
 		mNameTextView = (TextView) findViewById(R.id.tv_welcome);
-		mNameTextView.setText("欢迎回来："+DataManager.getInstance().getUser().getUserName());
+		mNameTextView.setText("欢迎回来："+DataManager.getInstance().getUserName());
 		mAdapter = new HotelListAdapter();
 		listView.setAdapter(mAdapter);
 		listView.expandGroup(0);

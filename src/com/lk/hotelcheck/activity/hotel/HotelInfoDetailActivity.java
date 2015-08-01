@@ -78,10 +78,11 @@ public class HotelInfoDetailActivity extends BaseActivity{
 		if (getIntent().hasExtra(Constance.IntentKey.INTENT_KEY_POSITION)) {
 			position = getIntent().getIntExtra(Constance.IntentKey.INTENT_KEY_POSITION, -1);
 			mHotel = DataManager.getInstance().getHotel(position);
-//			String name = DataManager.getInstance().getHotelName(position);
-			String name = mHotel.getName();
-			toolbar.setTitle(name);
-			init();
+			if (mHotel != null) {
+				String name = mHotel.getName();
+				toolbar.setTitle(name);
+				init();
+			}
 		}
 		toolbar.setNavigationIcon(R.drawable.back);
 		toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -280,6 +281,7 @@ public class HotelInfoDetailActivity extends BaseActivity{
 //					((HotelBaseInfoFragment)mAdapter.getItem(0)).setGuardianNumber(number);
 //					DataManager.getInstance().setHotelChecked(position, hotel);
 					mHotel.setStatus(true);
+					DataManager.getInstance().initCheckedData(mHotel);
 					if (mViewPager.getCurrentItem() != 2) {
 						mViewPager.setCurrentItem(2);
 					}

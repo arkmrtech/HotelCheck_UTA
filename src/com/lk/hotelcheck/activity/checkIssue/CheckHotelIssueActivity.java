@@ -76,15 +76,6 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 		context.startActivity(intent);
 	}
 	
-//	public static void gotoCheckHotelIssue(Context context,int position, int checkDataPosition, int subCheckedDataPosition) {
-//		Intent intent = new Intent();
-//		intent.setClass(context, CheckHotelIssueActivity.class);
-//		intent.putExtra(BUNDLE_POSITION_ID, position);
-//		intent.putExtra(BUNDLE_CHECK_DATA_POSITION, checkDataPosition);
-//		intent.putExtra(BUNDLE_IS_SUB_CHECKED_DATA, true);
-//		intent.putExtra(BUNDLE_CHECK_DATA_SUB_POSITION, subCheckedDataPosition);
-//		context.startActivity(intent);
-//	}
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -137,13 +128,10 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 	@Override
 	protected void onPause() {
 		super.onPause();
-//		DataManager.getInstance().setHotel(mHotelPosition, mHotel);
 	}
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-//		MenuItem mChoseAllItem = menu.add(0, 0X10086, 0, getString(R.string.chose_all));
-//		mChoseAllItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 		 getMenuInflater().inflate(R.menu.menu_check_issue, menu);
 		return true;
 	}
@@ -260,9 +248,6 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 		mCurrentIssuePosition = position;
 		IssueItem issueItem = mCheckData.getIssue(mCurrentIssuePosition);
 		issueItem.setCheck(isChecked);
-		if (issueItem.getId() == Constance.ISSUE_ITEM_WIFI) {
-			issueItem.setContent(((HotelCheckApplication)getApplication()).getWifiSpeed());
-		}
 		mCheckData.updateIssueCheck(issueItem);
 		DataManager.getInstance().saveIssueCheck(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), isChecked);
 	}
@@ -278,9 +263,9 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 		} else {
 			issueItem.setCheck(true);
 		} 
+		mAdapter.notifyItem(position, issueItem);
 		mCheckData.updateIssueCheck(issueItem);
 		DataManager.getInstance().saveIssueContent(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), content);
-		mAdapter.notifyItem(position, issueItem);
 	}
 	
 	@Override

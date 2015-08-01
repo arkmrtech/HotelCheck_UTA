@@ -125,7 +125,7 @@ public class HttpRequest {
 			JSONObject json = JsonParseHandler.parseHotelToJson(hotel);
 			jsonObject.put(NetConstance.PARAM_HOTEL, json);
 			jsonObject.put(NetConstance.REQUEST_PARAM_KEY, session);
-			jsonObject.put(NetConstance.REQUEST_PARAM_USER_NAME, DataManager.getInstance().getUser().getUserName());
+			jsonObject.put(NetConstance.REQUEST_PARAM_USER_NAME, DataManager.getInstance().getUserName());
 		} catch (JSONException e1) {
 			e1.printStackTrace();
 		}
@@ -202,11 +202,11 @@ public class HttpRequest {
 					JSONObject response) {
 				super.onSuccess(statusCode, headers, response);
 				int state = response.optInt(NetConstance.PARAM_STATE);
-//				if (state == NetConstance.ERROR_CODE_SUCCESS) {
+				if (state == NetConstance.ERROR_CODE_SUCCESS) {
 					callback.onSuccess(response);
-//				} else {
-//					callback.onError();
-//				}
+				} else {
+					callback.onError();
+				}
 				
 			}
 			

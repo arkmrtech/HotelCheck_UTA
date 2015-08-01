@@ -221,7 +221,7 @@ public class HotelIssueFragment extends Fragment {
 						.findViewById(R.id.rv_sublist);
 				mSubLayoutManager = new LinearLayoutManager(mContext,
 						RecyclerView.HORIZONTAL, false);
-					mGridView.setLayoutManager(mSubLayoutManager);
+				mGridView.setLayoutManager(mSubLayoutManager);
 				
 			}
 		}

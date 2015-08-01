@@ -1,5 +1,5 @@
 # cache for current jar dependency. DO NOT EDIT.
 # format is <lastModified> <length> <SHA-1> <path>
 # Encoding is UTF-8
-1432481025000 95377 a845a88238be0b5be9d238652c1bc0605ef91f52 /Users/lk/Desktop/dev/workspace/hotel/Hotel_release/HotelCheck/libs/android-async-http-1.4.6.jar
-1430922540000 95377 a845a88238be0b5be9d238652c1bc0605ef91f52 /Users/lk/Desktop/dev/opensource/multipart-upload-android-sdk-master/libs/android-async-http-1.4.6.jar
+1438357867000 106515 77bbfe240e437ecb396d982afa0d3bd4f9090ba7 /Users/lk/Desktop/dev/opensource/multipart-upload-android-sdk-master/libs/android-async-http-1.4.8.jar
+1438357867000 106515 77bbfe240e437ecb396d982afa0d3bd4f9090ba7 /Users/lk/Desktop/dev/workspace/hotel/Hotel_release/HotelCheck/libs/android-async-http-1.4.8.jar

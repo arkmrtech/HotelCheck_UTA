@@ -64,7 +64,7 @@ public class NetConstance {
 	
 	public static final int ERROR_CODE_SUCCESS = 1;
 	public static final int ERROR_CODE_FAIL = 0;
-	public static final String PARAM_REFORM_STATE = "reformState";
+	public static final String PARAM_REFORM_STATE = "reform_state";
 	
 	
 	

@@ -6,10 +6,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import com.lk.hotelcheck.bean.dao.CheckIssue;
+import com.lk.hotelcheck.bean.dao.HotelCheck;
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
-import common.Constance.PreQueType;
 
+import common.Constance.PreQueType;
 import android.support.v4.util.SparseArrayCompat;
 import android.text.TextUtils;
 import android.util.Log;
@@ -109,6 +111,8 @@ public class CheckData extends SugarRecord<CheckData> implements Serializable{
 	public void initCheckedIssue() {
 		if (checkedIssueArray == null) {
 			checkedIssueArray = new SparseArray<IssueItem>();
+		} else {
+			checkedIssueArray.clear();
 		}
 		for (IssueItem issueItem : mIssuelist) {
 			if (issueItem.isCheck() || issueItem.getIsPreQue() == PreQueType.TYPE_REVIEW) {
@@ -164,9 +168,18 @@ public class CheckData extends SugarRecord<CheckData> implements Serializable{
 			ImageItem temp = issueItem.getImageItem(i);
 			if (temp.getLocalImagePath().equals(imageItem.getLocalImagePath())) {
 				issueItem.removeImageItem(i);
+				HotelCheck hotelCheck = HotelCheck.deleteItemByImageLocalPath(imageItem.getLocalImagePath());
 				if (TextUtils.isEmpty(issueItem.getContent())
 						&& issueItem.getImageCount() == 0) {
 					issueItem.setCheck(false);
+					if (hotelCheck != null) {
+						long id = Long.valueOf(hotelCheck.getCheckId()+""+hotelCheck.getAreaId()+""+hotelCheck.getIssueId());
+						CheckIssue checkIssue = CheckIssue.findById(CheckIssue.class, id);
+						if (checkIssue != null) {
+							checkIssue.delete();
+						} 
+					}
+					initCheckedIssue();
 				}
 				return;
 			}
@@ -181,9 +194,11 @@ public class CheckData extends SugarRecord<CheckData> implements Serializable{
 				if (temp.getLocalImagePath().equals(
 						imageItem.getLocalImagePath())) {
 					issueItem.removeImageItem(i);
+					HotelCheck.deleteItemByImageLocalPath(imageItem.getLocalImagePath());
 					if (TextUtils.isEmpty(issueItem.getContent())
 							&& issueItem.getImageCount() == 0) {
 						issueItem.setCheck(false);
+						initCheckedIssue();
 					}
 					return;
 				}

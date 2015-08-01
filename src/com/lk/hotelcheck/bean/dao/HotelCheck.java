@@ -1,5 +1,7 @@
 package com.lk.hotelcheck.bean.dao;
 
+import java.util.List;
+
 import com.lk.hotelcheck.bean.ImageItem;
 import com.orm.SugarRecord;
 
@@ -95,6 +97,16 @@ public class HotelCheck extends SugarRecord<HotelCheck>{
 	}
 	public void setAreaName(String areaName) {
 		this.areaName = areaName;
+	}
+	public static HotelCheck deleteItemByImageLocalPath(String localImagePath) {
+		List<HotelCheck> dataList = HotelCheck.find(HotelCheck.class, "LOCAL_IMAGE_PATH = ?", localImagePath);
+		if (dataList != null) {
+			for (HotelCheck hotelCheck: dataList) {
+				hotelCheck.delete();
+				return hotelCheck;
+			}
+		}
+		return null;
 	}
 	
 	

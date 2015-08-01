@@ -172,6 +172,15 @@ public class DataManager {
 	public List<Hotel> getCheckedHotelList() {
 		return mCheckedHotelList;
 	}
+	
+	public void addHotelChecked(Hotel hotel) {
+		if (mCheckedHotelList == null) {
+			mCheckedHotelList = new ArrayList<Hotel>();
+		}
+		if (hotel.isStatus()) {
+			mCheckedHotelList.add(hotel);
+		}
+	}
 
 	public void saveUploadData(HotelUploadQueneBean uploadQueneBean) {
 		if (uploadQueneBean != null) {
@@ -217,10 +226,16 @@ public class DataManager {
 				checkData = new CheckData();
 				checkData.setId((long) areaIssue.getAreaId());
 				checkData.setName(areaIssue.getAreaName());
+				if (checkData.getId() == Constance.CHECK_DATA_ID_ROOM) {
+					checkData.setType(Constance.CheckDataType.TYPE_ROOM);
+				} else if (checkData.getId() == Constance.CHECK_DATA_ID_PASSWAY) {
+					checkData.setType(Constance.CheckDataType.TYPE_PASSWAY);
+				}
 			}
 			checkData.addIssue(issueItem);
 			mCheckModel.put(areaIssue.getAreaId(), checkData);
 		}
+		
 		return mCheckModel;
 	}
 	
@@ -554,12 +569,38 @@ public class DataManager {
 		
 	}
 
-	public User getUser() {
-		return mUser;
-	}
-
+//	public User getUser() {
+//		return mUser;
+//	}
+//
 	public void setUser(User user) {
 		this.mUser = user;
 	}
+//	
+	public String getUserName() {
+		if (mUser == null) {
+			return "";
+		}
+		return mUser.getUserName();
+	}
+
+	public void initCheckedData(Hotel hotel) {
+		if (mCheckedHotelList == null) {
+			mCheckedHotelList = new ArrayList<Hotel>();
+		}
+		if (hotel.isStatus()) {
+			mCheckedHotelList.add(hotel);
+		}
+		for (int i = 0 ;i< mUnCheckedHoteList.size(); i++) {
+			Hotel temp = mUnCheckedHoteList.get(i);
+			if (temp.getId() == hotel.getId()) {
+				mUnCheckedHoteList.remove(i);
+				return;
+			}
+		}
+	}
+
+	
+	
 	
 }

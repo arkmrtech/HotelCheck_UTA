@@ -5,11 +5,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import android.text.TextUtils;
 import android.util.SparseArray;
 
 import com.lk.hotelcheck.bean.dao.AreaIssue;
+import com.lk.hotelcheck.bean.dao.CheckIssue;
+import com.lk.hotelcheck.bean.dao.HotelCheck;
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
+
 import common.Constance;
 
 public class Hotel extends SugarRecord<Hotel>{
@@ -40,6 +44,10 @@ public class Hotel extends SugarRecord<Hotel>{
 	private transient List<CheckData> passwayArray;
 	@Ignore
 	private transient List<AreaIssue> questionList;
+	@Ignore
+	private transient SparseArray<IssueItem> roomCheckedIsuueArray;
+	@Ignore
+	private transient SparseArray<IssueItem> passwayCheckedIsuueArray;
 	
 	
 	
@@ -416,6 +424,8 @@ public class Hotel extends SugarRecord<Hotel>{
 		this.floorEnd = hotel.getFloorEnd();
 		this.imageStatus = hotel.isImageStatus();
 		this.guardianNumber = hotel.getGuardianNumber();
+		this.status = hotel.isStatus();
+		this.checkDate = hotel.getCheckDate();
 	}
 	public void setRoom(long areaId, CheckData checkData) {
 		if (roomArray == null) {
@@ -516,7 +526,174 @@ public class Hotel extends SugarRecord<Hotel>{
 	public void setBranchNumber(int branchNumber) {
 		this.branchNumber = branchNumber;
 	}
+	public int getDymicRoomCheckedIssueCount() {
+		if (roomCheckedIsuueArray == null) {
+			roomCheckedIsuueArray = new SparseArray<IssueItem>();
+		} else {
+			roomCheckedIsuueArray.clear();
+		}
+		if (roomArray != null) {
+			for (CheckData checkData : roomArray) {
+				for (IssueItem issueItem : checkData.getCheckedIssue()) {
+//					if (roomCheckedIsuueArray.indexOfKey(issueItem.getId()) > -1) {
+//						roomCheckedIsuueArray.get(issueItem.getId()).addImageList(issueItem.getImagelist());
+//					} else {
+						roomCheckedIsuueArray.put(issueItem.getId(), issueItem);
+//					}
+					
+				}
+			}
+		}
+		return roomCheckedIsuueArray.size();
+	}
+	public int getDymicPasswayCheckedIssueCount() {
+		if (passwayCheckedIsuueArray == null) {
+			passwayCheckedIsuueArray = new SparseArray<IssueItem>();
+		} else {
+			passwayCheckedIsuueArray.clear();
+		}
+		if (passwayArray != null) {
+			for (CheckData checkData : passwayArray) {
+				for (IssueItem issueItem : checkData.getCheckedIssue()) {
+//					if (passwayCheckedIsuueArray.indexOfKey(issueItem.getId()) > -1) {
+//						passwayCheckedIsuueArray.get(issueItem.getId()).addImageList(issueItem.getImagelist());
+//					} else {
+						passwayCheckedIsuueArray.put(issueItem.getId(), issueItem);
+//					}
+				}
+			}
+		}
+		return passwayCheckedIsuueArray.size();
+	}
+	public IssueItem getDymicPasswayCheckedIssue(int position) {
+		if (passwayCheckedIsuueArray != null) {
+			return passwayCheckedIsuueArray.valueAt(position);
+		}
+		return null;
+	}
+	public IssueItem getDymicRoomCheckedIssue(int position) {
+		if (roomCheckedIsuueArray != null) {
+			return roomCheckedIsuueArray.valueAt(position);
+		}
+		return null;
+	}
+	public List<ImageItem> getAllRoomCheckedImageList() {
+		List<ImageItem> dataList = new ArrayList<ImageItem>();
+		for (int i = 0; i < roomCheckedIsuueArray.size(); i++) {
+			if (roomCheckedIsuueArray.valueAt(i).getImageCount() >0) {
+				dataList.addAll(roomCheckedIsuueArray.valueAt(i).getImagelist());
+			}
+		}
+		return dataList;
+	}
+	public List<ImageItem> getAllPasswayCheckedImageList() {
+		List<ImageItem> dataList = new ArrayList<ImageItem>();
+		for (int i = 0; i < passwayCheckedIsuueArray.size(); i++) {
+			if (passwayCheckedIsuueArray.valueAt(i).getImageCount() >0) {
+				dataList.addAll(passwayCheckedIsuueArray.valueAt(i).getImagelist());
+			}
+		}
+		return dataList;
+	}
+	public void deleteRoomCheckedIssueImage(ImageItem imageItem) {
+		if (roomArray != null) {
+			for (CheckData checkData : roomArray) {
+				if (checkData.getCheckedIssueCount() > 0) {
+					for (IssueItem issueItem : checkData.getCheckedIssue()) {
+						if (issueItem.getImageCount() > 0) {
+							for (int i = 0; i < issueItem.getImageCount(); i++) {
+								ImageItem temp = issueItem.getImageItem(i);
+								if (temp.getLocalImagePath().equals(imageItem.getLocalImagePath())) {
+									issueItem.removeImageItem(i);
+									HotelCheck hotelCheck = HotelCheck.deleteItemByImageLocalPath(imageItem.getLocalImagePath());
+									if (TextUtils.isEmpty(issueItem.getContent())
+											&& issueItem.getImageCount() == 0) {
+										issueItem.setCheck(false);
+										if (hotelCheck != null) {
+											long id = Long.valueOf(hotelCheck.getCheckId()+""+hotelCheck.getAreaId()+""+hotelCheck.getIssueId());
+											CheckIssue checkIssue = CheckIssue.findById(CheckIssue.class, id);
+											if (checkIssue != null) {
+												checkIssue.delete();
+											} 
+										}
+										checkData.initCheckedIssue();
+									}
+									getDymicRoomCheckedIssueCount();
+									return;
+								}
+							}
+						}
+					}
+				}
+				
+			}
+		}
+		
+	}
+	public void deletePasswayCheckedIssueImage(ImageItem imageItem) {
+		if (passwayArray != null) {
+			for (CheckData checkData : passwayArray) {
+				if (checkData.getCheckedIssueCount() > 0) {
+					for (IssueItem issueItem : checkData.getCheckedIssue()) {
+						if (issueItem.getImageCount() > 0) {
+							for (int i = 0; i < issueItem.getImageCount(); i++) {
+								ImageItem temp = issueItem.getImageItem(i);
+								if (temp.getLocalImagePath().equals(imageItem.getLocalImagePath())) {
+									issueItem.removeImageItem(i);
+									HotelCheck hotelCheck = HotelCheck.deleteItemByImageLocalPath(imageItem.getLocalImagePath());
+									if (TextUtils.isEmpty(issueItem.getContent())
+											&& issueItem.getImageCount() == 0) {
+										issueItem.setCheck(false);
+										if (hotelCheck != null) {
+											long id = Long.valueOf(hotelCheck.getCheckId()+""+hotelCheck.getAreaId()+""+hotelCheck.getIssueId());
+											CheckIssue checkIssue = CheckIssue.findById(CheckIssue.class, id);
+											if (checkIssue != null) {
+												checkIssue.delete();
+											} 
+										}
+										checkData.initCheckedIssue();
+									}
+									getDymicPasswayCheckedIssueCount();
+									return;
+								}
+							}
+						}
+					}
+				}
+				
+			}
+		}
+	}
 	
+	public List<ImageItem> getAllRoomCheckedImageList(int i) {
+		List<ImageItem> dataList = new ArrayList<ImageItem>();
+		IssueItem issueItem = roomCheckedIsuueArray.valueAt(i);
+		if (issueItem != null) {
+			for (CheckData checkData : roomArray) {
+				for (IssueItem tempItem : checkData.getCheckedIssue()) {
+					if (tempItem.getId() == issueItem.getId()) {
+						dataList.addAll(tempItem.getImagelist());
+					}
+				}
+			}
+		}
+		return dataList;
+	}
+	
+	public List<ImageItem> getAllPasswayCheckedImageList(int i) {
+		List<ImageItem> dataList = new ArrayList<ImageItem>();
+		IssueItem issueItem = passwayCheckedIsuueArray.valueAt(i);
+		if (issueItem != null) {
+			for (CheckData checkData : passwayArray) {
+				for (IssueItem tempItem : checkData.getCheckedIssue()) {
+					if (tempItem.getId() == issueItem.getId()) {
+						dataList.addAll(tempItem.getImagelist());
+					}
+				}
+			}
+		}
+		return dataList;
+	}
 	
 	
 }

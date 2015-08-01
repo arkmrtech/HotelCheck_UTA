@@ -86,11 +86,7 @@ public class HotelIssueAdapter extends RecyclerView.Adapter<ViewHolder>{
 	@Override
 	public void onBindViewHolder(ViewHolder arg0, int arg1) {
 		IssueItem item = dataList.get(arg1);
-		if (arg0 instanceof ItemViewHolder) {
-			((ItemViewHolder)arg0).setData(item, arg1);
-		} else {
-			((WIFIViewHolder)arg0).setData(item, arg1);
-		}
+		((ItemViewHolder)arg0).setData(item, arg1);
 		
 	}
 
@@ -98,15 +94,9 @@ public class HotelIssueAdapter extends RecyclerView.Adapter<ViewHolder>{
 	public ViewHolder onCreateViewHolder(
 			ViewGroup arg0, int arg1) {
 		ViewHolder viewHolder = null;
-		if (arg1 == WIFI_VIEW_TYPE) {
-			View convertView = LayoutInflater.from(arg0.getContext())
-					.inflate(R.layout.wifi_item, arg0, false);
-			 viewHolder = new WIFIViewHolder(convertView);
-		} else {
-			View convertView = LayoutInflater.from(arg0.getContext())
+		View convertView = LayoutInflater.from(arg0.getContext())
 					.inflate(R.layout.listview_hotel_check_issue_item, arg0, false);
-			 viewHolder = new ItemViewHolder(convertView);
-		}
+		viewHolder = new ItemViewHolder(convertView);
 		
 		return viewHolder;
 	}
@@ -149,10 +139,23 @@ public class HotelIssueAdapter extends RecyclerView.Adapter<ViewHolder>{
 		}
 	};
 	
+	private OnClickListener wifiOnClickListener = new OnClickListener() {
+		
+		@Override
+		public void onClick(View v) {
+			if (mIsChecked) {
+				Toast.makeText(v.getContext(), "酒店已检查完成不能再修改", Toast.LENGTH_SHORT).show();
+				return;
+			} 
+			int position = (Integer) v.getTag();
+			listener.onWifiClick(position);
+		}
+	};
+	
 	private  EditText alertEditText;
 	
 	private void showDialog( int issuePositon, Context context){
-		IssueItem issueItem = dataList.get(issuePositon);
+		final IssueItem issueItem = dataList.get(issuePositon);
 		if (mAlertDialog == null) {
 			LayoutInflater factory = LayoutInflater.from(context);// 提示框
 			View view = factory.inflate(R.layout.alert_dialog_edit, null);// 这里必须是final的
@@ -167,6 +170,7 @@ public class HotelIssueAdapter extends RecyclerView.Adapter<ViewHolder>{
 								public void onClick(DialogInterface dialog,
 										int which) {
 									String content = alertEditText.getText().toString();
+									issueItem.setContent(content);
 									int position = (Integer) alertEditText.getTag();
 									listener.setContent(position, content);
 									alertEditText.setText("");
@@ -199,6 +203,7 @@ public class HotelIssueAdapter extends RecyclerView.Adapter<ViewHolder>{
 		private ImageView canmerImageView;
 		private TextView mNumberTextView;
 		private TextView mReviewTextView;
+		private View mContentRedDot;
 		private View mContentView;
 		private CheckBox mCheckBox;
 		
@@ -211,6 +216,7 @@ public class HotelIssueAdapter extends RecyclerView.Adapter<ViewHolder>{
 				mCheckBox = (CheckBox) view.findViewById(R.id.cb);
 				mNumberTextView = (TextView) view.findViewById(R.id.tv_number);
 				mReviewTextView = (TextView) view.findViewById(R.id.tv_review);
+				mContentRedDot = view.findViewById(R.id.iv_content_red_dot);
 			}
 		}
 		
@@ -224,7 +230,11 @@ public class HotelIssueAdapter extends RecyclerView.Adapter<ViewHolder>{
 			mCheckBox.setTag(position);
 			mContentView.setTag(position);
 			mContentView.setOnClickListener(mContentClickListener);
-			canmerImageView.setOnClickListener(photoOnClickListener);
+			if (item.getId() == Constance.ISSUE_ITEM_WIFI) {
+				canmerImageView.setOnClickListener(wifiOnClickListener);
+			} else {
+				canmerImageView.setOnClickListener(photoOnClickListener);
+			}
 			mCheckBox.setOnCheckedChangeListener(mOnCheckedChangeListener);
 //			if (mIsChecked || item.getImageCount() > 0 || !TextUtils.isEmpty(item.getContent())) {
 //				mCheckBox.setEnabled(false);
@@ -243,6 +253,11 @@ public class HotelIssueAdapter extends RecyclerView.Adapter<ViewHolder>{
 			} else {
 				mCheckBox.setEnabled(true);
 			}
+			if (!TextUtils.isEmpty(item.getContent())) {
+				mContentRedDot.setVisibility(View.VISIBLE);
+			} else {
+				mContentRedDot.setVisibility(View.GONE);
+			}
 			mCheckBox.setChecked(item.isCheck());
 			if (item.getImageCount() <= 0) {
 				mNumberTextView.setVisibility(View.GONE);
@@ -256,72 +271,74 @@ public class HotelIssueAdapter extends RecyclerView.Adapter<ViewHolder>{
 		
 	}
 	
-	class WIFIViewHolder extends ViewHolder {
-
-		private View mView;
-		private ImageView canmerImageView;
-		private TextView mNumberTextView;
-		private View mContentView;
-		private CheckBox mCheckBox;
-		private TextView nameTextView;
-		private TextView mReviewTextView;
-		
-		public WIFIViewHolder(View view) {
-			super(view);
-			if (view != null) {
-				mView = view;
-				nameTextView = (TextView) view.findViewById(R.id.tv_name);
-				mCheckBox = (CheckBox) view.findViewById(R.id.cb);
-				mContentView = view.findViewById(R.id.iv_edit);
-				canmerImageView = (ImageView) view.findViewById(R.id.iv_photo);
-				mNumberTextView = (TextView) view.findViewById(R.id.tv_number);
-				mReviewTextView = (TextView) view.findViewById(R.id.tv_review);
-			}
-		}
-		
-		public void setData(IssueItem item, final int position) {
-			if (item == null) {
-				return;
-			}
-			String name = item.getName();
-			nameTextView.setText(name);
-			mCheckBox.setTag(position);
-			mContentView.setTag(position);
-			mCheckBox.setOnCheckedChangeListener(mOnCheckedChangeListener);
-			if (item.getImageCount() > 0 || !TextUtils.isEmpty(item.getContent())) {
-				mCheckBox.setEnabled(false);
-			} else {
-				mCheckBox.setEnabled(true);
-			}
-			mCheckBox.setChecked(item.isCheck());
-			if (item.getImageCount() <= 0) {
-				mNumberTextView.setVisibility(View.GONE);
-			} else {
-				mNumberTextView.setVisibility(View.VISIBLE);
-				mNumberTextView.setText(""+item.getImageCount());
-			}
-			if (item.getIsPreQue() == PreQueType.TYPE_REVIEW) {
-				mReviewTextView.setVisibility(View.VISIBLE);
-				nameTextView.setTextColor(nameTextView.getContext().getResources().getColor(R.color.content_orange));
-			} else {
-				mReviewTextView.setVisibility(View.GONE);
-				nameTextView.setTextColor(Color.BLACK);
-			}
-			mView.setOnClickListener(new OnClickListener() {
-				
-				@Override
-				public void onClick(View v) {
-					listener.onWifiClick(position);
-				}
-			});
-			mContentView.setOnClickListener(mContentClickListener);
-		}
-		
-		
-		
-	
-		
-	}
+//	class WIFIViewHolder extends ViewHolder {
+//
+//		private View mView;
+//		private ImageView canmerImageView;
+//		private TextView mNumberTextView;
+//		private View mContentView;
+//		private CheckBox mCheckBox;
+//		private TextView nameTextView;
+//		private TextView mReviewTextView;
+//		
+//		public WIFIViewHolder(View view) {
+//			super(view);
+//			if (view != null) {
+//				mView = view;
+//				nameTextView = (TextView) view.findViewById(R.id.tv_name);
+//				mCheckBox = (CheckBox) view.findViewById(R.id.cb);
+//				mContentView = view.findViewById(R.id.iv_edit);
+//				canmerImageView = (ImageView) view.findViewById(R.id.iv_photo);
+//				mNumberTextView = (TextView) view.findViewById(R.id.tv_number);
+//				mReviewTextView = (TextView) view.findViewById(R.id.tv_review);
+//			}
+//		}
+//		
+//		public void setData(IssueItem item, final int position) {
+//			if (item == null) {
+//				return;
+//			}
+//			String name = item.getName();
+//			nameTextView.setText(name);
+//			mCheckBox.setTag(position);
+//			mContentView.setTag(position);
+//			mCheckBox.setOnCheckedChangeListener(mOnCheckedChangeListener);
+//			if (item.getImageCount() > 0 || !TextUtils.isEmpty(item.getContent())) {
+//				mCheckBox.setEnabled(false);
+//			} else {
+//				mCheckBox.setEnabled(true);
+//			}
+//			mCheckBox.setChecked(item.isCheck());
+//			if (item.getImageCount() <= 0) {
+//				mNumberTextView.setVisibility(View.GONE);
+//			} else {
+//				mNumberTextView.setVisibility(View.VISIBLE);
+//				mNumberTextView.setText(""+item.getImageCount());
+//			}
+//			if (item.getIsPreQue() == PreQueType.TYPE_REVIEW) {
+//				mReviewTextView.setVisibility(View.VISIBLE);
+//				nameTextView.setTextColor(nameTextView.getContext().getResources().getColor(R.color.content_orange));
+//			} else {
+//				mReviewTextView.setVisibility(View.GONE);
+//				nameTextView.setTextColor(Color.BLACK);
+//			}
+////			mView.setOnClickListener(new OnClickListener() {
+////				
+////				@Override
+////				public void onClick(View v) {
+////					listener.onWifiClick(position);
+////				}
+////			});
+//			canmerImageView.setTag(position);
+//			canmerImageView.setOnClickListener(wifiOnClickListener);
+//			mContentView.setOnClickListener(mContentClickListener);
+//		}
+//		
+//		
+//		
+//	
+//		
+//	}
 	
 	public interface CallBackListener {
 		void onPhotoClick(int position);

@@ -154,13 +154,19 @@ public class HotelBaseInfoFragment extends Fragment {
 		mRoomNumberTextView.setText("" + mHotel.getRoomCount());
 		mRoomCheckedNumberTextView.setText("" + mHotel.getRoomCheckedCount());
 		mFloorTextView.setText(floorBuffer.toString());
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTimeInMillis(System.currentTimeMillis());
-		String date = calendar.get(Calendar.YEAR) + "-"
-				+ (calendar.get(Calendar.MONTH) + 1) + "-"
-				+ calendar.get(Calendar.DAY_OF_MONTH);
-		mHotel.setCheckDate(date);
-		mCheckedDateTextView.setText(date);
+		if (mHotel.getCheckDate() != null) {
+			mCheckedDateTextView.setText(mHotel.getCheckDate());
+		} else {
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTimeInMillis(System.currentTimeMillis());
+			String date = calendar.get(Calendar.YEAR) + "-"
+					+ (calendar.get(Calendar.MONTH) + 1) + "-"
+					+ calendar.get(Calendar.DAY_OF_MONTH);
+			mHotel.setCheckDate(date);
+			mCheckedDateTextView.setText(date);
+		}
+		
+		
 		if (!mHotel.isStatus()) {
 			mFloorLayout.setOnClickListener(new View.OnClickListener() {
 
@@ -214,7 +220,6 @@ public class HotelBaseInfoFragment extends Fragment {
 					mDatePickerDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "取消", new DialogInterface.OnClickListener() {  
 			            @Override  
 			            public void onClick(DialogInterface dialog, int which) {  
-			                System.out.println("BUTTON_NEGATIVE~~");  
 			            }  
 			        }); 
 					

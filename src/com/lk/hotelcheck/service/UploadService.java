@@ -166,20 +166,22 @@ public class UploadService extends Service {
 	private void addUploadTask(CheckData checkData, long checkId) {
 		if (checkData.getCheckedIssueCount() > 0) {
 			for (IssueItem issueItem : checkData.getCheckedIssue()) {
-				for (ImageItem imageItem : issueItem.getImagelist()) {
-					UploadBean uploadBean = new UploadBean(
-							checkId, checkData.getId(),
-							checkData.getName(), issueItem.getId(),
-							issueItem.getName(),
-							issueItem.getDimOneId(),
-							issueItem.getDimOneName(), imageItem);
-					if (imageItem.isWidth()) {
-						uploadBean.setIsWidth(0);
-					} else {
-						uploadBean.setIsWidth(1);
+				if (issueItem.getImagelist() != null) {
+					for (ImageItem imageItem : issueItem.getImagelist()) {
+						UploadBean uploadBean = new UploadBean(
+								checkId, checkData.getId(),
+								checkData.getName(), issueItem.getId(),
+								issueItem.getName(),
+								issueItem.getDimOneId(),
+								issueItem.getDimOneName(), imageItem);
+						if (imageItem.isWidth()) {
+							uploadBean.setIsWidth(0);
+						} else {
+							uploadBean.setIsWidth(1);
+						}
+						uploadBean.setType(imageItem.getType());
+						addUploadTask(uploadBean);
 					}
-					uploadBean.setType(imageItem.getType());
-					addUploadTask(uploadBean);
 				}
 			}
 		}
@@ -211,7 +213,7 @@ public class UploadService extends Service {
 	private synchronized boolean startNext() {
 		int size = mWaitTaskQueue.size();
 		if (size <= 0) {
-			DataManager.getInstance().updateImageStatus(this);
+			DataManager.getInstance().updateImageStatus(UploadService.this);
 			return true;
 		}
 

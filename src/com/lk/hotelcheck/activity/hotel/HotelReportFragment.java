@@ -9,6 +9,7 @@ import com.lk.hotelcheck.manager.DataManager;
 import com.lk.hotelcheck.util.DrawUtil;
 
 import common.Constance;
+import common.NetConstance;
 import common.Constance.CheckDataType;
 import common.Constance.CheckType;
 import common.Constance.PreQueType;
@@ -105,7 +106,7 @@ public class HotelReportFragment extends Fragment{
 	
 	private void initInfoData() {
 		if (hotel != null) {
-			mUserNameTextView.setText(DataManager.getInstance().getUser().getUserName());
+			mUserNameTextView.setText(DataManager.getInstance().getUserName());
 			mCheckDateTextView.setText(hotel.getCheckDate());
 			mRoomNumberTextView.setText(""+hotel.getRoomCount());
 			mRoomInUseNumberTextView.setText(""+hotel.getRoomInUseCount());
@@ -150,8 +151,17 @@ public class HotelReportFragment extends Fragment{
 			public boolean onChildClick(ExpandableListView parent, View v,
 					int groupPosition, int childPosition, long id) {
 				CheckData checkData = hotel.getCheckData(groupPosition);
-				IssueItem issueItem = checkData.getCheckedIssue(childPosition);
-				if (issueItem.getImageCount() >0 ) {
+				IssueItem issueItem = null;
+				if (checkData.getType() == CheckDataType.TYPE_ROOM) {
+					issueItem = hotel.getDymicRoomCheckedIssue(childPosition);
+				} else if (checkData.getType() == CheckDataType.TYPE_PASSWAY) {
+					issueItem = hotel.getDymicPasswayCheckedIssue(childPosition);
+				} else {
+					issueItem = checkData.getCheckedIssue(childPosition);
+				}
+//				CheckData checkData = hotel.getCheckData(groupPosition);
+//				IssueItem issueItem = checkData.getCheckedIssue(childPosition);
+				if (issueItem != null && issueItem.getImageCount() >0 ) {
 					PhotoChosenActivity.gotoPhotoChosen(activity, position,groupPosition,childPosition);
 				}
 				return false;
@@ -185,7 +195,16 @@ public class HotelReportFragment extends Fragment{
 
 		@Override
 		public int getChildrenCount(int groupPosition) {
-			return hotel.getCheckData(groupPosition).getCheckedIssueCount();
+			int count = 0;
+			CheckData checkData = hotel.getCheckData(groupPosition);
+			if (checkData.getType() == CheckDataType.TYPE_ROOM) {
+				count = hotel.getDymicRoomCheckedIssueCount();
+			} else if (checkData.getType() == CheckDataType.TYPE_PASSWAY) {
+				count = hotel.getDymicPasswayCheckedIssueCount();
+			} else {
+				count = checkData.getCheckedIssueCount();
+			}
+			return count;
 		}
 
 		@Override
@@ -287,7 +306,15 @@ public class HotelReportFragment extends Fragment{
 				viewHolder = (ViewHolder) convertView.getTag();
 			}
 			CheckData checkData = hotel.getCheckData(groupPosition);
-			IssueItem issueItem = checkData.getCheckedIssue(childPosition);
+			IssueItem issueItem = null;
+			if (checkData.getType() == CheckDataType.TYPE_ROOM) {
+				issueItem = hotel.getDymicRoomCheckedIssue(childPosition);
+			} else if (checkData.getType() == CheckDataType.TYPE_PASSWAY) {
+				issueItem = hotel.getDymicPasswayCheckedIssue(childPosition);
+			} else {
+				issueItem = checkData.getCheckedIssue(childPosition);
+			}
+			
 			if (issueItem != null) {
 				if (issueItem.getImageCount() >0 ) {
 					viewHolder.flagTextView.setText("查看图片");
@@ -304,8 +331,13 @@ public class HotelReportFragment extends Fragment{
 						viewHolder.statusTextView.setTextColor(getResources().getColor(R.color.color_two));
 					}
 				} else {
-					viewHolder.statusTextView.setText("新发现");
-					viewHolder.statusTextView.setTextColor(getResources().getColor(R.color.color_three));
+					if (hotel.getCheckType() == CheckType.CHECK_TYPE_REVIEW) {
+						viewHolder.statusTextView.setText("新发现");
+						viewHolder.statusTextView.setTextColor(getResources().getColor(R.color.color_three));
+					} else {
+						viewHolder.statusTextView.setText("");
+						viewHolder.statusTextView.setTextColor(getResources().getColor(R.color.white));
+					}
 				}
 			}
 			if (checkData.getType() == CheckDataType.TYPE_ROOM)  {

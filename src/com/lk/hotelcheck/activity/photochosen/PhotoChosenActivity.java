@@ -30,18 +30,22 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.lk.hotelcheck.R;
 import com.lk.hotelcheck.activity.BaseActivity;
 import com.lk.hotelcheck.bean.CheckData;
 import com.lk.hotelcheck.bean.Hotel;
 import com.lk.hotelcheck.bean.ImageItem;
+import com.lk.hotelcheck.bean.IssueItem;
 import com.lk.hotelcheck.manager.DataManager;
 import com.lk.hotelcheck.upload.UploadProxy;
 import com.lk.hotelcheck.util.CustomBasePagerAdapter;
 import com.lk.hotelcheck.util.DrawUtil;
 import com.lk.hotelcheck.util.FileUtil;
 import com.nostra13.universalimageloader.core.ImageLoader;
+
+import common.Constance.CheckDataType;
 import common.Constance.IntentKey;
 
 public class PhotoChosenActivity extends BaseActivity {
@@ -92,16 +96,12 @@ public class PhotoChosenActivity extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_photo_chosen);
 		mSelectedMap = new HashMap<String, Boolean>();
-//		mUploadButton = (Button) findViewById(R.id.btn_upload);
-//		mUploadTextView = (TextView) findViewById(R.id.tv_upload);
 		mDetailLayout = findViewById(R.id.rl_image_detail);
-//		mDetailImageView = (ImageView) findViewById(R.id.iv_detail);
 		mDetailViewPager = (ViewPager) findViewById(R.id.vp_detail);
 		mDetailBackImageView = (ImageView) findViewById(R.id.iv_back);
 		mDetailDeleteImageView = (ImageView) findViewById(R.id.iv_delete);
 		mDetailBackImageView.setOnClickListener(mImageBackClickListener);
 		mDetailDeleteImageView.setOnClickListener(mImageDeleteClickListener);
-//		mUploadButton.setOnClickListener(mUploadClickListener);
 		mToolbar = (Toolbar) findViewById(R.id.toolbar);
 		mErrorTextView = (TextView) findViewById(R.id.tv_error_tips);
 		initData();
@@ -143,7 +143,6 @@ public class PhotoChosenActivity extends BaseActivity {
 			if (mHotel.isStatus()) {
 				mDetailDeleteImageView.setVisibility(View.GONE);
 			}
-//			updatePhotoData();
 			mNameSpinner
 					.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
@@ -200,12 +199,29 @@ public class PhotoChosenActivity extends BaseActivity {
 	private void updatePhotoData() {
 		List<ImageItem> data = null;
 		Log.d("lxk", "mCheckDataPosition = "+mCheckDataPosition +" mIssuePosition "+mIssuePosition);
-		if (mIssuePosition == 0) {
-			data = mHotel.getCheckData(mCheckDataPosition).getAllCheckedImage();
+		CheckData checkData = mHotel.getCheckData(mCheckDataPosition);
+		if (checkData.getType() == CheckDataType.TYPE_ROOM) {
+			if (mIssuePosition == 0) {
+				data = mHotel.getAllRoomCheckedImageList();
+			} else {
+//				data = mHotel.getDymicRoomCheckedIssue(mIssuePosition-1).getImagelist();
+				data = mHotel.getAllRoomCheckedImageList(mIssuePosition-1);
+			}
+		} else if (checkData.getType() == CheckDataType.TYPE_PASSWAY) {
+			if (mIssuePosition == 0) {
+				data = mHotel.getAllPasswayCheckedImageList();
+			} else {
+				data = mHotel.getAllPasswayCheckedImageList(mIssuePosition-1);
+			}
 		} else {
-			data = mHotel.getCheckData(mCheckDataPosition)
-						.getCheckedPointImageList(mIssuePosition-1);
+			if (mIssuePosition == 0) {
+				data = checkData.getAllCheckedImage();
+			} else {
+				data = mHotel.getCheckData(mCheckDataPosition)
+							.getCheckedPointImageList(mIssuePosition-1);
+			}
 		}
+		
 		
 		mAdapter.updateList(data);
 		mDetailAdapter.notifyDataSetChanged();
@@ -257,6 +273,10 @@ public class PhotoChosenActivity extends BaseActivity {
 
 		@Override
 		public void onClick(View v) {
+			if (mHotel.isStatus()) {
+				Toast.makeText(v.getContext(), "酒店已完成检查，不能再删除图片", Toast.LENGTH_SHORT).show();
+				return;
+			}
 			final int position = (Integer) v.getTag();
 			AlertDialog alertDialog = new AlertDialog.Builder(v.getContext())
 					.setTitle("确认删除这张图片？")
@@ -268,13 +288,22 @@ public class PhotoChosenActivity extends BaseActivity {
 										int which) {
 									ImageItem imageItem = mAdapter
 											.getDataItem(position);
-									if (mIssuePosition == 0) {
-										mHotel.getCheckData(mCheckDataPosition).deleteCheckedIssueImage(imageItem);
+									CheckData checkData = mHotel.getCheckData(mCheckDataPosition);
+									if (checkData.getType() == CheckDataType.TYPE_ROOM) {
+										mHotel.deleteRoomCheckedIssueImage(imageItem);
+									} else if (checkData.getType() == CheckDataType.TYPE_PASSWAY) {
+										mHotel.deletePasswayCheckedIssueImage(imageItem);
 									} else {
-										mHotel.getCheckData(mCheckDataPosition).deleteCheckedIssueImage(mIssuePosition -1, imageItem);
+										if (mIssuePosition == 0) {
+											checkData.deleteCheckedIssueImage(imageItem);
+										} else {
+											checkData.deleteCheckedIssueImage(mIssuePosition -1, imageItem);
+										}
 									}
-									DataManager.getInstance().setHotel(
-											mHotelPosition, mHotel);
+									
+									
+//									DataManager.getInstance().setHotel(
+//											mHotelPosition, mHotel);
 //									mSelectedMap.remove(imageItem.getImageUrl());
 									mAdapter.remove(position);
 									if (mAdapter.getItemCount() == 0) {
@@ -454,7 +483,14 @@ public class PhotoChosenActivity extends BaseActivity {
 				return count;
 			case SPINNER_TYPE_ISSUE:
 				CheckData checkData = mHotel.getCheckData(mCheckDataPosition);
-				return checkData == null ? 0 : checkData.getCheckedIssueCount()+1;
+				if (checkData.getType() == CheckDataType.TYPE_ROOM) {
+					count = mHotel.getDymicRoomCheckedIssueCount();
+				} else if (checkData.getType() == CheckDataType.TYPE_PASSWAY) {
+					count = mHotel.getDymicPasswayCheckedIssueCount();
+				} else {
+					count = checkData.getCheckedIssueCount();
+				}
+				return count+1;
 			default:
 				break;
 			}
@@ -509,10 +545,18 @@ public class PhotoChosenActivity extends BaseActivity {
 					name = "全部";
 				} else {
 					CheckData checkData = mHotel.getCheckData(mCheckDataPosition);
+					if (checkData.getType() == CheckDataType.TYPE_ROOM) {
+						name = mHotel.getDymicRoomCheckedIssue(position-1).getName();
+					} else if (checkData.getType() == CheckDataType.TYPE_PASSWAY) {
+						name = mHotel.getDymicPasswayCheckedIssue(position-1).getName();
+					} else {
+						name = checkData.getCheckedIssue(position-1).getName();
+					}
+//					CheckData checkData = mHotel.getCheckData(mCheckDataPosition);
 //					if (checkData.isGetSublist()) {
 //						name = checkData.getName()+checkData.getCheckedIssue(position-1).getName();
 //					} else {
-						name = checkData.getCheckedIssue(position-1).getName();
+						
 //					}
 				}
 				break;
@@ -639,8 +683,8 @@ public class PhotoChosenActivity extends BaseActivity {
 	     @Override
 	     public int getItemPosition(Object object)   {          
 	           if ( mChildCount > 0) {
-	           mChildCount --;
-	           return POSITION_NONE;
+	        	   mChildCount --;
+	        	   return POSITION_NONE;
 	           }
 	           return super.getItemPosition(object);
 	     }

@@ -101,5 +101,11 @@ public class IssueItem {
 	public void setReformState(int reformState) {
 		this.reformState = reformState;
 	}
+	public void addImageList(List<ImageItem> dataList) {
+		if (imagelist == null) {
+			imagelist = new ArrayList<ImageItem>();
+		}
+		imagelist.addAll(dataList);
+	}
 	
 }

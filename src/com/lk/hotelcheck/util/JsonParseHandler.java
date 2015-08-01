@@ -45,6 +45,7 @@ public class JsonParseHandler {
 		if (branchObject != null) {
 			hotel.setCheckId(branchObject.optInt(NetConstance.PARAM_BRANCH_CHECK_ID));
 			hotel.setName(branchObject.optString(NetConstance.PARAM_BRANCH_NAME));
+			hotel.setBranchNumber(branchObject.optInt(NetConstance.PARAM_BRANCH_NUMBER));
 			hotel.setAddress(branchObject.optString(NetConstance.PARAM_ADDRESS));
 			hotel.setPhone(branchObject.optString(NetConstance.PARAM_TELT));
 			hotel.setMemo(branchObject.optString(NetConstance.PARAM_REGION));
@@ -111,10 +112,14 @@ public class JsonParseHandler {
 		CheckData checkData = null;
 		if (type == Constance.CHECK_DATA_ID_ROOM) {
 			checkData = DataManager.getInstance().createRoomCheckData();
-			checkData.setType(Constance.CheckDataType.TYPE_ROOM);
+			if (checkData != null) {
+				checkData.setType(Constance.CheckDataType.TYPE_ROOM);
+			}
 		} else if (type == Constance.CHECK_DATA_ID_PASSWAY) {
 			checkData = DataManager.getInstance().createPasswayCheckData();
-			checkData.setType(Constance.CheckDataType.TYPE_PASSWAY);
+			if (checkData != null) {
+				checkData.setType(Constance.CheckDataType.TYPE_PASSWAY);
+			}
 		} else {
 			checkData = new CheckData();
 			checkData.setType(Constance.CheckDataType.TYPE_NORMAL);
@@ -173,7 +178,6 @@ public class JsonParseHandler {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		
 		return hotelJsonObject;
 	}
 	
@@ -193,48 +197,13 @@ public class JsonParseHandler {
 						jsonArray.put(issueObject);
 					}
 				}
-				if (jsonArray.length() == 0) {
-					jsonObject.put(NetConstance.PARAM_ISSUE_LIST, JSONObject.NULL);
-				} else {
-					jsonObject.put(NetConstance.PARAM_ISSUE_LIST, jsonArray);
-				}
+			jsonObject.put(NetConstance.PARAM_ISSUE_LIST, jsonArray);
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 		
 		
-		return jsonObject;
-	}
-	
-	public static JSONObject parseIssueItemToJson(IssueItem issueItem) {
-		if (issueItem == null) {
-			return null;
-		}
-		JSONObject jsonObject = null;
-		try {
-			jsonObject = new JSONObject( new GsonBuilder().serializeNulls().create().toJson(issueItem));
-			if (issueItem.getImagelist() != null) {
-				JSONArray jsonArray = new JSONArray();
-				for (ImageItem imageItem : issueItem.getImagelist()) {
-					JSONObject imageObject = new JSONObject(new GsonBuilder().serializeNulls().create().toJson(imageItem));
-//					imageObject.put(NetConstance.PARAM_FILE_PATH, imageItem.getServiceSavePath());
-//					imageObject.put(NetConstance.PARAM_IS_WIDTH, imageItem.isWidth());
-					jsonArray.put(imageObject);
-				}
-				if (jsonArray.length() == 0) {
-					jsonObject.put(NetConstance.PARAM_IMAGE_LIST, JSONObject.NULL);
-				} else {
-					jsonObject.put(NetConstance.PARAM_IMAGE_LIST, jsonArray);
-				}
-				
-			} else {
-				jsonObject.put(NetConstance.PARAM_IMAGE_LIST, JSONObject.NULL);
-			}
-			
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
 		return jsonObject;
 	}
 	
@@ -242,26 +211,25 @@ public class JsonParseHandler {
 //		if (issueItem == null) {
 //			return null;
 //		}
-//		JSONObject jsonObject = new JSONObject();
+//		JSONObject jsonObject = null;
 //		try {
-//			jsonObject.put(NetConstance.PARAM_DIM_ONE_ID, issueItem.getDimOneId());
-//			jsonObject.put(NetConstance.PARAM_DIM_ONE_NAME, issueItem.getDimOneName());
-//			jsonObject.put(NetConstance.PARAM_DIM_TWO_ID, issueItem.getId());
-//			jsonObject.put(NetConstance.PARAM_DIM_TWO_NAME, issueItem.getName());
-//			jsonObject.put(NetConstance.PARAM_DEF_QUE, issueItem.getIsDefQue());
-//			jsonObject.put(NetConstance.PARAM_PRE_QUE, issueItem.getIsPreQue());
-//			jsonObject.put(NetConstance.PARAM_IS_CHECK, issueItem.isCheck());
-//			jsonObject.put(NetConstance.PARAM_CONTENT, issueItem.getContent());
-//			jsonObject.put(NetConstance.PARAM_REFORM_STATE, issueItem.getReformState());
+//			jsonObject = new JSONObject( new GsonBuilder().serializeNulls().create().toJson(issueItem));
 //			if (issueItem.getImagelist() != null) {
 //				JSONArray jsonArray = new JSONArray();
 //				for (ImageItem imageItem : issueItem.getImagelist()) {
-//					JSONObject imageObject = new JSONObject();
-//					imageObject.put(NetConstance.PARAM_FILE_PATH, imageItem.getServiceSavePath());
-//					imageObject.put(NetConstance.PARAM_IS_WIDTH, imageItem.isWidth());
+//					JSONObject imageObject = new JSONObject(new GsonBuilder().serializeNulls().create().toJson(imageItem));
+////					imageObject.put(NetConstance.PARAM_FILE_PATH, imageItem.getServiceSavePath());
+////					imageObject.put(NetConstance.PARAM_IS_WIDTH, imageItem.isWidth());
 //					jsonArray.put(imageObject);
 //				}
-//				jsonObject.put(NetConstance.PARAM_IMAGE_LIST, jsonArray);
+//				if (jsonArray.length() == 0) {
+//					jsonObject.put(NetConstance.PARAM_IMAGE_LIST, JSONObject.NULL);
+//				} else {
+//					jsonObject.put(NetConstance.PARAM_IMAGE_LIST, jsonArray);
+//				}
+//				
+//			} else {
+//				jsonObject.put(NetConstance.PARAM_IMAGE_LIST, JSONObject.NULL);
 //			}
 //			
 //		} catch (JSONException e) {
@@ -269,5 +237,48 @@ public class JsonParseHandler {
 //		}
 //		return jsonObject;
 //	}
+	
+	public static JSONObject parseIssueItemToJson(IssueItem issueItem) {
+		if (issueItem == null) {
+			return null;
+		}
+		JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject.put(NetConstance.PARAM_DIM_ONE_ID, issueItem.getDimOneId());
+			if (issueItem.getDimOneName() == null) {
+				jsonObject.put(NetConstance.PARAM_DIM_ONE_NAME, JSONObject.NULL);
+			} else {
+				jsonObject.put(NetConstance.PARAM_DIM_ONE_NAME, issueItem.getDimOneName());
+			}
+			jsonObject.put(NetConstance.PARAM_DIM_TWO_ID, issueItem.getId());
+			if (issueItem.getName() == null) {
+				jsonObject.put(NetConstance.PARAM_DIM_TWO_NAME, JSONObject.NULL);
+			} else {
+				jsonObject.put(NetConstance.PARAM_DIM_TWO_NAME, issueItem.getName());
+			}
+			jsonObject.put(NetConstance.PARAM_DEF_QUE, issueItem.getIsDefQue());
+			jsonObject.put(NetConstance.PARAM_PRE_QUE, issueItem.getIsPreQue());
+			jsonObject.put(NetConstance.PARAM_IS_CHECK, issueItem.isCheck());
+			if (issueItem.getContent() == null) {
+				jsonObject.put(NetConstance.PARAM_CONTENT, JSONObject.NULL);
+			} else {
+				jsonObject.put(NetConstance.PARAM_CONTENT, issueItem.getContent());
+			}
+			jsonObject.put(NetConstance.PARAM_REFORM_STATE, issueItem.getReformState());
+			JSONArray jsonArray = new JSONArray();
+			if (issueItem.getImagelist() != null) {
+				for (ImageItem imageItem : issueItem.getImagelist()) {
+					JSONObject imageObject = new JSONObject();
+					imageObject.put(NetConstance.PARAM_FILE_PATH, imageItem.getServiceSavePath());
+					imageObject.put(NetConstance.PARAM_IS_WIDTH, imageItem.isWidth());
+					jsonArray.put(imageObject);
+				}
+			}
+			jsonObject.put(NetConstance.PARAM_IMAGE_LIST, jsonArray);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return jsonObject;
+	}
 	
 }

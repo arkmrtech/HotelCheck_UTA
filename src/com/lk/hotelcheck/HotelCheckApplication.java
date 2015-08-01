@@ -24,8 +24,8 @@ public class HotelCheckApplication extends SugarApp{
 //        crashHandler.init(this);  
         initDataFile();
         //bugly
-        String appId = "XXXXXMYAPPIDXXXX";   //上Bugly(bugly.qq.com)注册产品获取的AppId
-        boolean isDebug = true ;  //true代表App处于调试阶段，false代表App发布阶段
+        String appId = "900006006";   //上Bugly(bugly.qq.com)注册产品获取的AppId
+        boolean isDebug = false ;  //true代表App处于调试阶段，false代表App发布阶段
         CrashReport.initCrashReport(this, appId ,isDebug);  //初始化SDK     
 	}
 	

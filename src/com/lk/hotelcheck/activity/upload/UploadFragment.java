@@ -224,9 +224,11 @@ public class UploadFragment extends Fragment{
 		if (index == -1) {
 			return;
 		}
-		ViewHolder viewHolder = mRecycle.getChildViewHolder(mRecycle.getChildAt(index));
-		if (viewHolder != null && viewHolder instanceof UploadItemViewHolder) {
-			((UploadItemViewHolder)viewHolder).setData(uploadBean);
+		if (mRecycle != null) {
+			ViewHolder viewHolder = mRecycle.getChildViewHolder(mRecycle.getChildAt(index));
+			if (viewHolder != null && viewHolder instanceof UploadItemViewHolder) {
+				((UploadItemViewHolder)viewHolder).setData(uploadBean);
+			}
 		}
 	}
 
