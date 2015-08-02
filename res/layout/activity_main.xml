@@ -62,6 +62,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/pb_loading"
             android:layout_centerHorizontal="true"
+            android:textColor="@color/white"
             android:text="数据加载中" />
     </RelativeLayout>
 

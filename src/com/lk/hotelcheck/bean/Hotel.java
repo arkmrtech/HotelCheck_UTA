@@ -424,7 +424,7 @@ public class Hotel extends SugarRecord<Hotel>{
 		this.floorEnd = hotel.getFloorEnd();
 		this.imageStatus = hotel.isImageStatus();
 		this.guardianNumber = hotel.getGuardianNumber();
-		this.status = hotel.isStatus();
+//		this.status = hotel.isStatus();
 		this.checkDate = hotel.getCheckDate();
 	}
 	public void setRoom(long areaId, CheckData checkData) {

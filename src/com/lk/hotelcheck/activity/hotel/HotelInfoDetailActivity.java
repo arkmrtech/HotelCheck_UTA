@@ -260,13 +260,14 @@ public class HotelInfoDetailActivity extends BaseActivity{
 				
 				@Override
 				public void onSuccess(JSONObject response) {
+					Toast.makeText(HotelInfoDetailActivity.this, "酒店数据上传成功", Toast.LENGTH_SHORT).show();
 					mHotel.setDataStatus(true);
 					mLoadingGroup.setVisibility(View.GONE);
 				}
 				
 				@Override
-				public void onError() {
-					Toast.makeText(HotelInfoDetailActivity.this, "酒店检查失败，网络异常，请稍后再试", Toast.LENGTH_SHORT).show();
+				public void onError(int errorCode, String info) {
+					Toast.makeText(HotelInfoDetailActivity.this, "酒店数据上传失败，网络异常，请稍后再试", Toast.LENGTH_SHORT).show();
 					mLoadingGroup.setVisibility(View.GONE);
 				}
 			});
@@ -274,12 +275,13 @@ public class HotelInfoDetailActivity extends BaseActivity{
 	 
 	 private void updateHotelCheckState() {
 		 mLoadingGroup.setVisibility(View.VISIBLE);
-			HttpRequest.getInstance().updateHotelCheckStatus(this, mHotel.getCheckId(), mHotel.isStatus(), NetConstance.DEFAULT_SESSION, new HttpCallback() {
+			HttpRequest.getInstance().updateHotelCheckStatus(this, mHotel.getCheckId(), NetConstance.DEFAULT_SESSION, new HttpCallback() {
 				
 				@Override
 				public void onSuccess(JSONObject response) {
 //					((HotelBaseInfoFragment)mAdapter.getItem(0)).setGuardianNumber(number);
 //					DataManager.getInstance().setHotelChecked(position, hotel);
+					Toast.makeText(HotelInfoDetailActivity.this, "酒店检查状态上传成功", Toast.LENGTH_SHORT).show();
 					mHotel.setStatus(true);
 					DataManager.getInstance().initCheckedData(mHotel);
 					if (mViewPager.getCurrentItem() != 2) {
@@ -293,7 +295,7 @@ public class HotelInfoDetailActivity extends BaseActivity{
 				}
 				
 				@Override
-				public void onError() {
+				public void onError(int errorCode, String info) {
 					Toast.makeText(HotelInfoDetailActivity.this, "酒店检查失败，网络异常，请稍后再试", Toast.LENGTH_SHORT).show();
 					mLoadingGroup.setVisibility(View.GONE);
 				}

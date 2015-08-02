@@ -35,6 +35,7 @@ import com.lk.hotelcheck.network.HttpRequest;
 import com.lk.hotelcheck.upload.UploadProxy;
 import com.lk.hotelcheck.util.DrawUtil;
 import com.lk.hotelcheck.util.Machine;
+import com.lk.hotelcheck.util.SharedPrefsUtil;
 
 import common.NetConstance;
 
@@ -82,10 +83,7 @@ public class MainActivity extends BaseActivity {
 			}
 		});
 		mLoadingGroup = (ViewGroup) findViewById(R.id.vg_loadig);
-		initCheckData();
-		loadHotelData();
-//		checkData();
-//		checkNetworkSpeed();
+		initData();
 	}
     
     @Override
@@ -216,7 +214,7 @@ public class MainActivity extends BaseActivity {
 						}
 						
 						@Override
-						public void onError() {
+						public void onError(int errorCode, String info) {
 							// TODO Auto-generated method stub
 							
 						}
@@ -226,26 +224,31 @@ public class MainActivity extends BaseActivity {
 		}
 	}
 	
-	private void initCheckData() {
+	private void initData() {
 		mLoadingGroup.setVisibility(View.VISIBLE);
-		DataManager.getInstance().loadCheckData(this, new DataCallback() {
-			
-			@Override
-			public void onSuccess() {
-				mLoadingGroup.setVisibility(View.GONE);
-			}
-			
-			@Override
-			public void onFail() {
-				mLoadingGroup.setVisibility(View.GONE);
-			}
-		});
+		long lastDataDate = SharedPrefsUtil.getValue(this,NetConstance.PARAM_DATE , 0l);
+		if (DataManager.getInstance().getDate() > lastDataDate) {
+			SharedPrefsUtil.putValue(this, NetConstance.PARAM_DATE, DataManager.getInstance().getDate());
+			DataManager.getInstance().loadCheckData(this, new DataCallback() {
+				@Override
+				public void onSuccess() {
+					loadHotelData();
+				}
+				
+				@Override
+				public void onFail() {
+					mLoadingGroup.setVisibility(View.GONE);
+				}
+			});
+		} else {
+			loadHotelData();
+		}
+		
 		
 	}
 
 	
 	private void loadHotelData() {
-		mLoadingGroup.setVisibility(View.VISIBLE);
 		DataManager.getInstance().loadHotelData(this, new DataCallback() {
 			
 			@Override

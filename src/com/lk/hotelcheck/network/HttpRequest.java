@@ -93,16 +93,16 @@ public class HttpRequest {
 		postRequest(context, url, jsonObject, callback);
 	}
 	
-	public void updateHotelCheckStatus(Context context, int checkId, boolean status, String session, final HttpCallback callback) {
+	public void updateHotelCheckStatus(Context context, int checkId, String session, final HttpCallback callback) {
 		String url = getRequestURL(NetConstance.METHOD_UPDATE_HOTEL_STATUS);
 		JSONObject jsonObject = new JSONObject();
-		int state = 0;
-		if (status) {
-			state = 1;
-		}
+//		int state = 0;
+//		if (status) {
+//			state = 1;
+//		}
 		try {
 			jsonObject.put(NetConstance.PARAM_CHECK_ID, checkId);
-			jsonObject.put(NetConstance.PARAM_STATE, state);
+			jsonObject.put(NetConstance.PARAM_STATE, 2);//2 = finish;
 			jsonObject.put(NetConstance.REQUEST_PARAM_KEY, session);
 		} catch (JSONException e1) {
 			e1.printStackTrace();
@@ -119,7 +119,7 @@ public class HttpRequest {
 			Log.d("lxk", "updateHotelData hotel is null");
 			return;
 		}
-		String url = getRequestURL(NetConstance.METHOD_GET_CHECK_DATA);
+		String url = getRequestURL(NetConstance.METHOD_UPLOAD_HOTEL_DATA);
 		JSONObject jsonObject = new JSONObject();
 		try {
 			JSONObject json = JsonParseHandler.parseHotelToJson(hotel);
@@ -175,7 +175,7 @@ public class HttpRequest {
 			public void onFailure(int statusCode, Header[] headers,
 					String responseString, Throwable throwable) {
 				super.onFailure(statusCode, headers, responseString, throwable);
-				callback.onError();
+				callback.onError(statusCode, "error");
 				Log.d("lxk", "<onFailure> 1 response = "+responseString);
 			}
 			
@@ -184,7 +184,7 @@ public class HttpRequest {
 					Throwable throwable, JSONArray errorResponse) {
 				// TODO Auto-generated method stub
 				super.onFailure(statusCode, headers, throwable, errorResponse);
-				callback.onError();
+				callback.onError(statusCode, "error");
 				Log.d("lxk", "<onFailure> 2 response = "+errorResponse);
 			}
 			
@@ -194,18 +194,20 @@ public class HttpRequest {
 				// TODO Auto-generated method stub
 				super.onFailure(statusCode, headers, throwable, errorResponse);
 				Log.d("lxk", "<onFailure> 3 response = "+errorResponse);
-				callback.onError();
+				callback.onError(statusCode, "error");
 			}
 			
 			@Override
 			public void onSuccess(int statusCode, Header[] headers,
 					JSONObject response) {
 				super.onSuccess(statusCode, headers, response);
+				Log.d("lxk", "<onSuccess>  response = "+response);
 				int state = response.optInt(NetConstance.PARAM_STATE);
+				String info = response.optString(NetConstance.PARAM_INFO);
 				if (state == NetConstance.ERROR_CODE_SUCCESS) {
 					callback.onSuccess(response);
 				} else {
-					callback.onError();
+					callback.onError(state, info);
 				}
 				
 			}

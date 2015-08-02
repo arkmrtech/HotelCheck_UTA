@@ -406,7 +406,7 @@ public class DataManager {
 			}
 			
 			@Override
-			public void onError() {
+			public void onError(int errorCode, String info) {
 				callback.onFail();
 			}
 		});
@@ -439,7 +439,7 @@ public class DataManager {
 			}
 			
 			@Override
-			public void onError() {
+			public void onError(int errorCode, String info) {
 				callback.onFail();
 				
 			}
@@ -565,7 +565,7 @@ public class DataManager {
 				}
 				
 				@Override
-				public void onError() {
+				public void onError(int errorCode, String info) {
 					// TODO Auto-generated method stub
 					
 				}
@@ -581,7 +581,11 @@ public class DataManager {
 	public void setUser(User user) {
 		this.mUser = user;
 	}
-//	
+	
+	public long getDate() {
+		return mUser == null ? 0 : mUser.getDate();
+	}
+	
 	public String getUserName() {
 		if (mUser == null) {
 			return "";

@@ -4,5 +4,5 @@ import org.json.JSONObject;
 
 public interface HttpCallback {
 	void onSuccess(JSONObject response);
-	void onError();
+	void onError(int errorCode, String info);
 }

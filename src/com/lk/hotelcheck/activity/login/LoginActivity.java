@@ -68,7 +68,9 @@ public class LoginActivity extends Activity{
 			
 			@Override
 			public void onSuccess(JSONObject response) {
+				long date = response.optLong(NetConstance.PARAM_DATE);
 				User user = new User();
+				user.setDate(date);
 				user.setUserName(userId);
 				DataManager.getInstance().setUser(user);
 				Intent intent = new Intent();
@@ -80,8 +82,8 @@ public class LoginActivity extends Activity{
 			}
 			
 			@Override
-			public void onError() {
-				Toast.makeText(LoginActivity.this, "登录失败，用户名密码错误", Toast.LENGTH_SHORT).show();
+			public void onError(int errorCode, String info) {
+				Toast.makeText(LoginActivity.this, info, Toast.LENGTH_SHORT).show();
 				mLoadingGroup.setVisibility(View.GONE);
 			}
 		});

@@ -6,10 +6,10 @@ public class NetConstance {
 	public static final String REQUEST_PARAM_PASSWORD = "password";
 	public static final String REQUEST_PARAM_KEY = "key";
 	
-	public static final String BASE_URL = "http://203.195.172.191:8080/app/service/";
+//	public static final String BASE_URL = "http://203.195.172.191:8080/app/service/";
 
 	//for test
-//	public static final String BASE_URL = "http://192.168.1.154:8088/app/service/";
+	public static final String BASE_URL = "http://192.168.1.151:8088/app/service/";
 	public static final String DEFAULT_SESSION = "91c399bb80c2a34824d4bed4c4c57ca8";
 	
 	public static final String METHOD_LOGIN = "login.html";
@@ -65,6 +65,10 @@ public class NetConstance {
 	public static final int ERROR_CODE_SUCCESS = 1;
 	public static final int ERROR_CODE_FAIL = 0;
 	public static final String PARAM_REFORM_STATE = "reform_state";
+	public static final String PARAM_INFO = "info";
+	public static final String PARAM_DATE = "date";
+	public static final String PARAM_CHECK_STATE = "check_state";
+	public static final String PARAM_IS_UPDATE_DATA = "is_update_data";
 	
 	
 	

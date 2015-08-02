@@ -5,6 +5,7 @@ import android.R.integer;
 public class User {
 	private String userName;
 	private String session;
+	private long date;
 	
 	public String getUserName() {
 		return userName;
@@ -17,6 +18,12 @@ public class User {
 	}
 	public void setSession(String session) {
 		this.session = session;
+	}
+	public long getDate() {
+		return date;
+	}
+	public void setDate(long date) {
+		this.date = date;
 	}
 	
 	

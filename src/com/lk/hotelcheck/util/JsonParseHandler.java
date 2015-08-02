@@ -7,6 +7,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.R.integer;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.lk.hotelcheck.bean.CheckData;
@@ -15,6 +17,7 @@ import com.lk.hotelcheck.bean.ImageItem;
 import com.lk.hotelcheck.bean.IssueItem;
 import com.lk.hotelcheck.bean.dao.AreaIssue;
 import com.lk.hotelcheck.manager.DataManager;
+
 import common.Constance;
 import common.NetConstance;
 
@@ -49,6 +52,18 @@ public class JsonParseHandler {
 			hotel.setAddress(branchObject.optString(NetConstance.PARAM_ADDRESS));
 			hotel.setPhone(branchObject.optString(NetConstance.PARAM_TELT));
 			hotel.setMemo(branchObject.optString(NetConstance.PARAM_REGION));
+			int checkState = branchObject.optInt(NetConstance.PARAM_CHECK_STATE);
+			int uploadDataState = branchObject.optInt(NetConstance.PARAM_IS_UPDATE_DATA);
+			boolean status = false;
+			if (checkState == 2) {
+				status = true;
+			}
+			boolean dataStatus = false;
+			if (uploadDataState == 1) {
+				dataStatus = true;
+			}
+			hotel.setStatus(status);
+			hotel.setDataStatus(dataStatus);
 			long openDate = branchObject.optLong(NetConstance.PARAM_OPEN_DATE);
 			long lastCheckDate = branchObject.optLong(NetConstance.PARAM_LAST_CHECK_DATE);
 			SimpleDateFormat sFormat = new SimpleDateFormat("yyyy-MM-dd");
