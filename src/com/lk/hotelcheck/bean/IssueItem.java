@@ -56,6 +56,9 @@ public class IssueItem{
 		this.content = content;
 	}
 	public List<ImageItem> getImagelist() {
+		if (imagelist == null) {
+			return Collections.emptyList();
+		}
 		return imagelist;
 	}
 	public void setImagelist(List<ImageItem> imagelist) {

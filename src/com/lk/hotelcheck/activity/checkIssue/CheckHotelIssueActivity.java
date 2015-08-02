@@ -248,9 +248,13 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 	public void onCheckedChangeListener(int position, boolean isChecked) {
 		mCurrentIssuePosition = position;
 		IssueItem issueItem = mCheckData.getIssue(mCurrentIssuePosition);
-		issueItem.setCheck(isChecked);
-		mCheckData.updateIssueCheck(issueItem);
-		DataManager.getInstance().saveIssueCheck(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), isChecked);
+		if (isChecked != issueItem.isCheck()) {
+			issueItem.setCheck(isChecked);
+			mCheckData.updateIssueCheck(issueItem);
+			DataManager.getInstance().saveIssueCheck(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), isChecked);
+			mAdapter.notifyItemChanged(position);
+		}
+		
 	}
 
 	@Override
@@ -361,6 +365,12 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 			}
 		}
 		return false;
+	}
+
+
+	@Override
+	public void onDeleteItem(int position) {
+		mCheckData.initCheckedIssue();
 	}
 
 	

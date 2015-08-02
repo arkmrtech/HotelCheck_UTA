@@ -164,15 +164,11 @@ public class Hotel extends SugarRecord<Hotel>{
 		for (CheckData checkData : checkDatas) {
 				count += checkData.getCheckedIssueCount();
 		}
-		if (roomArray != null) {
-			for (CheckData checkData : roomArray) {
-				count += checkData.getCheckedIssueCount();
-			}
+		if (roomCheckedIsuueArray != null) {
+			count += roomCheckedIsuueArray.size();
 		}
-		if (passwayArray != null) {
-			for (CheckData checkData : passwayArray) {
-				count += checkData.getCheckedIssueCount();
-			}
+		if (passwayCheckedIsuueArray != null) {
+			count += passwayCheckedIsuueArray.size();
 		}
 		return count;
 	}

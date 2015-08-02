@@ -48,11 +48,10 @@ public class HotelIssueAdapter extends RecyclerView.Adapter<ViewHolder>{
 	
 	private List<IssueItem> mDataList;
 	private CallBackListener mListener;
-	private AlertDialog mAlertDialog;
+//	private AlertDialog mAlertDialog;
 	private boolean mIsChecked;
 	private static final int WIFI_VIEW_TYPE = 0X10086;
 	private static final int NORMAL_VIEW_TYPE = 0X10087;
-	private  EditText mAlertEditText;
 	
 	public HotelIssueAdapter(List<IssueItem> dataList, CallBackListener listener, boolean isChecked) {
 		super();
@@ -195,12 +194,11 @@ public class HotelIssueAdapter extends RecyclerView.Adapter<ViewHolder>{
 	
 	private void showDialog( int issuePositon, Context context){
 		final IssueItem issueItem = mDataList.get(issuePositon);
-		if (mAlertDialog == null) {
 			LayoutInflater factory = LayoutInflater.from(context);// 提示框
 			View view = factory.inflate(R.layout.alert_dialog_edit, null);// 这里必须是final的
-			mAlertEditText = (EditText) view.findViewById(R.id.et_content);// 获得输入框对象
+			final EditText mAlertEditText = (EditText) view.findViewById(R.id.et_content);// 获得输入框对象
 			mAlertEditText.setInputType(InputType.TYPE_CLASS_TEXT);
-			mAlertDialog = new AlertDialog.Builder(context)
+			AlertDialog mAlertDialog = new AlertDialog.Builder(context)
 					 .setTitle("问题描述")//提示框标题
 					.setView(view)
 					.setPositiveButton("确定",// 提示框的两个按钮
@@ -225,7 +223,6 @@ public class HotelIssueAdapter extends RecyclerView.Adapter<ViewHolder>{
 
 								}
 							}).create();
-		} 
 		mAlertEditText.setTag(issuePositon);
 		int index = mAlertEditText.getSelectionStart();
 		if (issueItem.getContent() != null) {
@@ -318,6 +315,7 @@ public class HotelIssueAdapter extends RecyclerView.Adapter<ViewHolder>{
 		void onCheckedChangeListener(int position, boolean isChecked);
 		void setContent(int position, String content);
 		void onWifiClick(int position);
+		void onDeleteItem(int position);
 	}
 
 	public void addIssue(IssueItem issueItem) {
@@ -335,6 +333,9 @@ public class HotelIssueAdapter extends RecyclerView.Adapter<ViewHolder>{
 			dymicIssue.delete();
 		}
 		mDataList.remove(position);
+		if (mListener != null) {
+			mListener.onDeleteItem(position);
+		}
 		notifyItemRemoved(position);
 	}
 

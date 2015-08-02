@@ -114,7 +114,9 @@ public class HotelBaseInfoFragment extends Fragment {
 			mFloorLayout = (RelativeLayout) mRootView
 					.findViewById(R.id.rl_floor_number);
 //			mGuardianNumberTextView = (TextView) mRootView.findViewById(R.id.tv_guardian_number);
-			init();
+			if (mHotel != null) {
+				init();
+			}
 		}
 		return mRootView;
 	}
