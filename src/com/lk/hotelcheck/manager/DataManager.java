@@ -269,7 +269,7 @@ public class DataManager {
 								hotel.addRoom(checkData);
 							}
 						} else if (checkData.getType() == Constance.CheckDataType.TYPE_PASSWAY) {
-							if (hotel.hasRoom(checkData.getId())) {
+							if (hotel.hasPassway(checkData.getId())) {
 								hotel.setPassway(checkData.getId(), checkData);
 							} else {
 								hotel.addPassway(checkData);

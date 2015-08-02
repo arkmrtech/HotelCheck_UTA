@@ -46,8 +46,9 @@ public class JsonParseHandler {
 		JSONArray questionList = jsonObject.optJSONArray(NetConstance.PARAM_QUESTION_LIST);
 		JSONArray dymicList = jsonObject.optJSONArray(NetConstance.PARAM_ROOM_ADN_PASSWAY_LIST);
 		if (branchObject != null) {
+			String hotelName = branchObject.optString(NetConstance.PARAM_BRANCH_NAME);
 			hotel.setCheckId(branchObject.optInt(NetConstance.PARAM_BRANCH_CHECK_ID));
-			hotel.setName(branchObject.optString(NetConstance.PARAM_BRANCH_NAME));
+			hotel.setName(hotelName);
 			hotel.setBranchNumber(branchObject.optInt(NetConstance.PARAM_BRANCH_NUMBER));
 			hotel.setAddress(branchObject.optString(NetConstance.PARAM_ADDRESS));
 			hotel.setPhone(branchObject.optString(NetConstance.PARAM_TELT));
@@ -89,11 +90,20 @@ public class JsonParseHandler {
 		if (dymicList != null) {
 			for (int i = 0; i < dymicList.length(); i++) {
 				try {
-					CheckData checkData = parseDymicData(dymicList.getJSONObject(i));
+					CheckData checkData = parseDymicData(dymicList.getJSONObject(i), hotel.getName());
 					if (checkData.getType() == Constance.CheckDataType.TYPE_ROOM) {
-						hotel.addRoom(checkData);
+						if (hotel.hasRoom(checkData.getId())) {
+							hotel.setRoom(checkData.getId(), checkData);
+						} else {
+							hotel.addRoom(checkData);
+						}
 					} else if (checkData.getType() == Constance.CheckDataType.TYPE_PASSWAY) {
-						hotel.addPassway(checkData);
+						if (hotel.hasPassway(checkData.getId())) {
+							hotel.setPassway(checkData.getId(), checkData);
+						} else {
+							hotel.addPassway(checkData);
+						}
+						
 					}
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -119,7 +129,7 @@ public class JsonParseHandler {
 		return areaIssue;
 	}
 	
-	public static CheckData parseDymicData(JSONObject jsonObject) {
+	public static CheckData parseDymicData(JSONObject jsonObject, String hotelName) {
 		if (jsonObject == null) {
 			return null;
 		}
@@ -140,10 +150,10 @@ public class JsonParseHandler {
 			checkData.setType(Constance.CheckDataType.TYPE_NORMAL);
 		}
 		checkData.setCheckId(jsonObject.optLong(NetConstance.PARAM_AREA_ID));
-		String name = jsonObject.optString(NetConstance.PARAM_QUE_AREA_NAME)+ jsonObject.optString(NetConstance.PARAM_NAME);
+		String name = jsonObject.optString(NetConstance.PARAM_NAME);
 		if (name != null) {
 			checkData.setName(name);
-			checkData.setId((long) Math.abs(name.hashCode()));
+			checkData.setId((long) Math.abs(name.hashCode()+hotelName.hashCode()));
 		}
 		
 		

@@ -162,7 +162,7 @@ public class HttpRequest {
 	private void postRequest(Context context, String url, JSONObject jsonObject, final HttpCallback callback) {
 		StringEntity entity = null;
 		try {
-			entity = new StringEntity(jsonObject.toString());
+			entity = new StringEntity(jsonObject.toString(),"utf-8");
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
