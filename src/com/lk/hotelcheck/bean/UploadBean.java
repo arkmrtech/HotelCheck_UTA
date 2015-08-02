@@ -13,7 +13,7 @@ public class UploadBean extends SugarRecord<UploadBean> implements Serializable{
 	@Expose
 	private long checkId;
 	@Expose
-	private long areaid;
+	private long areaId;
 	@Expose
 	private int issueId;
 	@Expose
@@ -28,11 +28,8 @@ public class UploadBean extends SugarRecord<UploadBean> implements Serializable{
 	private String localImagePath;
 	@Expose
 	private String serviceImageSavePath;
-	@Expose
 	private String fileName;
-	@Expose
 	private long transferedBytes;
-	@Expose
 	private long totalBytes;
 	@Expose
 	private int imageState;
@@ -58,7 +55,7 @@ public class UploadBean extends SugarRecord<UploadBean> implements Serializable{
 			ImageItem imageItem) {
 		super();
 		this.checkId = checkId;
-		this.areaid = areaId;
+		this.areaId = areaId;
 		this.areaName = areaName;
 		this.issueId = issueId;
 		this.issueName = issueName;
@@ -108,12 +105,12 @@ public class UploadBean extends SugarRecord<UploadBean> implements Serializable{
 
 
 	public long getAreaid() {
-		return areaid;
+		return areaId;
 	}
 
 
 	public void setAreaid(long areaid) {
-		this.areaid = areaid;
+		this.areaId = areaid;
 	}
 
 

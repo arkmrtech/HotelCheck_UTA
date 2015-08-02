@@ -56,7 +56,6 @@ public class HttpRequest {
 	 */
 	public void login(Context context, String userId, String password, HttpCallback callback) {
 		String url = getRequestURL(NetConstance.METHOD_LOGIN);
-		Log.d("lxk", "url = "+url);
 		JSONObject jsonObject = new JSONObject();
 		try {
 			jsonObject.put(NetConstance.REQUEST_PARAM_USER_NAME, userId);
@@ -134,22 +133,43 @@ public class HttpRequest {
 		
 	}
 	
-	public void updateImageStatus(Context context, List<UploadBean> uploadBeans, String session, final HttpCallback callback) {
-		if (uploadBeans == null) {
+//	public void updateImageStatus(Context context, List<UploadBean> uploadBeans, String session, final HttpCallback callback) {
+//		if (uploadBeans == null) {
+//			Log.d("lxk", "updateImageStatus uploadBeans is null");
+//			return;
+//		}
+//		String url = getRequestURL(NetConstance.METHOD_GET_CHECK_DATA);
+//		JSONObject jsonObject = new JSONObject();
+//		try {
+//			JSONArray json = new JSONArray();
+//			 Gson gson = new GsonBuilder()
+//			    .excludeFieldsWithoutExposeAnnotation() // <---
+//			    .create();
+//			for (UploadBean uploadBean : uploadBeans) {
+//				JSONObject temp = new JSONObject(gson.toJson(uploadBean));
+//				json.put(temp);
+//			}
+//			jsonObject.put(NetConstance.PARAM_IMAGE_LIST, json);
+//			jsonObject.put(NetConstance.REQUEST_PARAM_KEY, session);
+//		} catch (JSONException e1) {
+//			e1.printStackTrace();
+//		}
+//		
+//		postRequest(context, url, jsonObject, callback);
+//	}
+	
+	public void updateImageStatus(Context context, UploadBean uploadBean, String session, final HttpCallback callback) {
+		if (uploadBean == null) {
 			Log.d("lxk", "updateImageStatus uploadBeans is null");
 			return;
 		}
-		String url = getRequestURL(NetConstance.METHOD_GET_CHECK_DATA);
+		String url = getRequestURL(NetConstance.METHOD_UPLOAD_IMAGE_STATUS);
 		JSONObject jsonObject = new JSONObject();
 		try {
-			JSONArray json = new JSONArray();
 			 Gson gson = new GsonBuilder()
 			    .excludeFieldsWithoutExposeAnnotation() // <---
 			    .create();
-			for (UploadBean uploadBean : uploadBeans) {
-				JSONObject temp = new JSONObject(gson.toJson(uploadBean));
-				json.put(temp);
-			}
+			JSONObject json = new JSONObject(gson.toJson(uploadBean));
 			jsonObject.put(NetConstance.PARAM_IMAGE_LIST, json);
 			jsonObject.put(NetConstance.REQUEST_PARAM_KEY, session);
 		} catch (JSONException e1) {

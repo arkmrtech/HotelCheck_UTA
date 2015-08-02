@@ -228,6 +228,8 @@ public class DataManager {
 					checkData.setType(Constance.CheckDataType.TYPE_ROOM);
 				} else if (checkData.getId() == Constance.CHECK_DATA_ID_PASSWAY) {
 					checkData.setType(Constance.CheckDataType.TYPE_PASSWAY);
+				} else {
+					checkData.setType(Constance.CheckDataType.TYPE_NORMAL);
 				}
 			}
 			checkData.addIssue(issueItem);
@@ -511,11 +513,15 @@ public class DataManager {
 	}
 
 	public CheckData createRoomCheckData() {
-		return createDymicCheckData(Constance.CHECK_DATA_ID_ROOM);
+		CheckData checkData = createDymicCheckData(Constance.CHECK_DATA_ID_ROOM);
+		checkData.setType(CheckDataType.TYPE_ROOM);
+		return checkData;
 	}
 	
 	public CheckData createPasswayCheckData() {
-		return createDymicCheckData(Constance.CHECK_DATA_ID_PASSWAY);
+		CheckData checkData = createDymicCheckData(Constance.CHECK_DATA_ID_PASSWAY);
+		checkData.setType(CheckDataType.TYPE_PASSWAY);
+		return checkData;
 	}
 	
 	public CheckData createDymicCheckData(int checkDataId) {
@@ -553,20 +559,18 @@ public class DataManager {
 		return dataList;
 	}
 
-	public void updateImageStatus(Context context) {
-		List<UploadBean> uploadBean = UploadBean.listAll(UploadBean.class);
+	public void updateImageStatus(Context context, UploadBean uploadBean) {
+//		List<UploadBean> uploadBean = UploadBean.listAll(UploadBean.class);
 		if (uploadBean != null) {
 			HttpRequest.getInstance().updateImageStatus(context, uploadBean, NetConstance.DEFAULT_SESSION, new HttpCallback() {
 				
 				@Override
 				public void onSuccess(JSONObject response) {
-					// TODO Auto-generated method stub
 					
 				}
 				
 				@Override
 				public void onError(int errorCode, String info) {
-					// TODO Auto-generated method stub
 					
 				}
 			});

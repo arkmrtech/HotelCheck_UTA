@@ -190,7 +190,7 @@ public class UploadService extends Service {
 	private synchronized boolean startNext() {
 		int size = mWaitTaskQueue.size();
 		if (size <= 0) {
-			DataManager.getInstance().updateImageStatus(UploadService.this);
+//			DataManager.getInstance().updateImageStatus(UploadService.this);
 			return true;
 		}
 
@@ -291,6 +291,7 @@ public class UploadService extends Service {
 						if (isComplete) {
 							mBean.setImageState(ImageUploadState.STATE_FINISH);
 							mRuningTaskQueue.remove(mBean);
+							DataManager.getInstance().updateImageStatus(UploadService.this, mBean);
 						} else {
 							mBean.setImageState(ImageUploadState.STATE_FAIL);
 							mRuningTaskQueue.remove(mBean);
