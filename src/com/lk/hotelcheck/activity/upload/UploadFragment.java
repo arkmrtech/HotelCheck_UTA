@@ -22,9 +22,11 @@ import android.widget.Toast;
 
 import com.lk.hotelcheck.R;
 import com.lk.hotelcheck.bean.UploadBean;
+import com.lk.hotelcheck.manager.DataManager;
 import com.lk.hotelcheck.upload.UploadProxy;
 import com.lk.hotelcheck.util.Machine;
 import com.nostra13.universalimageloader.core.ImageLoader;
+
 import common.Constance;
 import common.Constance.ImageUploadState;
 import common.Constance.IntentKey;
@@ -64,7 +66,6 @@ public class UploadFragment extends Fragment{
 	
 	@Override
 	public void onAttach(Activity activity) {
-		// TODO Auto-generated method stub
 		super.onAttach(activity);
 		mContext = activity;
 	}
@@ -81,29 +82,39 @@ public class UploadFragment extends Fragment{
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-//		if (mRootView == null) {
 			mRootView = inflater.inflate(R.layout.fragment_upload, container, false);
 			mRecycle = (RecyclerView) mRootView.findViewById(R.id.rv_upload);
+//			if (mType == TYPE_UPLOADING) {
+//				mDataList = UploadProxy.getUploadingList(mHotelId);
+//			} else {
+//				mDataList = UploadProxy.getUploadComplete(mHotelId);
+//			}
 			if (mType == TYPE_UPLOADING) {
-				mDataList = UploadProxy.getUploadingList(mHotelId);
+				mDataList = DataManager.getInstance().getUploadingList(mHotelId);
 			} else {
-				mDataList = UploadProxy.getUploadComplete(mHotelId);
+				mDataList = DataManager.getInstance().getUploadCompleteList(mHotelId);
 			}
+			
+			
 			mAdapter = new UploadAdapter();
 			manager = new LinearLayoutManager(container.getContext());
 			mRecycle.setLayoutManager(manager);
 			mRecycle.setAdapter(mAdapter);
-			
-//		}
 		return mRootView;
 	}
 	
+	
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		mContext = null;
+	}
 	
 	class UploadAdapter extends RecyclerView.Adapter<ViewHolder> {
 
 		@Override
 		public int getItemCount() {
-			Log.d("lxk", "count = "+mDataList.size());
+			Log.d("lxk", "UploadAdapter count = "+mDataList.size());
 			return mDataList == null ? 0 : mDataList.size();
 		}
 
@@ -207,10 +218,6 @@ public class UploadFragment extends Fragment{
 		int i = -1;
 		for (int j = 0; j < mDataList.size(); j++) {
 			UploadBean uploadBean = mDataList.get(j);
-//			if (uploadBean.getId() == bean.getId()) {
-//				i = j;
-//				return i;
-//			}
 			if (uploadBean.getLocalImagePath().equals(bean.getLocalImagePath())) {
 				i = j;
 				return i;
@@ -224,10 +231,14 @@ public class UploadFragment extends Fragment{
 		if (index == -1) {
 			return;
 		}
+		mDataList.set(index, uploadBean);
 		if (mRecycle != null) {
-			ViewHolder viewHolder = mRecycle.getChildViewHolder(mRecycle.getChildAt(index));
-			if (viewHolder != null && viewHolder instanceof UploadItemViewHolder) {
-				((UploadItemViewHolder)viewHolder).setData(uploadBean);
+			View view = mRecycle.getChildAt(index);
+			if (view != null) {
+				ViewHolder viewHolder = mRecycle.getChildViewHolder(view);
+				if (viewHolder != null && viewHolder instanceof UploadItemViewHolder) {
+					((UploadItemViewHolder)viewHolder).setData(uploadBean);
+				}
 			}
 		}
 	}

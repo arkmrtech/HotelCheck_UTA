@@ -34,12 +34,20 @@ public class UploadProcessActivity extends BaseActivity {
 	private SlidingTabLayout mSlidingTabLayout;
 	private UploadAdapter mAdapter;
 	private int mPosition;
+	private int mCheckId = -1;
 	
-	public static void goToHotel(Context context , int id) {
+	public static void goToUpload(Context context , int id) {
 		Intent intent = new Intent();
 		intent.setClass(context, UploadProcessActivity.class);
 		int positiion = DataManager.getInstance().getHotelPosition(id);
 		intent.putExtra(Constance.IntentKey.INTENT_KEY_POSITION, positiion);
+		context.startActivity(intent);
+	}
+	
+	public static void goToUpload(Context context) {
+		Intent intent = new Intent();
+		intent.setClass(context, UploadProcessActivity.class);
+		intent.putExtra(Constance.IntentKey.INTENT_KEY_POSITION, -1);
 		context.startActivity(intent);
 	}
 	
@@ -52,7 +60,11 @@ public class UploadProcessActivity extends BaseActivity {
 		mPosition = -1;
 		if (getIntent().hasExtra(Constance.IntentKey.INTENT_KEY_POSITION)) {
 			mPosition = getIntent().getIntExtra(Constance.IntentKey.INTENT_KEY_POSITION, -1);
-			String name = DataManager.getInstance().getHotelName(mPosition);
+			String name = "图片传输进度";
+			if (mPosition != -1) {
+				name = DataManager.getInstance().getHotelName(mPosition)+name;
+				mCheckId = DataManager.getInstance().getHotel(mPosition).getCheckId();
+			}  
 			toolbar.setTitle(name);
 			init();
 		}
@@ -121,10 +133,9 @@ public class UploadProcessActivity extends BaseActivity {
 		
 		public UploadAdapter(FragmentManager fm, int position) {
 			super(fm);
-			Hotel hotel = DataManager.getInstance().getHotel(position);
 			mFragmentList = new ArrayList<Fragment>();
-			mFragmentList.add(UploadFragment.getUploadingInstance(hotel.getCheckId()));
-			mFragmentList.add(UploadFragment.getUploadCompleteInstance(hotel.getCheckId()));
+			mFragmentList.add(UploadFragment.getUploadingInstance(mCheckId));
+			mFragmentList.add(UploadFragment.getUploadCompleteInstance(mCheckId));
 		}
 
 		@Override

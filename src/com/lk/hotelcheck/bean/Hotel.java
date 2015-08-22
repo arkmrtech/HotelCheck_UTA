@@ -11,10 +11,16 @@ import android.util.SparseArray;
 import com.lk.hotelcheck.bean.dao.AreaIssue;
 import com.lk.hotelcheck.bean.dao.CheckIssue;
 import com.lk.hotelcheck.bean.dao.HotelCheck;
+import com.lk.hotelcheck.manager.DataManager;
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
 
 import common.Constance;
+import common.Constance.CheckDataType;
+import common.Constance.CheckType;
+import common.Constance.DefQueType;
+import common.Constance.ImageUploadState;
+import common.Constance.PreQueType;
 
 public class Hotel extends SugarRecord<Hotel>{
 
@@ -36,6 +42,9 @@ public class Hotel extends SugarRecord<Hotel>{
 	private boolean status;
 	private String guardianNumber;
 	private int checkType;
+	private transient String branchManager;
+	private transient String branchManagerTele;
+	private transient String brand;
 	@Ignore
 	private transient List<CheckData> checkDatas;
 	@Ignore
@@ -158,11 +167,13 @@ public class Hotel extends SugarRecord<Hotel>{
 	public int getRoomHadCheckedCount() {
 		return roomArray == null ? 0 : roomArray.size();
 	}
-	
+
 	public int getIssueCount() {
 		int count = 0;
-		for (CheckData checkData : checkDatas) {
+		if (checkDatas != null) {
+			for (CheckData checkData : checkDatas) {
 				count += checkData.getCheckedIssueCount();
+			}
 		}
 		if (roomCheckedIsuueArray != null) {
 			count += roomCheckedIsuueArray.size();
@@ -253,6 +264,9 @@ public class Hotel extends SugarRecord<Hotel>{
 		if (roomArray == null) {
 			roomArray = new ArrayList<CheckData>();
 		}
+		if (checkType == CheckType.CHECK_TYPE_REVIEW) {
+			initDymicQuestionCheckData(checkData);
+		}
 		roomArray.add(checkData);
 	}
 	
@@ -280,6 +294,9 @@ public class Hotel extends SugarRecord<Hotel>{
 		}
 		if (passwayArray == null) {
 			passwayArray = new ArrayList<CheckData>();
+		}
+		if (checkType == CheckType.CHECK_TYPE_REVIEW) {
+			initDymicQuestionCheckData(checkData);
 		}
 		passwayArray.add(checkData);
 	}
@@ -449,8 +466,10 @@ public class Hotel extends SugarRecord<Hotel>{
 	
 	public int getFixedIssueCount() {
 		int count = 0;
-		for (CheckData checkData : checkDatas) {
-			count += checkData.getFixedIssueCount();
+		if (checkDatas != null) {
+			for (CheckData checkData : checkDatas) {
+				count += checkData.getFixedIssueCount();
+			}
 		}
 		if (roomArray != null) {
 			for (CheckData checkData : roomArray) {
@@ -531,12 +550,7 @@ public class Hotel extends SugarRecord<Hotel>{
 		if (roomArray != null) {
 			for (CheckData checkData : roomArray) {
 				for (IssueItem issueItem : checkData.getCheckedIssue()) {
-//					if (roomCheckedIsuueArray.indexOfKey(issueItem.getId()) > -1) {
-//						roomCheckedIsuueArray.get(issueItem.getId()).addImageList(issueItem.getImagelist());
-//					} else {
-						roomCheckedIsuueArray.put(issueItem.getId(), issueItem);
-//					}
-					
+					roomCheckedIsuueArray.put(issueItem.getId(), issueItem);
 				}
 			}
 		}
@@ -551,11 +565,7 @@ public class Hotel extends SugarRecord<Hotel>{
 		if (passwayArray != null) {
 			for (CheckData checkData : passwayArray) {
 				for (IssueItem issueItem : checkData.getCheckedIssue()) {
-//					if (passwayCheckedIsuueArray.indexOfKey(issueItem.getId()) > -1) {
-//						passwayCheckedIsuueArray.get(issueItem.getId()).addImageList(issueItem.getImagelist());
-//					} else {
-						passwayCheckedIsuueArray.put(issueItem.getId(), issueItem);
-//					}
+					passwayCheckedIsuueArray.put(issueItem.getId(), issueItem);
 				}
 			}
 		}
@@ -663,12 +673,17 @@ public class Hotel extends SugarRecord<Hotel>{
 	
 	public List<ImageItem> getAllRoomCheckedImageList(int i) {
 		List<ImageItem> dataList = new ArrayList<ImageItem>();
-		IssueItem issueItem = roomCheckedIsuueArray.valueAt(i);
-		if (issueItem != null) {
-			for (CheckData checkData : roomArray) {
-				for (IssueItem tempItem : checkData.getCheckedIssue()) {
-					if (tempItem.getId() == issueItem.getId()) {
-						dataList.addAll(tempItem.getImagelist());
+		if (roomCheckedIsuueArray != null) {
+			IssueItem issueItem = roomCheckedIsuueArray.valueAt(i);
+			if (issueItem != null) {
+				for (CheckData checkData : roomArray) {
+					for (IssueItem tempItem : checkData.getCheckedIssue()) {
+						if (tempItem != null && tempItem.getId() == issueItem.getId()) {
+							if (tempItem.getImagelist() != null && tempItem.getImagelist().size() >0) {
+								dataList.addAll(tempItem.getImagelist());
+							}
+							
+						}
 					}
 				}
 			}
@@ -683,12 +698,122 @@ public class Hotel extends SugarRecord<Hotel>{
 			for (CheckData checkData : passwayArray) {
 				for (IssueItem tempItem : checkData.getCheckedIssue()) {
 					if (tempItem.getId() == issueItem.getId()) {
-						dataList.addAll(tempItem.getImagelist());
+						if (tempItem.getImagelist() != null && tempItem.getImagelist().size() >0) {
+							dataList.addAll(tempItem.getImagelist());
+						}
 					}
 				}
 			}
 		}
 		return dataList;
+	}
+	
+	public void initCheckedData() {
+			getDymicRoomCheckedIssueCount();
+			getDymicPasswayCheckedIssueCount();
+			if (checkDatas != null) {
+				for (CheckData checkData : checkDatas) {
+					checkData.initCheckedIssue();
+				}
+			}
+	}
+	public String getBrand() {
+		return brand;
+	}
+	public void setBrand(String brand) {
+		this.brand = brand;
+	}
+	
+	public int getDymicRoomCheckedIssueImageCount(int id) {
+		int count = 0;
+		if (roomCheckedIsuueArray != null && roomCheckedIsuueArray.indexOfKey(id) > -1) {
+			IssueItem issueItem = roomCheckedIsuueArray.get(id);
+			if (issueItem != null) {
+				for (CheckData checkData : roomArray) {
+					for (IssueItem tempItem : checkData.getCheckedIssue()) {
+						if (tempItem != null && tempItem.getId() == issueItem.getId()) {
+							if (tempItem.getImagelist() != null && tempItem.getImagelist().size() >0) {
+								count += tempItem.getImageCount();
+							}
+							
+						}
+					}
+				}
+			}
+		}
+		return count;
+	}
+	public int getDymicPasswayCheckedIssueImageCount(int id) {
+		int count = 0;
+		if (passwayCheckedIsuueArray != null && passwayCheckedIsuueArray.indexOfKey(id) > -1) {
+			IssueItem issueItem = passwayCheckedIsuueArray.get(id);
+			if (issueItem != null) {
+				for (CheckData checkData : passwayArray) {
+					for (IssueItem tempItem : checkData.getCheckedIssue()) {
+						if (tempItem != null && tempItem.getId() == issueItem.getId()) {
+							if (tempItem.getImagelist() != null && tempItem.getImagelist().size() >0) {
+								count += tempItem.getImageCount();
+							}
+							
+						}
+					}
+				}
+			}
+		}
+		return count;
+	}
+	
+	
+	public boolean isAllImageUploaded() {
+		boolean result = false;
+		int imageCount = getImageCount();
+		List<UploadBean> uploadTaskList = UploadBean.find(UploadBean.class,
+				"CHECK_ID = ? and IMAGE_STATE = ?", String.valueOf(id),
+				String.valueOf(ImageUploadState.STATE_FINISH));
+		if (uploadTaskList != null && uploadTaskList.size() == imageCount) {
+			result = true;
+		}
+		return result;
+	}
+	public String getBranchManager() {
+		return branchManager;
+	}
+	public void setBranchManager(String branchManager) {
+		this.branchManager = branchManager;
+	}
+	public String getBranchManagerTele() {
+		return branchManagerTele;
+	}
+	public void setBranchManagerTele(String branchManagerTele) {
+		this.branchManagerTele = branchManagerTele;
+	}
+	
+	public void initDymicQuestionCheckData(CheckData checkData) {
+		if (checkData == null || questionList == null) {
+			return;
+		}
+		for (AreaIssue areaIssue : questionList) {
+			if (areaIssue.getType() == checkData.getType()) {
+				if (areaIssue.getIsDefQue() == DefQueType.TYPE_DYMIC) {
+					IssueItem issueItem = new IssueItem();
+					issueItem.setId(areaIssue.getIssueId());
+					issueItem.setName(areaIssue.getIssueName());
+					issueItem.setIsPreQue(areaIssue.getIsPreQue());
+					issueItem.setIsDefQue(areaIssue.getIsDefQue());
+					checkData.addIssue(issueItem);
+				} else {
+					if (areaIssue.getIsPreQue() == PreQueType.TYPE_REVIEW) {
+						for (IssueItem issueItem : checkData.getIssuelist()) {
+							if (issueItem.getId() == areaIssue.getIssueId()) {
+								issueItem.setIsPreQue(areaIssue.getIsPreQue());
+								issueItem.setIsDefQue(areaIssue.getIsDefQue());
+							}
+						}
+					}
+				}
+				checkData.initCheckedIssue();
+			}
+		}
 	}
 	
 	

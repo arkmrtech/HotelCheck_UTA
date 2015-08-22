@@ -43,7 +43,6 @@ public class UploadBean extends SugarRecord<UploadBean> implements Serializable{
 	
 	public UploadBean() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 

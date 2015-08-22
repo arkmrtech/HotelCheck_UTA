@@ -107,7 +107,7 @@ public class HotelIssueFragment extends Fragment {
 
 		@Override
 		public int getItemCount() {
-			return mHotel.getCheckDataCount();
+			return mHotel == null ? 0 : mHotel.getCheckDataCount();
 		}
 
 		@Override
@@ -337,7 +337,7 @@ public class HotelIssueFragment extends Fragment {
 												} else {
 													checkData = DataManager.getInstance().createRoomCheckData();
 													checkData.setName(name);
-													checkData.setType(Constance.CheckDataType.TYPE_ROOM);
+//													checkData.setType(Constance.CheckDataType.TYPE_ROOM);
 												}
 												break;
 											case Constance.CheckDataType.TYPE_PASSWAY:
@@ -352,7 +352,7 @@ public class HotelIssueFragment extends Fragment {
 												} else {
 													checkData = DataManager.getInstance().createPasswayCheckData();
 													checkData.setName(name);
-													checkData.setType(Constance.CheckDataType.TYPE_PASSWAY);
+//													checkData.setType(Constance.CheckDataType.TYPE_PASSWAY);
 												}
 												break;
 											default:
@@ -360,7 +360,7 @@ public class HotelIssueFragment extends Fragment {
 											}
 											checkData.setId((long) areaId);
 											checkData.setCheckId(mHotel.getCheckId());
-											update(checkData);
+											addDymicCheckData(checkData);
 											mEditText.setText("");
 									}
 								})
@@ -390,7 +390,7 @@ public class HotelIssueFragment extends Fragment {
 			mAlertDialog.show();
 		}
 
-		public void update(CheckData checkData) {
+		public void addDymicCheckData(CheckData checkData) {
 			switch (mType) {
 			case Constance.CheckDataType.TYPE_ROOM:
 				mHotel.addRoom(checkData);

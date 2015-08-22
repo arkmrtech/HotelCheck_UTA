@@ -12,10 +12,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
+import android.content.Intent;
+import android.provider.ContactsContract.Contacts.Data;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.lk.hotelcheck.activity.login.LoginActivity;
 import com.lk.hotelcheck.bean.Hotel;
 import com.lk.hotelcheck.bean.UploadBean;
 import com.lk.hotelcheck.manager.DataManager;
@@ -66,11 +70,30 @@ public class HttpRequest {
 		postRequest(context, url, jsonObject, callback);
 	}
 	
+	/**
+	 * 
+	 * @param context
+	 * @param userId
+	 * @param password
+	 * @param callback
+	 */
+	public void logout(Context context, HttpCallback callback) {
+		String url = getRequestURL(NetConstance.METHOD_LOGOUT);
+		JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject.put(NetConstance.REQUEST_PARAM_USER_NAME, DataManager.getInstance().getUserName());
+			jsonObject.put(NetConstance.REQUEST_PARAM_KEY, DataManager.getInstance().getSession());
+		} catch (JSONException e1) {
+			e1.printStackTrace();
+		}
+		postRequest(context, url, jsonObject, callback);
+	}
+	
 	public void getHotelList(Context context, String session, final HttpCallback callback) {
 		String url = getRequestURL(NetConstance.METHOD_GET_CHECK_HOTEL_LIST);
 		JSONObject jsonObject = new JSONObject();
 		try {
-			jsonObject.put(NetConstance.REQUEST_PARAM_USER_NAME, "1");
+			jsonObject.put(NetConstance.REQUEST_PARAM_USER_NAME, DataManager.getInstance().getUserName());
 			jsonObject.put(NetConstance.REQUEST_PARAM_KEY, session);
 		} catch (JSONException e1) {
 			e1.printStackTrace();
@@ -83,7 +106,7 @@ public class HttpRequest {
 		String url = getRequestURL(NetConstance.METHOD_GET_CHECK_DATA);
 		JSONObject jsonObject = new JSONObject();
 		try {
-			jsonObject.put(NetConstance.REQUEST_PARAM_USER_NAME, "1");
+			jsonObject.put(NetConstance.REQUEST_PARAM_USER_NAME, DataManager.getInstance().getUserName());
 			jsonObject.put(NetConstance.REQUEST_PARAM_KEY, session);
 		} catch (JSONException e1) {
 			e1.printStackTrace();
@@ -103,6 +126,7 @@ public class HttpRequest {
 			jsonObject.put(NetConstance.PARAM_CHECK_ID, checkId);
 			jsonObject.put(NetConstance.PARAM_STATE, 2);//2 = finish;
 			jsonObject.put(NetConstance.REQUEST_PARAM_KEY, session);
+			jsonObject.put(NetConstance.REQUEST_PARAM_USER_NAME, DataManager.getInstance().getUserName());
 		} catch (JSONException e1) {
 			e1.printStackTrace();
 		}
@@ -179,7 +203,7 @@ public class HttpRequest {
 		postRequest(context, url, jsonObject, callback);
 	}
 	
-	private void postRequest(Context context, String url, JSONObject jsonObject, final HttpCallback callback) {
+	private void postRequest(final Context context, String url, JSONObject jsonObject, final HttpCallback callback) {
 		StringEntity entity = null;
 		try {
 			entity = new StringEntity(jsonObject.toString(),"utf-8");
@@ -226,6 +250,9 @@ public class HttpRequest {
 				String info = response.optString(NetConstance.PARAM_INFO);
 				if (state == NetConstance.ERROR_CODE_SUCCESS) {
 					callback.onSuccess(response);
+				} else if (state == NetConstance.ERROR_CODE_SESSSION_TIME_OUT) {
+					Toast.makeText(context, "权限过期，请重新登录", Toast.LENGTH_SHORT).show();
+					goToLogin(context);
 				} else {
 					callback.onError(state, info);
 				}
@@ -235,61 +262,11 @@ public class HttpRequest {
 		});
 	}
 	
-	
-//	public void uploadSingleImage(String filePath, FileUploadHandle handle) {
-//		if (TextUtils.isEmpty(filePath)) {
-//			Log.e(TAG, "fielpath is null or empty");
-//			return;
-//		}
-//		File file = new File(filePath);
-//		if (file.exists()) {
-//			String url = "";
-//			RequestParams params = new RequestParams();
-//			try {
-//				params.put("imageFile", file, "image/jpeg");
-//				mHttpClient.post(url, params, handle);
-//			} catch (FileNotFoundException e) {
-//				Log.e(TAG, "uploadSingleImage FileNotFoundException file : "+filePath+"does not exists");
-//				e.printStackTrace();
-//			}
-//		} else {
-//			Log.e(TAG, "uploadSingleImage error file : "+filePath+"does not exists");
-//		}
-//	}
-//	
-//	public void uploadMutilImage(String[] filePathArray, FileUploadHandle handle) {
-//		if (filePathArray == null || filePathArray.length == 0) {
-//			Log.e(TAG, "uploadMutilImage filePathArray null or empty");
-//			return;
-//		}
-//		String url = "";
-//		RequestParams params = new RequestParams();
-//		String filePath;
-//		File imageFile;
-//		for (int i = 0; i < filePathArray.length; i++) {
-//			filePath = filePathArray[i];
-//			if (TextUtils.isEmpty(filePath)) {
-//				Log.d(TAG, "uploadMutilImage");
-//				break;
-//			}
-//			imageFile = new File(filePath);
-//			if (imageFile.exists()) {
-//				try {
-//					params.put(""+i, imageFile, "image/jpeg");
-//				} catch (FileNotFoundException e) {
-//					e.printStackTrace();
-//					Log.e(TAG, "uploadMutilImage error file : "+filePath+"does not exists");
-//				}
-//			} else {
-//				Log.e(TAG, "uploadMutilImage error file : "+filePath+"does not exists");
-//			}
-//					
-//		}
-//		mHttpClient.post(url, params, handle);
-//		
-//	}
-	
-	
+	private void goToLogin(Context context) {
+		Intent intent = new Intent();
+		intent.setClass(context, LoginActivity.class);
+		context.startActivity(intent);
+	}
 	
 	
 	public void downloadTest(String url, FileAsyncHttpResponseHandler handler) {

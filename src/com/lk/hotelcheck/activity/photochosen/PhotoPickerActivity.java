@@ -187,7 +187,7 @@ public class PhotoPickerActivity extends BaseActivity implements CallBackListene
 	}
 
 	@Override
-	public void onPhotoClick(int position) {
+	public void onCameraClick(int position) {
 		Intent openCameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 		mImagePath = mImagePath+mImageName+new DateFormat().format("yyyyMMddhhmmss",
 				Calendar.getInstance(Locale.CHINA))+".jpg";

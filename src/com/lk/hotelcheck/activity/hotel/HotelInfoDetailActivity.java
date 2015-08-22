@@ -169,7 +169,7 @@ public class HotelInfoDetailActivity extends BaseActivity{
 				}
 				break;
 			case R.id.menu_check_image_transfer_speed :
-				UploadProcessActivity.goToHotel(this, mHotel.getCheckId());
+				UploadProcessActivity.goToUpload(this, mHotel.getCheckId());
 				break;
 			default:
 				break;
@@ -245,18 +245,22 @@ public class HotelInfoDetailActivity extends BaseActivity{
 			Toast.makeText(this, "该酒店图片已经上传过", Toast.LENGTH_SHORT).show();
 			return;
 		}
-		mHotel.setImageStatus(true);
+//		mHotel.setImageStatus(true);
 		UploadProxy.addUploadTask(mHotel);
-		UploadProcessActivity.goToHotel(this, mHotel.getCheckId());
+		UploadProcessActivity.goToUpload(this, mHotel.getCheckId());
 	} 
 	    
 	 private void uploadData() {
-		 if (!mHotel.isStatus()) {
-			 Toast.makeText(this, "请先完成酒店检查", Toast.LENGTH_SHORT).show();
+		if (!mHotel.isStatus()) {
+			Toast.makeText(this, "请先完成酒店检查", Toast.LENGTH_SHORT).show();
+			return;
+		}
+		if (mHotel.isDataStatus()) {
+			Toast.makeText(this, "酒店数据已经上传", Toast.LENGTH_SHORT).show();
 			return;
 		}
 		 mLoadingGroup.setVisibility(View.VISIBLE);
-			HttpRequest.getInstance().uploadHotelData(this, mHotel, NetConstance.DEFAULT_SESSION, new HttpCallback() {
+			HttpRequest.getInstance().uploadHotelData(this, mHotel, DataManager.getInstance().getSession(), new HttpCallback() {
 				
 				@Override
 				public void onSuccess(JSONObject response) {
@@ -275,7 +279,7 @@ public class HotelInfoDetailActivity extends BaseActivity{
 	 
 	 private void updateHotelCheckState() {
 		 mLoadingGroup.setVisibility(View.VISIBLE);
-			HttpRequest.getInstance().updateHotelCheckStatus(this, mHotel.getCheckId(), NetConstance.DEFAULT_SESSION, new HttpCallback() {
+			HttpRequest.getInstance().updateHotelCheckStatus(this, mHotel.getCheckId(), DataManager.getInstance().getSession(), new HttpCallback() {
 				
 				@Override
 				public void onSuccess(JSONObject response) {

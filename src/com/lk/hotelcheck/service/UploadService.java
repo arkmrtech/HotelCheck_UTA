@@ -1,15 +1,11 @@
 package com.lk.hotelcheck.service;
 
 import java.io.File;
-import java.nio.Buffer;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-
-import javax.xml.transform.Templates;
 
 import android.app.Service;
 import android.content.Intent;
@@ -17,13 +13,9 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.text.TextUtils;
 import android.util.Log;
-import android.util.SparseArray;
-import android.widget.Toast;
 
 import com.lk.hotelcheck.bean.CheckData;
 import com.lk.hotelcheck.bean.Hotel;
-import com.lk.hotelcheck.bean.HotelUploadQueneBean;
-import com.lk.hotelcheck.bean.HotelUploadTask;
 import com.lk.hotelcheck.bean.ImageItem;
 import com.lk.hotelcheck.bean.IssueItem;
 import com.lk.hotelcheck.bean.UploadBean;
@@ -32,21 +24,16 @@ import com.upyun.block.api.listener.CompleteListener;
 import com.upyun.block.api.listener.ProgressListener;
 import com.upyun.block.api.main.UploaderManager;
 import com.upyun.block.api.utils.UpYunUtils;
-
-import common.Constance;
 import common.Constance.HotelAction;
 import common.Constance.ImageUploadState;
 import common.Constance.UPAI;
 
 public class UploadService extends Service {
-
+	
 	private ServiceBinder mServiceBinder = new ServiceBinder();
+	private static final int MAX_DOWNLOAD_SIZE = 6;
 	private Executor mTaskExecutor = Executors.newFixedThreadPool(MAX_DOWNLOAD_SIZE);
-	private ArrayList<UploadBean> mWaitTaskQueue = new ArrayList<UploadBean>();
-	private ArrayList<UploadBean> mRuningTaskQueue = new ArrayList<UploadBean>();
-	private ArrayList<UploadBean> mExceptionQueue = new ArrayList<UploadBean>();
-	private static final int MAX_DOWNLOAD_SIZE = 3;
-	private HotelUploadQueneBean mUploadQuene;
+	private ConcurrentHashMap<String, UploadBean> mRuningTaskQueue = new ConcurrentHashMap<String, UploadBean>();
 	
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -56,7 +43,6 @@ public class UploadService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate(); 
-		mUploadQuene = new HotelUploadQueneBean();
 	}
 	
 	@Override
@@ -71,73 +57,47 @@ public class UploadService extends Service {
 	}
 	
 	public void saveUnFinishData() {
-		for (UploadBean bean : mWaitTaskQueue) {
-			bean.setImageState(ImageUploadState.STATE_FAIL);
-			bean.save();
-		}
-		for (UploadBean bean : mRuningTaskQueue) {
-			bean.setImageState(ImageUploadState.STATE_FAIL);
-			bean.save();
-		}
-		for (UploadBean bean : mExceptionQueue) {
+		for (UploadBean bean : mRuningTaskQueue.values()) {
 			bean.setImageState(ImageUploadState.STATE_FAIL);
 			bean.save();
 		}
 	}
-
 	
 	public synchronized void addUploadTask(UploadBean uploadBean) {
-		uploadBean.setImageState(ImageUploadState.STATE_WAIT);
-		mWaitTaskQueue.add(uploadBean);
-		sendBroadcast(uploadBean);
-		if (mRuningTaskQueue.size() < MAX_DOWNLOAD_SIZE) {
-			startNext();
+		if (uploadBean == null) {
+			return;
 		}
+		if (mRuningTaskQueue.containsKey(uploadBean.getLocalImagePath())) {
+			return;
+		}
+		List<UploadBean> list = UploadBean.find(UploadBean.class, "LOCAL_IMAGE_PATH = ?", uploadBean.getLocalImagePath());
+		// 如果上传任务已经存在则更新，否则新增一条记录
+		if (list != null && list.size() > 0) {
+			uploadBean = list.get(0);
+		}
+		uploadBean.setImageState(ImageUploadState.STATE_WAIT);
+		sendBroadcast(uploadBean);
+		startTask(uploadBean);
 	}
 	
 	public synchronized void restart(UploadBean uploadBean) {
-		boolean result = false;
-		if (mExceptionQueue != null && mExceptionQueue.size() >0) {
-			for (int i = 0; i < mExceptionQueue.size(); i++) {
-				UploadBean tmp = mExceptionQueue.get(i);
-				if (tmp.getId() == uploadBean.getId()) {
-					mExceptionQueue.remove(i);
-//					result = startTask(uploadBean);
-					addUploadTask(uploadBean);
-					return;
-				}
-			}
-			if (!result) {
-				addUploadTask(uploadBean);
-			} 
-		} else {
 			addUploadTask(uploadBean);
-		}
-		
 	}
 	
 	public synchronized void addUploadTask(Hotel hotel) {
-		
+
 		if (hotel == null) {
 			return;
 		}
-//		List<UploadBean> uploadList = DataManager.getInstance().getUploadTaskList(hotel.getCheckId());
-//		if (uploadList != null) {
-//			for (UploadBean uploadBean : uploadList) {
-//				addUploadTask(uploadBean);
-//			}
-//		} else {
-			for (CheckData  checkData : hotel.getCheckDatas()) {
-				addUploadTask(checkData, hotel.getCheckId());
-			}
-			for (CheckData  checkData : hotel.getRoomList()) {
-				addUploadTask(checkData, hotel.getCheckId());
-			}
-			for (CheckData  checkData : hotel.getPasswayList()) {
-				addUploadTask(checkData, hotel.getCheckId());
-			}
-//		}
-		
+		for (CheckData checkData : hotel.getCheckDatas()) {
+			addUploadTask(checkData, hotel.getCheckId());
+		}
+		for (CheckData checkData : hotel.getRoomList()) {
+			addUploadTask(checkData, hotel.getCheckId());
+		}
+		for (CheckData checkData : hotel.getPasswayList()) {
+			addUploadTask(checkData, hotel.getCheckId());
+		}
 	}
 	
 	private void addUploadTask(CheckData checkData, long checkId) {
@@ -164,55 +124,10 @@ public class UploadService extends Service {
 		}
 	}
 	
-	private boolean hasHotelTask(int hotelId) {
-		boolean flag = false;
-		if (mUploadQuene.getHotelUploadTaskList() == null) {
-			return flag;
-		}
-		for (HotelUploadTask task : mUploadQuene.getHotelUploadTaskList()) {
-			if (task.getHotelId() == hotelId) {
-				flag = true;
-				return flag;
-			}
-		}
-		return flag;
-	}
-	
-	private HotelUploadTask getHotelUploadTask(int hotelId) {
-		for (HotelUploadTask task : mUploadQuene.getHotelUploadTaskList()) {
-			if (task.getHotelId() == hotelId) {
-				return task;
-			}
-		}
-		return null;
-	}
-	
-	private synchronized boolean startNext() {
-		int size = mWaitTaskQueue.size();
-		if (size <= 0) {
-//			DataManager.getInstance().updateImageStatus(UploadService.this);
-			return true;
-		}
-
-		UploadBean tmp = mWaitTaskQueue.remove(0);
-//		if (null != tmp) {
-//			tmp.setImageState(ImageUploadState.STATE_WAIT);
-//			mRuningTaskQueue.add(tmp);
-//			UploadTask task = new UploadTask(tmp);
-//			mTaskExecutor.execute(task);
-//			return true;
-//		}
-
-//		return false;
-		return startTask(tmp);
-		
-	}
-	
 	
 	private boolean startTask(UploadBean uploadBean) {
 		if (null != uploadBean) {
-			uploadBean.setImageState(ImageUploadState.STATE_WAIT);
-			mRuningTaskQueue.add(uploadBean);
+			mRuningTaskQueue.put(uploadBean.getLocalImagePath(), uploadBean);
 			UploadTask task = new UploadTask(uploadBean);
 			mTaskExecutor.execute(task);
 			return true;
@@ -249,9 +164,7 @@ public class UploadService extends Service {
 				Log.e(TAG, "uploadFile localFilePath is null or empty");
 				mBean.setImageState(ImageUploadState.STATE_FAIL);
 				sendBroadcast(mBean);
-				mRuningTaskQueue.remove(mBean);
-				mExceptionQueue.add(mBean);
-				startNext();
+				mRuningTaskQueue.remove(mBean.getLocalImagePath());
 				return;
 			}
 			File localFile = new File(localFilePath);
@@ -259,9 +172,7 @@ public class UploadService extends Service {
 				Log.e(TAG, "uploadFile localFile not exist and filepath = "+localFilePath);
 				mBean.setImageState(ImageUploadState.STATE_FAIL);
 				sendBroadcast(mBean);
-				mRuningTaskQueue.remove(mBean);
-				mExceptionQueue.add(mBean);
-				startNext();
+				mRuningTaskQueue.remove(mBean.getLocalImagePath());
 				return;
 			}
 			try {
@@ -280,7 +191,7 @@ public class UploadService extends Service {
 						mBean.setTransferedBytes(transferedBytes);
 						mBean.setTotalBytes(totalBytes);
 						sendBroadcast(mBean);
-						Log.d("lxk", "trans:" + transferedBytes + "; total:" + totalBytes +"imageurl = "+mBean.getServiceImageSavePath());
+						Log.d(TAG, "trans:" + transferedBytes + "; total:" + totalBytes +"imageurl = "+mBean.getServiceImageSavePath());
 					}
 				};
 				
@@ -290,17 +201,16 @@ public class UploadService extends Service {
 						// do something...
 						if (isComplete) {
 							mBean.setImageState(ImageUploadState.STATE_FINISH);
-							mRuningTaskQueue.remove(mBean);
-							DataManager.getInstance().updateImageStatus(UploadService.this, mBean);
+							mRuningTaskQueue.remove(mBean.getLocalImagePath());
 						} else {
 							mBean.setImageState(ImageUploadState.STATE_FAIL);
-							mRuningTaskQueue.remove(mBean);
-							mExceptionQueue.add(mBean);
+							mRuningTaskQueue.remove(mBean.getLocalImagePath());
 						}
 						sendBroadcast(mBean);
-						startNext();
-						Log.d("lxk", "isComplete:"+isComplete+" imageurl = "+mBean.getServiceImageSavePath());
-//						Log.d("lxk", "isComplete:"+isComplete+";result:"+result+";error:"+error);
+						if (isComplete) {
+							DataManager.getInstance().updateImageStatus(UploadService.this, mBean);
+						}
+						Log.d(TAG, "upload task result = "+isComplete);
 					}
 				};
 				
@@ -322,52 +232,14 @@ public class UploadService extends Service {
 		
 	}
 	
-//	public List<UploadBean> getUploadingList(int hotelId) {
-//		if (mUploadTaskArray.indexOfKey(hotelId) >-1) {
-//			SparseArray<UploadBean> tmp = mUploadTaskArray.get(hotelId);
-//			List<UploadBean> uploadBeanList = new ArrayList<UploadBean>();
-//			for (int i = 0; i < tmp.size(); i++) {
-//				UploadBean uploadBean = tmp.valueAt(i);
-//				if (uploadBean.getImageState() != ImageUploadState.STATE_FINISH) {
-//					uploadBeanList.add(uploadBean);
-//				}
-//			}
-//			return uploadBeanList;
-//		} else {
-//			return Collections.emptyList();
-//		}
-//	}
-//	
-//	public List<UploadBean> getUploadCompleteList(int hotelId) {
-//		if (mUploadTaskArray.indexOfKey(hotelId) >-1) {
-//			SparseArray<UploadBean> tmp = mUploadTaskArray.get(hotelId);
-//			List<UploadBean> uploadBeanList = new ArrayList<UploadBean>();
-//			for (int i = 0; i < tmp.size(); i++) {
-//				UploadBean uploadBean = tmp.valueAt(i);
-//				if (uploadBean.getImageState() == ImageUploadState.STATE_FINISH) {
-//					uploadBeanList.add(uploadBean);
-//				}
-//			}
-//			return uploadBeanList;
-//		} else {
-//			return Collections.emptyList();
-//		}
-//	}
 	
-	
-	public List<UploadBean> getUploadingList(int hotelId) {
-		return DataManager.getInstance().getUploadingList(hotelId);
-	}
-	
-	public List<UploadBean> getUploadCompleteList(int hotelId) {
-		return DataManager.getInstance().getUploadCompleteList(hotelId);
-	}
-	
-	public void sendBroadcast(UploadBean bean) {
-		Intent intent = new Intent(HotelAction.ACTION_IMAGE_UPLOAD);
-		intent.putExtra(HotelAction.IMAGE_UPLOAD_EXTRA, bean);
-		sendBroadcast(intent);
-		bean.save();
+	private void sendBroadcast(UploadBean bean) {
+		if (bean != null) {
+			Intent intent = new Intent(HotelAction.ACTION_IMAGE_UPLOAD);
+			intent.putExtra(HotelAction.IMAGE_UPLOAD_EXTRA, bean);
+			sendBroadcast(intent);	
+			bean.save();	
+		}
 	}
 	
 	

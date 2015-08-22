@@ -1,7 +1,5 @@
 package com.lk.hotelcheck.activity.login;
 
-import java.io.File;
-
 import org.json.JSONObject;
 
 import android.app.Activity;
@@ -18,11 +16,9 @@ import com.lk.hotelcheck.R;
 import com.lk.hotelcheck.activity.main.MainActivity;
 import com.lk.hotelcheck.bean.User;
 import com.lk.hotelcheck.manager.DataManager;
-import com.lk.hotelcheck.network.DataCallback;
 import com.lk.hotelcheck.network.HttpCallback;
 import com.lk.hotelcheck.network.HttpRequest;
-
-import common.Constance;
+import com.lk.hotelcheck.util.Machine;
 import common.NetConstance;
 
 public class LoginActivity extends Activity{
@@ -44,14 +40,18 @@ public class LoginActivity extends Activity{
 			
 			@Override
 			public void onClick(View v) {
-				login();
+				login(v);
 			}
 		});
 		
 		
 	}
 	
-	private void login() {
+	private void login(final View v) {
+		if (!Machine.isNetworkOK(this)) {
+			Toast.makeText(this, "无网络链接，请检查网络", Toast.LENGTH_SHORT).show();
+			return;
+		}
 		final String userId = mUserIdEditText.getText().toString();
 		String password = mPasswordEditText.getText().toString();
 		if (TextUtils.isEmpty(userId)) {
@@ -63,7 +63,7 @@ public class LoginActivity extends Activity{
 			return;
 		}
 		mLoadingGroup.setVisibility(View.VISIBLE);
-		
+		v.setClickable(false);
 		HttpRequest.getInstance().login(this, userId, password, new HttpCallback() {
 			
 			@Override
@@ -72,6 +72,7 @@ public class LoginActivity extends Activity{
 				User user = new User();
 				user.setDate(date);
 				user.setUserName(userId);
+				user.setSession(response.optString(NetConstance.PARAM_SESSION));
 				DataManager.getInstance().setUser(user);
 				Intent intent = new Intent();
 				intent.setClass(LoginActivity.this, MainActivity.class);
@@ -79,12 +80,14 @@ public class LoginActivity extends Activity{
 				Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
 				mLoadingGroup.setVisibility(View.GONE);
 				finish();
+				v.setClickable(true);
 			}
 			
 			@Override
 			public void onError(int errorCode, String info) {
 				Toast.makeText(LoginActivity.this, info, Toast.LENGTH_SHORT).show();
 				mLoadingGroup.setVisibility(View.GONE);
+				v.setClickable(true);
 			}
 		});
 		

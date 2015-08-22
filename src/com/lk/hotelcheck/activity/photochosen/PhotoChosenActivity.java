@@ -79,11 +79,9 @@ public class PhotoChosenActivity extends BaseActivity {
 	private SpinnerNameAdapter mCheckDataMenuAdapter;
 	private SpinnerNameAdapter mIssueDataMenuAdapter;
 	private View mDetailLayout;
-//	private ImageView mDetailImageView;
 	private ViewPager mDetailViewPager;
 	private ImageView mDetailBackImageView;
 	private ImageView mDetailDeleteImageView;
-//	private CheckData mCheckData;
 	private Toolbar mToolbar;
 	private TextView mErrorTextView;
 	private Spinner mNameSpinner;
@@ -192,7 +190,6 @@ public class PhotoChosenActivity extends BaseActivity {
 			Log.d("lxk", "mCheckDataPosition = "+mCheckDataPosition +" mIssuePosition "+mIssuePosition);
 			mIsFristTime = true;
 			mNameSpinner.setSelection(mCheckDataPosition);
-//			mIssueSpinner.setSelection(mIssuePosition+1);
 		}
 	}
 	
@@ -204,7 +201,6 @@ public class PhotoChosenActivity extends BaseActivity {
 			if (mIssuePosition == 0) {
 				data = mHotel.getAllRoomCheckedImageList();
 			} else {
-//				data = mHotel.getDymicRoomCheckedIssue(mIssuePosition-1).getImagelist();
 				data = mHotel.getAllRoomCheckedImageList(mIssuePosition-1);
 			}
 		} else if (checkData.getType() == CheckDataType.TYPE_PASSWAY) {
@@ -257,14 +253,6 @@ public class PhotoChosenActivity extends BaseActivity {
 		
 		@Override
 		public void onClick(View v) {
-//			if (mSelectedMap.size() > 0) {
-//				Iterator<String> keys = mSelectedMap.keySet().iterator();
-//				List<String> key = new ArrayList<String>();
-//				while (keys.hasNext()) {
-//					key.add(keys.next());
-//				}
-//				UploadActivity.gotoUpload(v.getContext(), mAdapter.getDataItem(0).getLocalImagePath());
-//			}
 			UploadProxy.addUploadTask(mHotel);
 		}
 	};		
@@ -302,16 +290,12 @@ public class PhotoChosenActivity extends BaseActivity {
 									}
 									
 									
-//									DataManager.getInstance().setHotel(
-//											mHotelPosition, mHotel);
-//									mSelectedMap.remove(imageItem.getImageUrl());
 									mAdapter.remove(position);
 									if (mAdapter.getItemCount() == 0) {
 										mDetailLayout.setVisibility(View.GONE);
 										showError();
 									} 
 									mDetailAdapter.notifyDataSetChanged();
-//									updateUploadText();
 									FileUtil.deleteFile(imageItem.getLocalImagePath());
 									
 									
@@ -330,31 +314,6 @@ public class PhotoChosenActivity extends BaseActivity {
 			alertDialog.show();
 		}
 	};
-
-//	private void updateUploadText() {
-//		StringBuffer textBuffer = new StringBuffer();
-//		textBuffer.append(getString(R.string.upload));
-//		if (mSelectedMap.size() > 0) {
-//			textBuffer.append("(");
-//			textBuffer.append(mSelectedMap.size());
-//			textBuffer.append(")");
-//		}
-//		if (mSelectedMap.size() == 0 && mIsSelectAll) {
-//			mIsSelectAll = false;
-//			mChoseAllItem.setTitle(getString(R.string.chose_all));
-//		} else if (mSelectedMap.size() == mAdapter.getItemCount() && !mIsSelectAll) {
-//			mIsSelectAll = true;
-//			mChoseAllItem.setTitle(getString(R.string.chose_none));
-//		}
-//		mUploadTextView.setText(textBuffer.toString());
-//	}
-
-//	@Override
-//	public boolean onCreateOptionsMenu(Menu menu) {
-//		mChoseAllItem = menu.add(0, 0X10086, 0, getString(R.string.chose_all));
-//		mChoseAllItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-//		return true;
-//	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -379,7 +338,6 @@ public class PhotoChosenActivity extends BaseActivity {
 				item.setTitle(R.string.chose_all);
 				mSelectedMap.clear();
 			}
-//			updateUploadText();
 			if (mAdapter.getItemCount() >0 ) {
 				int firstIndex = mLayoutManager.findFirstVisibleItemPosition();
 				int lastIndex = mLayoutManager.findLastVisibleItemPosition()+1;
@@ -552,12 +510,6 @@ public class PhotoChosenActivity extends BaseActivity {
 					} else {
 						name = checkData.getCheckedIssue(position-1).getName();
 					}
-//					CheckData checkData = mHotel.getCheckData(mCheckDataPosition);
-//					if (checkData.isGetSublist()) {
-//						name = checkData.getName()+checkData.getCheckedIssue(position-1).getName();
-//					} else {
-						
-//					}
 				}
 				break;
 			default:
@@ -585,66 +537,21 @@ public class PhotoChosenActivity extends BaseActivity {
 			mItem.setImageData(item.getLocalImagePath());
 			mItem.setTag(R.id.iv_delete, position);
 			mItem.setOnClickListener(mClickListener);
-//			mItem.getCheckBox().setTag(item);
-//			mItem.setChecked(mSelectedMap.containsKey(item.getLocalImagePath()));
-//			mItem.getCheckBox().setOnCheckedChangeListener(changeListener);
 		}
 
 		public void setImageData(String imageURL) {
 			mItem.setImageData(imageURL);
 		}
 
-//		public void setItemChecked(boolean check) {
-//			mItem.setChecked(check);
-//		}
-//
-//		public boolean isChecked() {
-//			if (mItem == null) {
-//				return false;
-//			} else {
-//				return mItem.isChecked();
-//			}
-//		}
-
-//		private OnCheckedChangeListener changeListener = new OnCheckedChangeListener() {
-//
-//			@Override
-//			public void onCheckedChanged(CompoundButton buttonView,
-//					boolean isChecked) {
-//				ImageItem item = (ImageItem) buttonView.getTag();
-//				if (item != null) {
-//					item.setSelected(!item.isSelected());
-//					setItemChecked(item.isSelected());
-//				}
-//				if (isChecked) {
-//					mSelectedMap.put(item.getLocalImagePath(), isChecked);
-//				} else {
-//					mSelectedMap.remove(item.getLocalImagePath());
-//				}
-////				updateUploadText();
-//			}
-//		};
 
 		private OnClickListener mClickListener = new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-//				ImageItem item = (ImageItem) v.getTag(R.id.iv_back);
 				int position = (Integer) v.getTag(R.id.iv_delete);
 				mDetailLayout.setVisibility(View.VISIBLE);
 				mDetailViewPager.setCurrentItem(position);
 				mDetailDeleteImageView.setTag(position);
-//				String imageUrl = "file://" + item.getImageUrl();
-//				DisplayImageOptions options = new DisplayImageOptions.Builder()
-//						.showImageForEmptyUri(R.drawable.icon) // resource or
-//																// drawable
-//						.showImageOnFail(R.drawable.icon) // resource or
-//															// drawable
-//						.cacheInMemory(true).cacheOnDisk(true)
-//
-//						.build();
-//				ImageLoader.getInstance().displayImage(imageUrl,
-//						mDetailImageView, options);
 				
 			}
 		};
@@ -708,7 +615,6 @@ public class PhotoChosenActivity extends BaseActivity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		DataManager.getInstance().setHotel(mHotelPosition, mHotel);
 	}
 
 }

@@ -963,10 +963,12 @@ public class ImageUtil {
     }
 
 	public static boolean isWidthPic(String localImagePath) {
+		boolean result = false;
 		Bitmap bitmap = BitmapFactory.decodeFile(localImagePath);
 		if (bitmap != null) {
-			return bitmap.getWidth() > bitmap.getHeight();
+			result = bitmap.getWidth() > bitmap.getHeight();
 		} 
-		return false;
+		bitmap.recycle();
+		return result;
 	}
 }

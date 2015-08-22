@@ -5,7 +5,10 @@ import java.util.List;
 import org.json.JSONObject;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.provider.ContactsContract.Contacts.Data;
 import android.support.v7.widget.Toolbar;
@@ -26,7 +29,10 @@ import android.widget.Toast;
 import com.lk.hotelcheck.R;
 import com.lk.hotelcheck.activity.BaseActivity;
 import com.lk.hotelcheck.activity.login.LoginActivity;
+import com.lk.hotelcheck.activity.upload.UploadFragment;
+import com.lk.hotelcheck.activity.upload.UploadProcessActivity;
 import com.lk.hotelcheck.bean.Hotel;
+import com.lk.hotelcheck.bean.UploadBean;
 import com.lk.hotelcheck.bean.dao.HotelCheck;
 import com.lk.hotelcheck.manager.DataManager;
 import com.lk.hotelcheck.network.DataCallback;
@@ -38,6 +44,8 @@ import com.lk.hotelcheck.util.Machine;
 import com.lk.hotelcheck.util.SharedPrefsUtil;
 
 import common.NetConstance;
+import common.Constance.HotelAction;
+import common.Constance.ImageUploadState;
 
 
 
@@ -84,6 +92,7 @@ public class MainActivity extends BaseActivity {
 		});
 		mLoadingGroup = (ViewGroup) findViewById(R.id.vg_loadig);
 		initData();
+		registerUoloadBroadcast();
 	}
     
     @Override
@@ -131,6 +140,7 @@ public class MainActivity extends BaseActivity {
     	Log.d("lxk", "mainActivity onDestroy");
     	UploadProxy.initInstance(this).doUnbindService();
     	DataManager.getInstance().clear();
+    	unRegisterUploadBroadcast();
     }
     
     @Override
@@ -159,10 +169,22 @@ public class MainActivity extends BaseActivity {
 			
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent();
-				intent.setClass(MainActivity.this, LoginActivity.class);
-				startActivity(intent);
-				finish();
+				HttpRequest.getInstance().logout(v.getContext(), new HttpCallback() {
+					
+					@Override
+					public void onSuccess(JSONObject response) {
+						Intent intent = new Intent();
+						intent.setClass(MainActivity.this, LoginActivity.class);
+						startActivity(intent);
+						finish();
+					}
+					
+					@Override
+					public void onError(int errorCode, String info) {
+						Toast.makeText(MainActivity.this, "网络异常，请稍后再试", Toast.LENGTH_SHORT).show();
+					}
+				});
+				
 			}
 		});
     	AlertDialog alertDialog = new AlertDialog.Builder(this).setView(view).create();
@@ -184,15 +206,23 @@ public class MainActivity extends BaseActivity {
 		}
 		List<Hotel> hotelList = DataManager.getInstance().getCheckedHotelList();
 		if (hotelList != null) {
-			int i = 0;
 			for (Hotel hotel : hotelList) {
+//				if (hotel.isStatus() && !hotel.isAllImageUploaded()) {
+//					if (hotel.get) {
+//						
+//					}
+//					UploadProxy.addUploadTask(hotel);
+////					hotel.setImageStatus(true);
+//				}
 				if (hotel.isStatus() && !hotel.isImageStatus()) {
 					UploadProxy.addUploadTask(hotel);
 					hotel.setImageStatus(true);
-					DataManager.getInstance().setHotel(i, hotel);
 				}
-				i++;
 			}
+			if (mAdapter != null) {
+				mAdapter.notifyDataSetChanged();
+			}
+			UploadProcessActivity.goToUpload(this);
 		}
 	}
 	
@@ -205,18 +235,21 @@ public class MainActivity extends BaseActivity {
 		if (hotelList != null) {
 			for (final Hotel hotel : hotelList) {
 				if (hotel.isStatus() && !hotel.isDataStatus()) {
-					HttpRequest.getInstance().uploadHotelData(this, hotel, NetConstance.DEFAULT_SESSION, new HttpCallback() {
+					HttpRequest.getInstance().uploadHotelData(this, hotel, DataManager.getInstance().getSession(), new HttpCallback() {
 						
 						@Override
 						public void onSuccess(JSONObject response) {
 							hotel.setDataStatus(true);
 							hotel.save();
+							Toast.makeText(MainActivity.this, hotel.getName()+"数据上传成功", Toast.LENGTH_SHORT).show();
+							if (mAdapter != null) {
+								mAdapter.notifyDataSetChanged();
+							}
 						}
 						
 						@Override
 						public void onError(int errorCode, String info) {
-							// TODO Auto-generated method stub
-							
+							Toast.makeText(MainActivity.this, hotel.getName()+"数据上传失败", Toast.LENGTH_SHORT).show();
 						}
 					});
 				}
@@ -264,5 +297,37 @@ public class MainActivity extends BaseActivity {
 		});
 	}
     
+	
+	private void registerUoloadBroadcast() {
+		IntentFilter intent = new IntentFilter();
+		intent.addAction(HotelAction.ACTION_IMAGE_UPLOAD);
+		registerReceiver(uploadBroadcastReceiver, intent);
+	}
+	
+	private void unRegisterUploadBroadcast() {
+		unregisterReceiver(uploadBroadcastReceiver);
+	}
+	
+	 private BroadcastReceiver uploadBroadcastReceiver = new BroadcastReceiver() {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			String action = intent.getAction();
+			if (action.equals(HotelAction.ACTION_IMAGE_UPLOAD)) {
+				UploadBean uploadBean = (UploadBean) intent.getSerializableExtra(HotelAction.IMAGE_UPLOAD_EXTRA);
+				if (uploadBean.getImageState() == ImageUploadState.STATE_FINISH) {
+					Hotel hotel = DataManager.getInstance().getHotelbyId(uploadBean.getCheckId());
+					if (hotel != null) {
+						if (hotel.isAllImageUploaded()) {
+							hotel.setImageStatus(true);
+//							int position = DataManager.getInstance().getHotelPosition(hotel.getCheckId());
+							mAdapter.notifyDataSetChanged();
+						}
+					}
+				} 
+			}
+		}
+		 
+	 };
     
 }

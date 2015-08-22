@@ -46,16 +46,6 @@ public class PhotoPickerAdapter extends RecyclerView.Adapter<ViewHolder>{
 
 	@Override
 	public ViewHolder onCreateViewHolder(ViewGroup arg0, int arg1) {
-//		DrawUtil.resetDensity(arg0.getContext());
-//		LayoutParams params = arg0.getLayoutParams();
-//		ImageView item = new ImageView(arg0.getContext());
-//		int width = DrawUtil.getScreenWidth(arg0.getContext()) / 2;
-//		int padding = DrawUtil.dip2px(10);
-//		params.width = DrawUtil.dip2px(width);
-//		params.height = DrawUtil.dip2px(width);
-//		item.setLayoutParams(params);
-//		item.setScaleType(ScaleType.CENTER_INSIDE);
-//		item.setPadding(padding, padding, padding, padding);
 		PhotoPickerViewHolder viewHolder = new PhotoPickerViewHolder(new PhotoChosenItem(arg0.getContext()));
 		return viewHolder;
 	}
@@ -63,12 +53,10 @@ public class PhotoPickerAdapter extends RecyclerView.Adapter<ViewHolder>{
 	
 	class PhotoPickerViewHolder extends ViewHolder {
 		
-//		private ImageView mView;
 		private PhotoChosenItem mItem;
 		
 		public PhotoPickerViewHolder(PhotoChosenItem itemView) {
 			super(itemView);
-//			mView = itemView;
 			mItem = itemView;
 		}
 		
@@ -85,7 +73,6 @@ public class PhotoPickerAdapter extends RecyclerView.Adapter<ViewHolder>{
 				});
 			}
 			mItem.setOriginImageData("file://"+imagePath);
-//			ImageLoader.getInstance().displayImage(imagePath, mView);
 		}
 		
 		public void setData(final int position, int resId) {
@@ -97,19 +84,18 @@ public class PhotoPickerAdapter extends RecyclerView.Adapter<ViewHolder>{
 					@Override
 					public void onClick(View v) {
 						if (mListener != null) {
-							mListener.onPhotoClick(position);
+							mListener.onCameraClick(position);
 						}
 					}
 				});
 			} 
 			mItem.setOriginImageData(imagePath);
-//			ImageLoader.getInstance().displayImage(imagePath, mView);
 		}
 	
 	}
 
 	public interface CallBackListener {
-		void onPhotoClick(int position);
+		void onCameraClick(int position);
 		void onPhotoPick(int position, String imagePath);
 	}
 

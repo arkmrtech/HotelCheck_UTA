@@ -125,8 +125,10 @@ public class FileUtil {
 				try {
 					bos.flush();
 					bos.close();
+					return result;
 				} catch (IOException e) {
 					e.printStackTrace();
+					return result;
 				}
 			}
 		}

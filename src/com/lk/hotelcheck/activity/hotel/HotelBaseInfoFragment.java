@@ -124,23 +124,16 @@ public class HotelBaseInfoFragment extends Fragment {
 	@Override
 	public void onPause() {
 		super.onPause();
-//		DataManager.getInstance().setHotel(mPosition, mHotel);
 	}
 	
-//	public void setGuardianNumber(String number) {
-//		if (number == null) {
-//			return;
-//		}
-//		mGuardianNumberTextView.setText(number);
-//	}
 
 	private void init() {
-		mNameTextView.setText(mHotel.getName());
+		mNameTextView.setText(mHotel.getBrand()+mHotel.getName());
 		mAddressTextView.setText(mHotel.getAddress());
 		mPhoneTextView.setText("电话："+mHotel.getPhone());
 		memoTextView.setText(mHotel.getMemo());
 		if (!TextUtils.isEmpty(mHotel.getOpenDate())) {
-			mOpenDateTextView.setText("开业时间：" + mHotel.getLastCheckedDate());
+			mOpenDateTextView.setText("开业时间：" + mHotel.getOpenDate());
 		}
 		if (!TextUtils.isEmpty(mHotel.getLastCheckedDate())) {
 			mLastCheckedDateTextView.setText("上次检查：" + mHotel.getLastCheckedDate());

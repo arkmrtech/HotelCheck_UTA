@@ -80,13 +80,13 @@ public class UploadProxy {
 		sInstance.mBinder.addUploadTask(hotel);
 	}
 	
-	public static List<UploadBean> getUploadingList(int hotelId) {
-		return sInstance.mBinder.getUploadingList(hotelId);
-	}
-	
-	public static List<UploadBean> getUploadComplete(int hotelId) {
-		return sInstance.mBinder.getUploadCompleteList(hotelId);
-	}
+//	public static List<UploadBean> getUploadingList(int hotelId) {
+//		return sInstance.mBinder.getUploadingList(hotelId);
+//	}
+//	
+//	public static List<UploadBean> getUploadComplete(int hotelId) {
+//		return sInstance.mBinder.getUploadCompleteList(hotelId);
+//	}
 	
 	public static void restart(UploadBean bean) {
 		sInstance.mBinder.restart(bean);

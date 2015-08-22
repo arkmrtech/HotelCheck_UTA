@@ -37,6 +37,9 @@
         android:gravity="center"
         android:textColor="@color/white"
         android:textSize="14sp"
+        android:text="复检问题"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
         android:visibility="gone" />
 
     <ImageView

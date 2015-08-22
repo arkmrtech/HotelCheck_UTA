@@ -155,65 +155,71 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
+		String localSavePath = "";
+		String serviceSavePath = "";
 		if (resultCode == Activity.RESULT_OK) {
 			IssueItem issueItem = mCheckData.getIssue(mCurrentIssuePosition);
 			ImageItem imageItem = new ImageItem();
+			String fileName = "";
+			boolean result = false;
 			if (requestCode == CAMMER_REQUEST_CODE) {
 				String sdStatus = Environment.getExternalStorageState();
 				if (!sdStatus.equals(Environment.MEDIA_MOUNTED)) { // 检测sd是否可用
 					Log.i("lxk", "SD card is not avaiable/writeable right now.");
 					return;
 				}
-				String name = "";
+				
 				String imagePath = "";
 				if (mCheckData.getId() == Constance.CHECK_DATA_ID_ROOM) {
-					name = mCheckData.getName()+"_"+new DateFormat().format("yyyyMMddhhmmss",
+					fileName = mCheckData.getName()+"_"+new DateFormat().format("yyyyMMddhhmmss",
 							Calendar.getInstance(Locale.CHINA))
 							+ ".jpg";
 					imagePath = "/"+mHotel.getName()+"/"+"客房"+"/" + mCheckData.getIssue(mCurrentIssuePosition).getName()+"/";
 				} else if (mCheckData.getId() == Constance.CHECK_DATA_ID_PASSWAY) {
-					name = mCheckData.getName()+"_"+new DateFormat().format("yyyyMMddhhmmss",
+					fileName = mCheckData.getName()+"_"+new DateFormat().format("yyyyMMddhhmmss",
 							Calendar.getInstance(Locale.CHINA))
 							+ ".jpg";
 					imagePath = "/"+mHotel.getName()+"/"+"楼层"+"/" + mCheckData.getIssue(mCurrentIssuePosition).getName()+"/";
 				} else {
-					name = new DateFormat().format("yyyyMMddhhmmss",
+					fileName = new DateFormat().format("yyyyMMddhhmmss",
 							Calendar.getInstance(Locale.CHINA))
 							+ ".jpg";
 					imagePath = "/"+mHotel.getName()+"/"+mCheckData.getName()+"/" + mCheckData.getIssue(mCurrentIssuePosition).getName()+"/";
 				}
-				String localSavePath = Constance.Path.HOTEL_SRC+imagePath;
-				String serviceSavePath = Constance.Path.SERVER_IMAGE_PATH+name;
+				String filepath = Constance.Path.HOTEL_SRC+imagePath;
+				localSavePath = filepath+fileName;
+				
 				
 				Bitmap bitmap = PictureUtil.getSmallBitmap(Constance.Path.TEMP_IMAGE);
-				FileUtil.saveBitmapToSDFile(bitmap,localSavePath , name, CompressFormat.JPEG);
-				
-				imageItem.setLocalImagePath(localSavePath+name);
-				imageItem.setServiceSavePath(serviceSavePath);
-				issueItem.addImage(imageItem);
+				result = FileUtil.saveBitmapToSDFile(bitmap,filepath , fileName, CompressFormat.JPEG);
+				bitmap.recycle();
 				
 			} else if (requestCode == Constance.REQUEST_CODE_WIFI) {
 				mCurrentIssuePosition = data.getIntExtra(IntentKey.INTENT_KEY_ISSUE_POSITION, -99);
-				String imagePath = data.getStringExtra(IntentKey.INTENT_KEY_FILE_PATH);
-				File imageFile = new File(imagePath);
+				localSavePath = data.getStringExtra(IntentKey.INTENT_KEY_FILE_PATH);
+				File imageFile = new File(localSavePath);
 				if (imageFile.exists()) {
-					String serviceSavePath = Constance.Path.SERVER_IMAGE_PATH+imageFile.getName();
-					imageItem.setLocalImagePath(imagePath);
-					imageItem.setServiceSavePath(serviceSavePath);
-					issueItem.addImage(imageItem);
-					
+					result = true;
+					fileName = imageFile.getName();
 				}
 			}
-			boolean isWidth = ImageUtil.isWidthPic(imageItem.getLocalImagePath());
-			imageItem.setType(mCheckData.getType());
-			imageItem.setWidth(isWidth);
-			if (!issueItem.isCheck()) {
-				issueItem.setCheck(true);
+			serviceSavePath = Constance.Path.SERVER_IMAGE_PATH+mHotel.getCheckId()+"/"+DataManager.getInstance().getUserName()+"/"+fileName;
+			if (result) {
+				imageItem.setLocalImagePath(localSavePath);
+				imageItem.setServiceSavePath(serviceSavePath);
+				issueItem.addImage(imageItem);
+				boolean isWidth = ImageUtil.isWidthPic(imageItem.getLocalImagePath());
+				imageItem.setType(mCheckData.getType());
+				imageItem.setWidth(isWidth);
+				if (!issueItem.isCheck()) {
+					issueItem.setCheck(true);
+				}
+				HotelCheck hotelCheck = new HotelCheck(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), imageItem);
+				hotelCheck.save();
+				DataManager.getInstance().saveIssueCheck(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), issueItem.isCheck());
+				mAdapter.notifyItem(mCurrentIssuePosition, mCheckData.getIssue(mCurrentIssuePosition));
+				mCheckData.updateIssueCheck(issueItem);
 			}
-			HotelCheck hotelCheck = new HotelCheck(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), imageItem);
-			hotelCheck.save();
-			mAdapter.notifyItem(mCurrentIssuePosition, mCheckData.getIssue(mCurrentIssuePosition));
-			mCheckData.updateIssueCheck(issueItem);
 		}
 		
 	}
@@ -270,7 +276,7 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 		} 
 		mAdapter.notifyItem(position, issueItem);
 		mCheckData.updateIssueCheck(issueItem);
-		DataManager.getInstance().saveIssueContent(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), content);
+		DataManager.getInstance().saveIssueContent(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), content, issueItem.isCheck());
 	}
 	
 	@Override
@@ -296,46 +302,51 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 	}
 	
 	private void showAddIssue() {
-		if (mAlertDialog == null) {
-			LayoutInflater factory = LayoutInflater.from(this);// 提示框
-			View view = factory.inflate(R.layout.alert_input, null);// 这里必须是final的
-			mEditText = (EditText) view.findViewById(R.id.et_content);// 获得输入框对象
-			mAlertDialog = new AlertDialog.Builder(this)
-					.setView(view)
-					.setPositiveButton(
-							"确定",// 提示框的两个按钮
-							new android.content.DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-									String content = mEditText.getText()
-											.toString();
-									if (TextUtils.isEmpty(content)) {
-										Toast.makeText(CheckHotelIssueActivity.this, "请输入问题名称", Toast.LENGTH_SHORT).show();
-										return;
-									}
-									if (hasIssue(content)) {
-										Toast.makeText(CheckHotelIssueActivity.this, "问题已存在，请修改", Toast.LENGTH_SHORT).show();
-										return;
-									} else {
-										addIssue(content);
-										mEditText.setText("");
-									}
-									
+		if (mHotel.isStatus()) {
+			Toast.makeText(this, "酒店已经完成检查，不能再新增问题", Toast.LENGTH_SHORT).show();
+			return;
+		}
+		LayoutInflater factory = LayoutInflater.from(this);// 提示框
+		View view = factory.inflate(R.layout.alert_input, null);// 这里必须是final的
+		mEditText = (EditText) view.findViewById(R.id.et_content);// 获得输入框对象
+		mAlertDialog = new AlertDialog.Builder(this)
+				.setView(view)
+				.setPositiveButton("确定",// 提示框的两个按钮
+						new android.content.DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								String content = mEditText.getText().toString();
+								if (TextUtils.isEmpty(content)) {
+									Toast.makeText(
+											CheckHotelIssueActivity.this,
+											"请输入问题名称", Toast.LENGTH_SHORT)
+											.show();
+									return;
 								}
-							})
-					.setNegativeButton(
-							"取消",
-							new android.content.DialogInterface.OnClickListener() {
-
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
+								if (hasIssue(content)) {
+									Toast.makeText(
+											CheckHotelIssueActivity.this,
+											"问题已存在，请修改", Toast.LENGTH_SHORT)
+											.show();
+									return;
+								} else {
+									addIssue(content);
 									mEditText.setText("");
 								}
-							}).create();
-			mAlertDialog.setTitle("请输入问题名称");
-		}
+
+							}
+						})
+				.setNegativeButton("取消",
+						new android.content.DialogInterface.OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								mEditText.setText("");
+							}
+						}).create();
+		mAlertDialog.setTitle("请输入问题名称");
 		if (!mAlertDialog.isShowing()) {
 			mAlertDialog.show();
 		}
@@ -348,13 +359,12 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 		issueItem.setContent("");
 		issueItem.setIsDefQue(DefQueType.TYPE_DYMIC);
 		issueItem.setIsPreQue(PreQueType.TYPE_NEW);
-		issueItem.setDimOneId(mCheckData.getId().intValue());
-		issueItem.setDimOneName(mCheckData.getName());
+		issueItem.setDimOneId(1013);
+		issueItem.setDimOneName("其他");
 		int id = Math.abs(name.hashCode());
 		issueItem.setId(id);
 		DymicIssue dymicIssue = new DymicIssue(mHotel.getId(), mCheckData.getId(), issueItem);
 		dymicIssue.save();
-//		mCheckData.addIssue(issueItem);
 		mAdapter.addIssue(issueItem);
 	}
 	
