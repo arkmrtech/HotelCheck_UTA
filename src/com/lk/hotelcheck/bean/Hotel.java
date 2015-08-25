@@ -31,7 +31,7 @@ public class Hotel extends SugarRecord<Hotel>{
 	private String phone;
 	private String memo;
 	private String openDate;
-	private String lastCheckedDate;
+	private transient String lastCheckedDate;
 	private String checkDate;
 	private int roomCount;
 	private int roomCheckedCount;

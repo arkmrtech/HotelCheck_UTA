@@ -118,10 +118,6 @@ public class HttpRequest {
 	public void updateHotelCheckStatus(Context context, int checkId, String session, final HttpCallback callback) {
 		String url = getRequestURL(NetConstance.METHOD_UPDATE_HOTEL_STATUS);
 		JSONObject jsonObject = new JSONObject();
-//		int state = 0;
-//		if (status) {
-//			state = 1;
-//		}
 		try {
 			jsonObject.put(NetConstance.PARAM_CHECK_ID, checkId);
 			jsonObject.put(NetConstance.PARAM_STATE, 2);//2 = finish;
@@ -203,7 +199,7 @@ public class HttpRequest {
 		postRequest(context, url, jsonObject, callback);
 	}
 	
-	private void postRequest(final Context context, String url, JSONObject jsonObject, final HttpCallback callback) {
+	private void postRequest(final Context context, final String url, JSONObject jsonObject, final HttpCallback callback) {
 		StringEntity entity = null;
 		try {
 			entity = new StringEntity(jsonObject.toString(),"utf-8");
@@ -226,7 +222,6 @@ public class HttpRequest {
 			@Override
 			public void onFailure(int statusCode, Header[] headers,
 					Throwable throwable, JSONArray errorResponse) {
-				// TODO Auto-generated method stub
 				super.onFailure(statusCode, headers, throwable, errorResponse);
 				callback.onError(statusCode, "error");
 				Log.d("lxk", "<onFailure> 2 response = "+errorResponse);
@@ -235,7 +230,6 @@ public class HttpRequest {
 			@Override
 			public void onFailure(int statusCode, Header[] headers,
 					Throwable throwable, JSONObject errorResponse) {
-				// TODO Auto-generated method stub
 				super.onFailure(statusCode, headers, throwable, errorResponse);
 				Log.d("lxk", "<onFailure> 3 response = "+errorResponse);
 				callback.onError(statusCode, "error");
@@ -248,6 +242,11 @@ public class HttpRequest {
 				Log.d("lxk", "<onSuccess>  response = "+response);
 				int state = response.optInt(NetConstance.PARAM_STATE);
 				String info = response.optString(NetConstance.PARAM_INFO);
+//				if (url.contains(NetConstance.METHOD_UPLOAD_HOTEL_DATA)) {
+//					Toast.makeText(context, "权限过期，请重新登录", Toast.LENGTH_SHORT).show();
+//					goToLogin(context);
+//					return;
+//				}
 				if (state == NetConstance.ERROR_CODE_SUCCESS) {
 					callback.onSuccess(response);
 				} else if (state == NetConstance.ERROR_CODE_SESSSION_TIME_OUT) {

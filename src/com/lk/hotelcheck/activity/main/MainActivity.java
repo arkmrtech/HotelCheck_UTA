@@ -137,7 +137,6 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
     	super.onDestroy();
-    	Log.d("lxk", "mainActivity onDestroy");
     	UploadProxy.initInstance(this).doUnbindService();
     	DataManager.getInstance().clear();
     	unRegisterUploadBroadcast();
@@ -173,6 +172,7 @@ public class MainActivity extends BaseActivity {
 					
 					@Override
 					public void onSuccess(JSONObject response) {
+						Toast.makeText(MainActivity.this, "已注销账户", Toast.LENGTH_SHORT).show();
 						Intent intent = new Intent();
 						intent.setClass(MainActivity.this, LoginActivity.class);
 						startActivity(intent);
@@ -274,7 +274,11 @@ public class MainActivity extends BaseActivity {
 				}
 			});
 		} else {
-			loadHotelData();
+			if (DataManager.getInstance().getHotelCount() == 0) {
+				loadHotelData();
+			} else {
+				mLoadingGroup.setVisibility(View.GONE);
+			}
 		}
 		
 		
