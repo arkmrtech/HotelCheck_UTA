@@ -2,8 +2,6 @@ package com.lk.hotelcheck.bean;
 
 import java.io.Serializable;
 
-import android.R.string;
-
 public class ImageItem implements Serializable{
 	private String localImagePath;
 	private String serviceSavePath;

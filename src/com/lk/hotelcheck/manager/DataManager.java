@@ -8,7 +8,6 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.SparseArray;
 
 import com.google.gson.Gson;
@@ -28,8 +27,6 @@ import com.lk.hotelcheck.network.HttpCallback;
 import com.lk.hotelcheck.network.HttpRequest;
 import com.lk.hotelcheck.util.FileUtil;
 import com.lk.hotelcheck.util.JsonParseHandler;
-import com.tencent.bugly.proguard.u;
-
 import common.Constance;
 import common.Constance.CheckDataType;
 import common.Constance.DefQueType;

@@ -5,11 +5,8 @@ import java.util.Collections;
 import java.util.List;
 
 import com.lk.hotelcheck.bean.dao.DymicIssue;
-import com.orm.SugarRecord;
-
 import common.Constance.DefQueType;
 import common.Constance.PreQueType;
-import android.provider.MediaStore.Images;
 
 public class IssueItem{
 	

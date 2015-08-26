@@ -2,7 +2,6 @@ package com.lk.hotelcheck.activity.main;
 
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.provider.ContactsContract.Contacts.Data;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -10,7 +9,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
-import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -20,8 +18,6 @@ import com.lk.hotelcheck.activity.photochosen.PhotoChosenActivity;
 import com.lk.hotelcheck.bean.Hotel;
 import com.lk.hotelcheck.manager.DataManager;
 import com.lk.hotelcheck.util.DrawUtil;
-
-import common.Constance.CheckDataType;
 import common.Constance.CheckType;
 
 public class HotelListAdapter extends BaseExpandableListAdapter {

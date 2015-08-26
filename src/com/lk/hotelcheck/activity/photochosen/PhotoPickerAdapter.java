@@ -1,11 +1,7 @@
 package com.lk.hotelcheck.activity.photochosen;
 
-import java.io.File;
 import java.util.List;
 
-import android.content.Intent;
-import android.net.Uri;
-import android.provider.MediaStore;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.view.View;
@@ -13,8 +9,6 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 
 import com.lk.hotelcheck.R;
-
-import common.Constance;
 
 public class PhotoPickerAdapter extends RecyclerView.Adapter<ViewHolder>{
 

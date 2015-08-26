@@ -1,20 +1,16 @@
 package com.lk.hotelcheck.activity.photochosen;
 
-import com.lk.hotelcheck.R;
-import com.lk.hotelcheck.util.DrawUtil;
-import com.nostra13.universalimageloader.core.ImageLoader;
-
-import android.R.bool;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+
+import com.lk.hotelcheck.util.DrawUtil;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 @SuppressLint("NewApi")
 public class PhotoChosenItem extends RelativeLayout{

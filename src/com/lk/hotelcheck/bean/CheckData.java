@@ -4,19 +4,15 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
+
+import android.text.TextUtils;
+import android.util.SparseArray;
 
 import com.lk.hotelcheck.bean.dao.CheckIssue;
 import com.lk.hotelcheck.bean.dao.HotelCheck;
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
-
 import common.Constance.PreQueType;
-import android.support.v4.util.SparseArrayCompat;
-import android.text.TextUtils;
-import android.util.Log;
-import android.util.SparseArray;
-import android.util.SparseIntArray;
 
 public class CheckData extends SugarRecord<CheckData> implements Serializable{
 	/**

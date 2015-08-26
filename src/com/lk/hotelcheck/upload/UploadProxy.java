@@ -1,23 +1,14 @@
 package com.lk.hotelcheck.upload;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
-import android.os.RemoteException;
-import android.widget.Toast;
 
-import com.lk.hotelcheck.R;
 import com.lk.hotelcheck.bean.Hotel;
-import com.lk.hotelcheck.bean.ImageItem;
 import com.lk.hotelcheck.bean.UploadBean;
 import com.lk.hotelcheck.service.UploadService;
-import com.lk.hotelcheck.util.Machine;
 
 public class UploadProxy {
 	

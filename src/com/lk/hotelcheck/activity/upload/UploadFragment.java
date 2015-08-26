@@ -26,7 +26,6 @@ import com.lk.hotelcheck.manager.DataManager;
 import com.lk.hotelcheck.upload.UploadProxy;
 import com.lk.hotelcheck.util.Machine;
 import com.nostra13.universalimageloader.core.ImageLoader;
-
 import common.Constance;
 import common.Constance.ImageUploadState;
 import common.Constance.IntentKey;

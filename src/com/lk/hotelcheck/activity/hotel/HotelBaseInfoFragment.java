@@ -2,17 +2,14 @@ package com.lk.hotelcheck.activity.hotel;
 
 import java.util.Calendar;
 
-import android.R.integer;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.app.DatePickerDialog.OnDateSetListener;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,7 +23,6 @@ import com.lk.hotelcheck.R;
 import com.lk.hotelcheck.bean.Hotel;
 import com.lk.hotelcheck.manager.DataManager;
 import com.lk.hotelcheck.util.StringUtil;
-
 import common.Constance;
 
 public class HotelBaseInfoFragment extends Fragment {

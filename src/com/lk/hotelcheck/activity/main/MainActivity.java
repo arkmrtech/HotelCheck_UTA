@@ -10,9 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.provider.ContactsContract.Contacts.Data;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,18 +20,15 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ExpandableListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lk.hotelcheck.R;
 import com.lk.hotelcheck.activity.BaseActivity;
 import com.lk.hotelcheck.activity.login.LoginActivity;
-import com.lk.hotelcheck.activity.upload.UploadFragment;
 import com.lk.hotelcheck.activity.upload.UploadProcessActivity;
 import com.lk.hotelcheck.bean.Hotel;
 import com.lk.hotelcheck.bean.UploadBean;
-import com.lk.hotelcheck.bean.dao.HotelCheck;
 import com.lk.hotelcheck.manager.DataManager;
 import com.lk.hotelcheck.network.DataCallback;
 import com.lk.hotelcheck.network.HttpCallback;
@@ -42,10 +37,9 @@ import com.lk.hotelcheck.upload.UploadProxy;
 import com.lk.hotelcheck.util.DrawUtil;
 import com.lk.hotelcheck.util.Machine;
 import com.lk.hotelcheck.util.SharedPrefsUtil;
-
-import common.NetConstance;
 import common.Constance.HotelAction;
 import common.Constance.ImageUploadState;
+import common.NetConstance;
 
 
 

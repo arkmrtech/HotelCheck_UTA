@@ -11,12 +11,9 @@ import android.util.SparseArray;
 import com.lk.hotelcheck.bean.dao.AreaIssue;
 import com.lk.hotelcheck.bean.dao.CheckIssue;
 import com.lk.hotelcheck.bean.dao.HotelCheck;
-import com.lk.hotelcheck.manager.DataManager;
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
-
 import common.Constance;
-import common.Constance.CheckDataType;
 import common.Constance.CheckType;
 import common.Constance.DefQueType;
 import common.Constance.ImageUploadState;

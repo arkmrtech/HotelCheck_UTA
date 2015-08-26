@@ -15,7 +15,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -25,25 +24,20 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lk.hotelcheck.R;
 import com.lk.hotelcheck.activity.BaseActivity;
-import com.lk.hotelcheck.activity.photochosen.PhotoChosenActivity;
 import com.lk.hotelcheck.activity.upload.UploadProcessActivity;
 import com.lk.hotelcheck.bean.Hotel;
-import com.lk.hotelcheck.bean.ImageItem;
 import com.lk.hotelcheck.manager.DataManager;
 import com.lk.hotelcheck.network.HttpCallback;
 import com.lk.hotelcheck.network.HttpRequest;
 import com.lk.hotelcheck.upload.UploadProxy;
 import com.lk.hotelcheck.util.Machine;
-
 import common.Constance;
-import common.NetConstance;
 import common.view.SlidingTabLayout;
 
 

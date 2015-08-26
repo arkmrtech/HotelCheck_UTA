@@ -1,5 +1,16 @@
 package com.lk.hotelcheck.activity.hotel;
 
+import android.app.Activity;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseExpandableListAdapter;
+import android.widget.ExpandableListView;
+import android.widget.ImageView;
+import android.widget.TextView;
+
 import com.lk.hotelcheck.R;
 import com.lk.hotelcheck.activity.photochosen.PhotoChosenActivity;
 import com.lk.hotelcheck.bean.CheckData;
@@ -7,27 +18,10 @@ import com.lk.hotelcheck.bean.Hotel;
 import com.lk.hotelcheck.bean.IssueItem;
 import com.lk.hotelcheck.manager.DataManager;
 import com.lk.hotelcheck.util.DrawUtil;
-
 import common.Constance;
-import common.NetConstance;
 import common.Constance.CheckDataType;
 import common.Constance.CheckType;
 import common.Constance.PreQueType;
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.database.DataSetObserver;
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseExpandableListAdapter;
-import android.widget.ExpandableListAdapter;
-import android.widget.ExpandableListView;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 public class HotelReportFragment extends Fragment{
 	

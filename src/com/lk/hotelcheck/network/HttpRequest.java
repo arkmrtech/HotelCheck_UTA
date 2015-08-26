@@ -1,7 +1,6 @@
 package com.lk.hotelcheck.network;
 
 import java.io.UnsupportedEncodingException;
-import java.util.List;
 
 import org.apache.http.Header;
 import org.apache.http.entity.StringEntity;
@@ -13,7 +12,6 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.content.Intent;
-import android.provider.ContactsContract.Contacts.Data;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -28,7 +26,6 @@ import com.lk.hotelcheck.util.JsonParseHandler;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.FileAsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
-
 import common.NetConstance;
 
 public class HttpRequest {

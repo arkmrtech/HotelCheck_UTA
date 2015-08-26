@@ -19,10 +19,8 @@ import android.view.View;
 
 import com.lk.hotelcheck.R;
 import com.lk.hotelcheck.activity.BaseActivity;
-import com.lk.hotelcheck.bean.Hotel;
 import com.lk.hotelcheck.bean.UploadBean;
 import com.lk.hotelcheck.manager.DataManager;
-
 import common.Constance;
 import common.Constance.HotelAction;
 import common.Constance.ImageUploadState;

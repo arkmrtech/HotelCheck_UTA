@@ -4,45 +4,33 @@ import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import com.lk.hotelcheck.R;
-import com.lk.hotelcheck.activity.BaseActivity;
-import com.lk.hotelcheck.activity.photochosen.PhotoPickerAdapter.CallBackListener;
-import com.lk.hotelcheck.bean.ImageItem;
-import com.lk.hotelcheck.bean.IssueItem;
-import com.lk.hotelcheck.util.DrawUtil;
-import com.lk.hotelcheck.util.FileUtil;
-import com.lk.hotelcheck.util.PictureUtil;
-
-import common.Constance;
-import common.Constance.IntentKey;
-import common.Constance.Path;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.Bitmap.CompressFormat;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.content.IntentCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.RecyclerView.LayoutManager;
+import android.support.v7.widget.Toolbar;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+
+import com.lk.hotelcheck.R;
+import com.lk.hotelcheck.activity.BaseActivity;
+import com.lk.hotelcheck.activity.photochosen.PhotoPickerAdapter.CallBackListener;
+import com.lk.hotelcheck.util.FileUtil;
+
+import common.Constance.IntentKey;
 
 public class PhotoPickerActivity extends BaseActivity implements CallBackListener{
 

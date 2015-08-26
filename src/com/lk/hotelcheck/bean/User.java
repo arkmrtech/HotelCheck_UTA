@@ -1,6 +1,5 @@
 package com.lk.hotelcheck.bean;
 
-import android.R.integer;
 
 public class User {
 	private String userName;
