@@ -22,11 +22,14 @@ import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
+import android.widget.ImageView.ScaleType;
 
 /**
  * 
@@ -1013,4 +1016,36 @@ public class BitmapUtil {
 		}
 		return new BitmapDrawable(base);
 	}
+
+	public static  Bitmap drawTextToBitmap(Bitmap bitmap, String gText) {  
+			  android.graphics.Bitmap.Config bitmapConfig =  
+			      bitmap.getConfig();  
+			  
+			  
+			  
+//			  // set default bitmap config if none  
+			  if(bitmapConfig == null) {  
+			    bitmapConfig = android.graphics.Bitmap.Config.ARGB_8888;  
+			  }  
+//			  // resource bitmaps are imutable,   
+//			  // so we need to convert it to mutable one  
+			Bitmap  textBitmap = bitmap.copy(bitmapConfig, true);  
+			   
+			  Canvas canvas = new Canvas(textBitmap);  
+			  // new antialised Paint  
+			  Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);  
+			  // text color - #3D3D3D  
+			  paint.setColor(Color.WHITE);    
+			  paint.setTextSize(DrawUtil.sp2px(30));		  
+		       paint.setDither(true); //获取跟清晰的图像采样  
+		       paint.setFilterBitmap(true);//过滤一些  
+			  Rect bounds = new Rect();  
+			  paint.getTextBounds(gText, 0, gText.length(), bounds);  			  
+			  int x = 30;  
+			  int y = 30;  			   
+			  canvas.drawText(gText, 20, textBitmap.getHeight()-20, paint);  
+			  bitmap = null;
+			  return textBitmap;  
+			} 
+
 }

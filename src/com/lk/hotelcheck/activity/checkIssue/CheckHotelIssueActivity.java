@@ -49,6 +49,7 @@ import com.lk.hotelcheck.util.ImageUtil;
 import com.lk.hotelcheck.util.PictureUtil;
 
 import common.Constance;
+import common.Constance.CheckDataType;
 import common.Constance.DefQueType;
 import common.Constance.IntentKey;
 import common.Constance.PreQueType;
@@ -170,16 +171,19 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 				}
 				
 				String imagePath = "";
-				if (mCheckData.getId() == Constance.CHECK_DATA_ID_ROOM) {
+				Bitmap bitmap = PictureUtil.getSmallBitmap(Constance.Path.TEMP_IMAGE);
+				if (mCheckData.getType() == CheckDataType.TYPE_ROOM) {
 					fileName = mCheckData.getName()+"_"+new DateFormat().format("yyyyMMddhhmmss",
 							Calendar.getInstance(Locale.CHINA))
 							+ ".jpg";
 					imagePath = "/"+mHotel.getName()+"/"+"客房"+"/" + mCheckData.getIssue(mCurrentIssuePosition).getName()+"/";
-				} else if (mCheckData.getId() == Constance.CHECK_DATA_ID_PASSWAY) {
+					bitmap = BitmapUtil.drawTextToBitmap(bitmap, mCheckData.getName());
+				} else if (mCheckData.getType() == CheckDataType.TYPE_PASSWAY) {
 					fileName = mCheckData.getName()+"_"+new DateFormat().format("yyyyMMddhhmmss",
 							Calendar.getInstance(Locale.CHINA))
 							+ ".jpg";
 					imagePath = "/"+mHotel.getName()+"/"+"楼层"+"/" + mCheckData.getIssue(mCurrentIssuePosition).getName()+"/";
+					bitmap = BitmapUtil.drawTextToBitmap(bitmap, mCheckData.getName());
 				} else {
 					fileName = new DateFormat().format("yyyyMMddhhmmss",
 							Calendar.getInstance(Locale.CHINA))
@@ -190,7 +194,8 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 				localSavePath = filepath+fileName;
 				
 				
-				Bitmap bitmap = PictureUtil.getSmallBitmap(Constance.Path.TEMP_IMAGE);
+				
+				
 				result = FileUtil.saveBitmapToSDFile(bitmap,filepath , fileName, CompressFormat.JPEG);
 				bitmap.recycle();
 				
