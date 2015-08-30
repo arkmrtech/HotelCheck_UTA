@@ -8,17 +8,16 @@
         android:layout_width="match_parent"
         android:layout_height="218dp"
         android:background="@drawable/hotelbg"
-        android:orientation="vertical" 
-        android:paddingTop="20dp">
+        android:orientation="vertical"
+        android:paddingTop="10dp" >
 
         <TextView
             android:id="@+id/tv_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
             android:gravity="center"
-            android:text="7天海珠店"
             android:textColor="@android:color/white"
             android:textSize="18sp" />
 
@@ -28,11 +27,10 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/tv_name"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
             android:drawableLeft="@drawable/location"
             android:drawablePadding="8dp"
             android:gravity="center"
-            android:text="广州市海珠区"
             android:textColor="@android:color/white"
             android:textSize="14sp" />
 
@@ -42,9 +40,8 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/tv_address"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
             android:gravity="center"
-            android:text="8888888"
             android:textColor="@android:color/white"
             android:textSize="14sp" />
 
@@ -54,9 +51,41 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/tv_phone"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
             android:gravity="center"
-            android:text="自营"
+            android:textColor="@android:color/white"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tv_manager"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_memo"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="5dp"
+            android:gravity="center"
+            android:textColor="@android:color/white"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tv_mamager_tel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_manager"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="5dp"
+            android:gravity="center"
+            android:textColor="@android:color/white"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tv_area_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_mamager_tel"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="5dp"
+            android:gravity="center"
             android:textColor="@android:color/white"
             android:textSize="14sp" />
 
@@ -103,17 +132,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
             android:layout_marginLeft="30dp"
-            android:text="@string/room_number"
-            android:layout_centerVertical="true" />
+            android:text="@string/room_number" />
 
         <TextView
             android:id="@+id/tv_room_number"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="30dp"
-            android:layout_centerVertical="true" />
+            android:layout_centerVertical="true"
+            android:layout_marginRight="30dp" />
 
         <ImageView
             android:layout_width="match_parent"
@@ -123,6 +152,7 @@
             android:layout_marginRight="10dp"
             android:background="@color/gray" />
     </RelativeLayout>
+
     <RelativeLayout
         android:id="@+id/rl_room_check_number"
         android:layout_width="match_parent"
@@ -132,17 +162,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
             android:layout_marginLeft="30dp"
-            android:text="@string/room_check_number"
-            android:layout_centerVertical="true" />
+            android:text="@string/room_check_number" />
 
         <TextView
             android:id="@+id/tv_room_check_number"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="30dp"
             android:layout_alignParentRight="true"
-            android:layout_centerVertical="true" />
+            android:layout_centerVertical="true"
+            android:layout_marginRight="30dp" />
 
         <ImageView
             android:layout_width="match_parent"
@@ -152,6 +182,7 @@
             android:layout_marginRight="10dp"
             android:background="@color/gray" />
     </RelativeLayout>
+
     <RelativeLayout
         android:id="@+id/rl_floor_number"
         android:layout_width="match_parent"
@@ -161,17 +192,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
             android:layout_marginLeft="30dp"
-            android:text="@string/floor_number"
-            android:layout_centerVertical="true" />
+            android:text="@string/floor_number" />
 
         <TextView
             android:id="@+id/tv_floor_number"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="30dp"
-            android:layout_centerVertical="true" />
+            android:layout_centerVertical="true"
+            android:layout_marginRight="30dp" />
 
         <ImageView
             android:layout_width="match_parent"
@@ -181,6 +212,7 @@
             android:layout_marginRight="10dp"
             android:background="@color/gray" />
     </RelativeLayout>
+
     <RelativeLayout
         android:id="@+id/rl_check_date"
         android:layout_width="match_parent"
@@ -190,17 +222,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
             android:layout_marginLeft="30dp"
-            android:text="@string/check_date"
-            android:layout_centerVertical="true" />
+            android:text="@string/check_date" />
 
         <TextView
             android:id="@+id/tv_check_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="30dp"
-            android:layout_centerVertical="true" />
+            android:layout_centerVertical="true"
+            android:layout_marginRight="30dp" />
 
         <ImageView
             android:layout_width="match_parent"

@@ -34,6 +34,9 @@ public class HotelBaseInfoFragment extends Fragment {
 	private TextView mAddressTextView;
 	private TextView mPhoneTextView;
 	private TextView memoTextView;
+	private TextView managerTextView;
+	private TextView managerTelTextView;
+	private TextView mAreaTextView;
 	private TextView mOpenDateTextView;
 	private TextView mLastCheckedDateTextView;
 	private TextView mRoomNumberTextView;
@@ -89,6 +92,9 @@ public class HotelBaseInfoFragment extends Fragment {
 					.findViewById(R.id.tv_address);
 			mPhoneTextView = (TextView) mRootView.findViewById(R.id.tv_phone);
 			memoTextView = (TextView) mRootView.findViewById(R.id.tv_memo);
+			managerTextView = (TextView) mRootView.findViewById(R.id.tv_manager);
+			managerTelTextView = (TextView) mRootView.findViewById(R.id.tv_mamager_tel);
+			mAreaTextView = (TextView) mRootView.findViewById(R.id.tv_area_info);
 			mOpenDateTextView = (TextView) mRootView
 					.findViewById(R.id.tv_open_date);
 			mLastCheckedDateTextView = (TextView) mRootView
@@ -142,6 +148,8 @@ public class HotelBaseInfoFragment extends Fragment {
 		if (!TextUtils.isEmpty(mHotel.getFloorEnd())) {
 			floorBuffer.append(mHotel.getFloorEnd());
 		}
+		managerTextView.setText("店长:"+mHotel.getBranchManager());
+		managerTelTextView.setText("店长电话:"+mHotel.getBranchManagerTele());
 		mRoomNumberTextView.setText("" + mHotel.getRoomCount());
 		mRoomCheckedNumberTextView.setText("" + mHotel.getRoomCheckedCount());
 		mFloorTextView.setText(floorBuffer.toString());

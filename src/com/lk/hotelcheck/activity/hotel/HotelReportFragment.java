@@ -333,6 +333,7 @@ public class HotelReportFragment extends Fragment{
 			}
 			viewHolder.nameTextView.setText(issueItem.getName());
 			if (issueItem.getIsPreQue() == PreQueType.TYPE_REVIEW) {
+				viewHolder.statusTextView.setVisibility(View.VISIBLE);
 				if (issueItem.isCheck()) {
 					viewHolder.statusTextView.setText("未整改/整改中");
 					viewHolder.statusTextView.setTextColor(getResources()
@@ -344,10 +345,12 @@ public class HotelReportFragment extends Fragment{
 				}
 			} else {
 				if (mHotel.getCheckType() == CheckType.CHECK_TYPE_REVIEW) {
+					viewHolder.statusTextView.setVisibility(View.VISIBLE);
 					viewHolder.statusTextView.setText("新发现");
 					viewHolder.statusTextView.setTextColor(getResources()
 							.getColor(R.color.color_three));
 				} else {
+					viewHolder.statusTextView.setVisibility(View.GONE);
 					viewHolder.statusTextView.setText("");
 					viewHolder.statusTextView.setTextColor(getResources()
 							.getColor(R.color.white));

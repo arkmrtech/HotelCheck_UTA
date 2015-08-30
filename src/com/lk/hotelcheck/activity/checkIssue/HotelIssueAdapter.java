@@ -36,14 +36,17 @@ public class HotelIssueAdapter extends RecyclerView.Adapter<ViewHolder>{
 	private CallBackListener mListener;
 //	private AlertDialog mAlertDialog;
 	private boolean mIsChecked;
+	private boolean mIsPreview;
+	
 	private static final int WIFI_VIEW_TYPE = 0X10086;
 	private static final int NORMAL_VIEW_TYPE = 0X10087;
 	
-	public HotelIssueAdapter(List<IssueItem> dataList, CallBackListener listener, boolean isChecked) {
+	public HotelIssueAdapter(List<IssueItem> dataList, CallBackListener listener, boolean isChecked, boolean isPreview) {
 		super();
 		this.mDataList = dataList;
 		this.mListener = listener;
 		this.mIsChecked = isChecked;
+		this.mIsPreview = isPreview;
 	}
 
 	@Override
@@ -266,10 +269,18 @@ public class HotelIssueAdapter extends RecyclerView.Adapter<ViewHolder>{
 			mCheckBox.setOnCheckedChangeListener(mOnCheckedChangeListener);
 			if (item.getIsPreQue() == PreQueType.TYPE_REVIEW) {
 				mReviewTextView.setVisibility(View.VISIBLE);
+				mReviewTextView.setBackgroundResource(R.color.content_orange);
 				nameTextView.setTextColor(nameTextView.getContext().getResources().getColor(R.color.content_orange));
+				mReviewTextView.setText("复检问题");
 			} else {
-				mReviewTextView.setVisibility(View.GONE);
-				nameTextView.setTextColor(Color.BLACK);
+				if (mIsPreview && item.isCheck()) {
+					mReviewTextView.setVisibility(View.VISIBLE);
+					mReviewTextView.setBackgroundResource(R.color.color_three);
+					mReviewTextView.setText("新发现");
+				} else {
+					mReviewTextView.setVisibility(View.GONE);
+					nameTextView.setTextColor(Color.BLACK);
+				}
 			}
 			if (mIsChecked) {
 				mCheckBox.setEnabled(false);

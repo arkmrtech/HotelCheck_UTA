@@ -50,6 +50,7 @@ import com.lk.hotelcheck.util.PictureUtil;
 
 import common.Constance;
 import common.Constance.CheckDataType;
+import common.Constance.CheckType;
 import common.Constance.DefQueType;
 import common.Constance.IntentKey;
 import common.Constance.PreQueType;
@@ -121,7 +122,8 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 				RecyclerView listView = (RecyclerView) findViewById(R.id.lv_hotel_issue);
 				LinearLayoutManager layoutManager = new LinearLayoutManager(this);
 				listView.setLayoutManager(layoutManager);
-				mAdapter = new HotelIssueAdapter(mCheckData.getIssuelist(), this, mHotel.isStatus());
+				boolean isPreview = mHotel.getCheckType() == CheckType.CHECK_TYPE_REVIEW;
+				mAdapter = new HotelIssueAdapter(mCheckData.getIssuelist(), this, mHotel.isStatus(), isPreview);
 				listView.setAdapter(mAdapter);
 				initDataFile();
 			}

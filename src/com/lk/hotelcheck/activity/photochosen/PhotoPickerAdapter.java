@@ -14,9 +14,20 @@ public class PhotoPickerAdapter extends RecyclerView.Adapter<ViewHolder>{
 
 	private List<String> mDataList;
 	private CallBackListener mListener;
+	private String mDirPath;
 	
 	
 	
+	
+	
+	public String getDirPath() {
+		return mDirPath;
+	}
+
+	public void setDirPath(String dirPath) {
+		this.mDirPath = dirPath;
+	}
+
 	public PhotoPickerAdapter(List<String> mDataList, CallBackListener listener) {
 		super();
 		this.mDataList = mDataList;
@@ -66,7 +77,7 @@ public class PhotoPickerAdapter extends RecyclerView.Adapter<ViewHolder>{
 					}
 				});
 			}
-			mItem.setOriginImageData("file://"+imagePath);
+			mItem.setOriginImageData("file://"+mDirPath+"/"+imagePath);
 		}
 		
 		public void setData(final int position, int resId) {

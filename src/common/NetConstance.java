@@ -7,7 +7,7 @@ public class NetConstance {
 	public static final String REQUEST_PARAM_KEY = "key";
 	
 	public static final String BASE_URL = "http://203.195.172.191:8080/app/service/";
-//	public static final String BASE_URL = "http://182.254.157.92:9080/app/service/";
+//	public static final String BASE_URL = "http://http://203.195.134.141:9080/app/service/";
 
 	//for test
 //	public static final String BASE_URL = "http://192.168.1.151:8088/app/service/";
