@@ -12,6 +12,9 @@ import com.lk.hotelcheck.bean.dao.CheckIssue;
 import com.lk.hotelcheck.bean.dao.HotelCheck;
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
+
+import common.Constance;
+import common.NetConstance;
 import common.Constance.PreQueType;
 
 public class CheckData extends SugarRecord<CheckData> implements Serializable{
@@ -40,12 +43,13 @@ public class CheckData extends SugarRecord<CheckData> implements Serializable{
 	public void setName(String name) {
 		this.name = name;
 	}
+
 	public IssueItem getIssue(int position) {
-			if (mIssuelist == null) {
-				return null;
-			}
-			return mIssuelist.get(position);
-		
+		if (mIssuelist == null) {
+			return null;
+		}
+		return mIssuelist.get(position);
+
 	}
 	
 	public int getIssueCount() {
@@ -97,7 +101,7 @@ public class CheckData extends SugarRecord<CheckData> implements Serializable{
 			if (checkedIssueArray.indexOfKey(issueItem.getId()) < 0) {
 				checkedIssueArray.put(issueItem.getId(), issueItem);
 			}
-		} else {
+		} else if (!issueItem.isCheck() && issueItem.getIsPreQue() != Constance.PreQueType.TYPE_REVIEW) {
 			if (checkedIssueArray.indexOfKey(issueItem.getId()) > -1) {
 				checkedIssueArray.remove(issueItem.getId());
 			}
@@ -219,8 +223,10 @@ public class CheckData extends SugarRecord<CheckData> implements Serializable{
 		int count = 0;
 		if (checkedIssueArray != null) {
 			for (IssueItem issueItem : mIssuelist) {
-				if (issueItem.getIsPreQue() == PreQueType.TYPE_REVIEW && !issueItem.isCheck()) {
-					count++;
+				if (issueItem.getIsPreQue() == PreQueType.TYPE_REVIEW) {
+					if (issueItem.getReformState() == IssueItem.REFORM_STATE_FIXED) {
+						count++;
+					}
 				}
 			}
 		}
@@ -231,8 +237,24 @@ public class CheckData extends SugarRecord<CheckData> implements Serializable{
 		int count = 0;
 		if (checkedIssueArray != null) {
 			for (IssueItem issueItem : mIssuelist) {
-				if (issueItem.getIsPreQue() == PreQueType.TYPE_REVIEW && issueItem.isCheck()) {
-					count++;
+				if (issueItem.getIsPreQue() == PreQueType.TYPE_REVIEW ) {
+					if (issueItem.getReformState() == IssueItem.REFORM_STATE_FIXING) {
+						count++;
+					}
+				}
+			}
+		}
+		return count;
+	}
+	
+	public int getUnFixIssueCount() {
+		int count = 0;
+		if (checkedIssueArray != null) {
+			for (IssueItem issueItem : mIssuelist) {
+				if (issueItem.getIsPreQue() == PreQueType.TYPE_REVIEW ) {
+					if (issueItem.getReformState() == IssueItem.REFORM_STATE_UN_FIX) {
+						count++;
+					}
 				}
 			}
 		}

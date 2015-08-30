@@ -19,14 +19,15 @@ public class IssueItem{
 	private int isPreQue;
 	private int dimOneId;
 	private String dimOneName;
-	private int reformState;//整改状态：0.未整改，1整改中，2完成整改
-	private final int REFORM_STATE_FINISH = 2;
-	private final int REFORM_STATE_UN_FINISH = 0;
+	private int reformState;//整改状态：1.未整改，2整改中，3完成整改
+	public static final int REFORM_STATE_FIXED = 3;
+	public static final int REFORM_STATE_FIXING = 2;
+	public static final int REFORM_STATE_UN_FIX = 1;
 	
 	public IssueItem() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
+	
 	public IssueItem(DymicIssue dymicIssue) {
 		this.id = dymicIssue.getId().intValue();
 		this.name = dymicIssue.getName();
@@ -77,11 +78,9 @@ public class IssueItem{
 	public void setCheck(boolean isCheck) {
 		this.isCheck = isCheck;
 		if (isPreQue == PreQueType.TYPE_REVIEW) {
-			if (isCheck) {
-				this.reformState = REFORM_STATE_UN_FINISH;
-			} else {
-				this.reformState = REFORM_STATE_FINISH;
-			}
+			if (!isCheck) {
+				this.reformState = REFORM_STATE_FIXED;
+			} 
 		}
 	}
 	public ImageItem getImageItem(int i) {

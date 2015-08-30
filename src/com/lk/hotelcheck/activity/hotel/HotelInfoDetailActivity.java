@@ -156,7 +156,10 @@ public class HotelInfoDetailActivity extends BaseActivity{
 								|| TextUtils.isEmpty(mHotel.getCheckDate())) {
 							Toast.makeText(HotelInfoDetailActivity.this, "酒店基本信息未填写完整", Toast.LENGTH_SHORT).show();
 							mViewPager.setCurrentItem(0);
-						} else {
+						} else if (!mHotel.checkReformState()) {
+							Toast.makeText(HotelInfoDetailActivity.this, "复检问题状态未填写完整", Toast.LENGTH_SHORT).show();
+							mViewPager.setCurrentItem(2);
+						}else {
 							showCheckedDoneAlert();
 						}
 					}

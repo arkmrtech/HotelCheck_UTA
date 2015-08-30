@@ -1,15 +1,20 @@
 package com.lk.hotelcheck.activity.hotel;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.lk.hotelcheck.R;
 import com.lk.hotelcheck.activity.photochosen.PhotoChosenActivity;
@@ -18,6 +23,7 @@ import com.lk.hotelcheck.bean.Hotel;
 import com.lk.hotelcheck.bean.IssueItem;
 import com.lk.hotelcheck.manager.DataManager;
 import com.lk.hotelcheck.util.DrawUtil;
+
 import common.Constance;
 import common.Constance.CheckDataType;
 import common.Constance.CheckType;
@@ -48,8 +54,12 @@ public class HotelReportFragment extends Fragment{
 	private ViewGroup mReviewGroup;
 	private TextView mFixedTextView;
 	private TextView mFixingTextView;
+	private TextView mUnFixedTextView;
 	private TextView mNewTextView;
 	private ExpandableListView mExpandableListView;
+	private String[] mStateItems = new String[]{"未整改","整改中","已整改"};
+	private int[] mStateValues = new int[]{IssueItem.REFORM_STATE_UN_FIX, IssueItem.REFORM_STATE_FIXING, IssueItem.REFORM_STATE_FIXED};
+	private int mChoosePosition;
 	@Override
 	public void setUserVisibleHint(boolean isVisibleToUser) {
 		super.setUserVisibleHint(isVisibleToUser);
@@ -114,6 +124,7 @@ public class HotelReportFragment extends Fragment{
 				mFixedTextView.setText(""+mHotel.getFixedIssueCount());
 				mFixingTextView.setText(""+mHotel.getFixingIssueCount());
 				mNewTextView.setText(""+mHotel.getNewIssueCount());
+				mUnFixedTextView.setText(""+mHotel.getUnFixIssueCount());
 			}
 		}
 	}
@@ -132,6 +143,7 @@ public class HotelReportFragment extends Fragment{
 		mReviewGroup = (ViewGroup) headerView.findViewById(R.id.ll_review);
 		mFixingTextView = (TextView) headerView.findViewById(R.id.tv_issue_fixing);
 		mFixedTextView = (TextView) headerView.findViewById(R.id.tv_issue_fixed);
+		mUnFixedTextView = (TextView) headerView.findViewById(R.id.tv_issue_unfix);
 		mNewTextView = (TextView) headerView.findViewById(R.id.tv_issue_new);
 		initInfoData();
 		
@@ -139,37 +151,37 @@ public class HotelReportFragment extends Fragment{
 		mExpandableListView.addHeaderView(headerView);
 		mAdapter = new IssueListAdapter();
 		mExpandableListView.setAdapter(mAdapter);
-		mExpandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-			
-			@Override
-			public boolean onChildClick(ExpandableListView parent, View v,
-					int groupPosition, int childPosition, long id) {
-				CheckData checkData = mHotel.getCheckData(groupPosition);
-				IssueItem issueItem = null;
-				if (checkData.getType() == CheckDataType.TYPE_ROOM) {
-					issueItem = mHotel.getDymicRoomCheckedIssue(childPosition);
-				} else if (checkData.getType() == CheckDataType.TYPE_PASSWAY) {
-					issueItem = mHotel.getDymicPasswayCheckedIssue(childPosition);
-				} else {
-					issueItem = checkData.getCheckedIssue(childPosition);
-				}
-				
-				if (issueItem != null ) {
-					int issueImageCount = 0;
-					if (checkData.getType() == CheckDataType.TYPE_ROOM) {
-						issueImageCount = mHotel.getDymicRoomCheckedIssueImageCount(issueItem.getId());
-					} else if (checkData.getType() == CheckDataType.TYPE_PASSWAY) {
-						issueImageCount = mHotel.getDymicPasswayCheckedIssueImageCount(issueItem.getId());
-					} else {
-						issueImageCount = issueItem.getImageCount();
-					}
-					if (issueImageCount > 0) {
-						PhotoChosenActivity.gotoPhotoChosen(mActivity, mPosition,groupPosition,childPosition);
-					}
-				}
-				return false;
-			}
-		});
+//		mExpandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+//			
+//			@Override
+//			public boolean onChildClick(ExpandableListView parent, View v,
+//					int groupPosition, int childPosition, long id) {
+//				CheckData checkData = mHotel.getCheckData(groupPosition);
+//				IssueItem issueItem = null;
+//				if (checkData.getType() == CheckDataType.TYPE_ROOM) {
+//					issueItem = mHotel.getDymicRoomCheckedIssue(childPosition);
+//				} else if (checkData.getType() == CheckDataType.TYPE_PASSWAY) {
+//					issueItem = mHotel.getDymicPasswayCheckedIssue(childPosition);
+//				} else {
+//					issueItem = checkData.getCheckedIssue(childPosition);
+//				}
+//				
+//				if (issueItem != null ) {
+//					int issueImageCount = 0;
+//					if (checkData.getType() == CheckDataType.TYPE_ROOM) {
+//						issueImageCount = mHotel.getDymicRoomCheckedIssueImageCount(issueItem.getId());
+//					} else if (checkData.getType() == CheckDataType.TYPE_PASSWAY) {
+//						issueImageCount = mHotel.getDymicPasswayCheckedIssueImageCount(issueItem.getId());
+//					} else {
+//						issueImageCount = issueItem.getImageCount();
+//					}
+//					if (issueImageCount > 0) {
+//						PhotoChosenActivity.gotoPhotoChosen(mActivity, mPosition,groupPosition,childPosition);
+//					}
+//				}
+//				return false;
+//			}
+//		});
 		expanAll();
 	}
 	
@@ -247,9 +259,9 @@ public class HotelReportFragment extends Fragment{
 			if (convertView == null) {
 				convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.listview_report_group_item, parent,false);
 				viewHolder = new ViewHolder();
-				viewHolder.nameTextView = (TextView) convertView.findViewById(R.id.tv_name);
-				viewHolder.issueCountTextView = (TextView) convertView.findViewById(R.id.tv_number);
-				viewHolder.colorImageView = (ImageView) convertView.findViewById(R.id.iv_color);
+				viewHolder.mNameTextView = (TextView) convertView.findViewById(R.id.tv_name);
+				viewHolder.mIssueCountTextView = (TextView) convertView.findViewById(R.id.tv_number);
+				viewHolder.mColorImageView = (ImageView) convertView.findViewById(R.id.iv_color);
 				viewHolder.mNumberView = convertView.findViewById(R.id.rl_number);
 				convertView.setTag(viewHolder);
 			} else {
@@ -257,35 +269,35 @@ public class HotelReportFragment extends Fragment{
 			}
 			switch (groupPosition) {
 			case 0:
-				viewHolder.colorImageView.setBackgroundColor(getResources().getColor(R.color.color_one));
+				viewHolder.mColorImageView.setBackgroundColor(getResources().getColor(R.color.color_one));
 				break;
 			case 1:
-				viewHolder.colorImageView.setBackgroundColor(getResources().getColor(R.color.color_two));
+				viewHolder.mColorImageView.setBackgroundColor(getResources().getColor(R.color.color_two));
 				break;
 			case 2:
-				viewHolder.colorImageView.setBackgroundColor(getResources().getColor(R.color.color_three));
+				viewHolder.mColorImageView.setBackgroundColor(getResources().getColor(R.color.color_three));
 				break;
 			case 3:
-				viewHolder.colorImageView.setBackgroundColor(getResources().getColor(R.color.color_four));
+				viewHolder.mColorImageView.setBackgroundColor(getResources().getColor(R.color.color_four));
 				break;
 			case 4:
-				viewHolder.colorImageView.setBackgroundColor(getResources().getColor(R.color.color_five));
+				viewHolder.mColorImageView.setBackgroundColor(getResources().getColor(R.color.color_five));
 				break;
 			case 5:
-				viewHolder.colorImageView.setBackgroundColor(getResources().getColor(R.color.color_six));
+				viewHolder.mColorImageView.setBackgroundColor(getResources().getColor(R.color.color_six));
 				break;
 			default:
-				viewHolder.colorImageView.setBackgroundColor(getResources().getColor(R.color.color_seven));
+				viewHolder.mColorImageView.setBackgroundColor(getResources().getColor(R.color.color_seven));
 				break;
 			}
 			CheckData checkData = mHotel.getCheckData(groupPosition);
-			viewHolder.nameTextView.setText(checkData.getName());
+			viewHolder.mNameTextView.setText(checkData.getName());
 			int count = getChildrenCount(groupPosition);
 			if (count <= 0) {
 				viewHolder.mNumberView.setVisibility(View.GONE);
 			} else {
 				viewHolder.mNumberView.setVisibility(View.VISIBLE);
-				viewHolder.issueCountTextView.setText(""+count);
+				viewHolder.mIssueCountTextView.setText(""+count);
 			}
 			ExpandableListView mExpandableListView = (ExpandableListView) parent;
 		    mExpandableListView.expandGroup(groupPosition);
@@ -300,10 +312,10 @@ public class HotelReportFragment extends Fragment{
 				convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.listview_report_check_issue_item, parent,false);
 				convertView.setPadding(DrawUtil.dip2px(10), 0, DrawUtil.dip2px(10), 0);
 				viewHolder = new ViewHolder();
-				viewHolder.nameTextView = (TextView) convertView.findViewById(R.id.tv_name);
-				viewHolder.flagTextView = (TextView) convertView.findViewById(R.id.tv_flag);
-				viewHolder.percentTextView = (TextView) convertView.findViewById(R.id.tv_percent);
-				viewHolder.statusTextView = (TextView) convertView.findViewById(R.id.tv_status);
+				viewHolder.mNameTextView = (TextView) convertView.findViewById(R.id.tv_name);
+				viewHolder.mFlagTextView = (TextView) convertView.findViewById(R.id.tv_flag);
+				viewHolder.mPercentTextView = (TextView) convertView.findViewById(R.id.tv_percent);
+				viewHolder.mStatusTextView = (TextView) convertView.findViewById(R.id.tv_status);
 				convertView.setTag(viewHolder);
 			} else {
 				viewHolder = (ViewHolder) convertView.getTag();
@@ -327,45 +339,64 @@ public class HotelReportFragment extends Fragment{
 			}
 			
 			if (issueImageCount > 0) {
-				viewHolder.flagTextView.setText("查看图片");
+				viewHolder.mFlagTextView.setText("查看图片");
+				viewHolder.mFlagTextView.setTag(R.id.tv_name, groupPosition);
+				viewHolder.mFlagTextView.setTag(R.id.tv_flag, childPosition);
+				viewHolder.mFlagTextView.setOnClickListener(mPhotoClickListener);
 			} else {
-				viewHolder.flagTextView.setText("");
+				viewHolder.mFlagTextView.setText("");
 			}
-			viewHolder.nameTextView.setText(issueItem.getName());
+			viewHolder.mNameTextView.setText(issueItem.getName());
 			if (issueItem.getIsPreQue() == PreQueType.TYPE_REVIEW) {
-				viewHolder.statusTextView.setVisibility(View.VISIBLE);
-				if (issueItem.isCheck()) {
-					viewHolder.statusTextView.setText("未整改/整改中");
-					viewHolder.statusTextView.setTextColor(getResources()
-							.getColor(R.color.content_orange));
-				} else {
-					viewHolder.statusTextView.setText("已整改");
-					viewHolder.statusTextView.setTextColor(getResources()
+				viewHolder.mStatusTextView.setTag(R.id.tv_name, groupPosition);
+				viewHolder.mStatusTextView.setTag(R.id.tv_flag, childPosition);
+				viewHolder.mStatusTextView.setOnClickListener(mReformStateClickListener);
+				viewHolder.mStatusTextView.setVisibility(View.VISIBLE);
+				switch (issueItem.getReformState()) {
+				case IssueItem.REFORM_STATE_FIXED:
+					viewHolder.mStatusTextView.setText("已整改");
+					viewHolder.mStatusTextView.setTextColor(getResources()
 							.getColor(R.color.color_two));
+					break;
+				case IssueItem.REFORM_STATE_UN_FIX:
+					viewHolder.mStatusTextView.setText("未整改");
+					viewHolder.mStatusTextView.setTextColor(getResources()
+							.getColor(R.color.color_two));
+					break;
+				case IssueItem.REFORM_STATE_FIXING:
+					viewHolder.mStatusTextView.setText("整改中");
+					viewHolder.mStatusTextView.setTextColor(getResources()
+							.getColor(R.color.color_two));
+					break;
+				default:
+					viewHolder.mStatusTextView.setText("未整改/整改中");
+					viewHolder.mStatusTextView.setTextColor(getResources()
+							.getColor(R.color.content_orange));
+					break;
 				}
 			} else {
 				if (mHotel.getCheckType() == CheckType.CHECK_TYPE_REVIEW) {
-					viewHolder.statusTextView.setVisibility(View.VISIBLE);
-					viewHolder.statusTextView.setText("新发现");
-					viewHolder.statusTextView.setTextColor(getResources()
+					viewHolder.mStatusTextView.setVisibility(View.VISIBLE);
+					viewHolder.mStatusTextView.setText("新发现");
+					viewHolder.mStatusTextView.setTextColor(getResources()
 							.getColor(R.color.color_three));
 				} else {
-					viewHolder.statusTextView.setVisibility(View.GONE);
-					viewHolder.statusTextView.setText("");
-					viewHolder.statusTextView.setTextColor(getResources()
+					viewHolder.mStatusTextView.setVisibility(View.GONE);
+					viewHolder.mStatusTextView.setText("");
+					viewHolder.mStatusTextView.setTextColor(getResources()
 							.getColor(R.color.white));
 				}
 			}
 			if (checkData.getType() == CheckDataType.TYPE_ROOM) {
-				viewHolder.percentTextView.setText(mHotel
+				viewHolder.mPercentTextView.setText(mHotel
 						.getRoomIssuePercent(issueItem.getId()));
-				viewHolder.percentTextView.setVisibility(View.VISIBLE);
+				viewHolder.mPercentTextView.setVisibility(View.VISIBLE);
 			} else if (checkData.getType() == CheckDataType.TYPE_PASSWAY) {
-				viewHolder.percentTextView.setText(mHotel
+				viewHolder.mPercentTextView.setText(mHotel
 						.getPasswayIssuePercent(issueItem.getId()));
-				viewHolder.percentTextView.setVisibility(View.VISIBLE);
+				viewHolder.mPercentTextView.setVisibility(View.VISIBLE);
 			} else {
-				viewHolder.percentTextView.setVisibility(View.GONE);
+				viewHolder.mPercentTextView.setVisibility(View.GONE);
 			}
 			return convertView;
 		}
@@ -375,15 +406,105 @@ public class HotelReportFragment extends Fragment{
 			return true;
 		}
 
+		private OnClickListener mPhotoClickListener = new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				int groupPosition = (Integer) v.getTag(R.id.tv_name);
+				int childPosition = (Integer) v.getTag(R.id.tv_flag);
+				CheckData checkData = mHotel.getCheckData(groupPosition);
+				IssueItem issueItem = null;
+				if (checkData.getType() == CheckDataType.TYPE_ROOM) {
+					issueItem = mHotel.getDymicRoomCheckedIssue(childPosition);
+				} else if (checkData.getType() == CheckDataType.TYPE_PASSWAY) {
+					issueItem = mHotel.getDymicPasswayCheckedIssue(childPosition);
+				} else {
+					issueItem = checkData.getCheckedIssue(childPosition);
+				}
+				
+				if (issueItem != null ) {
+					int issueImageCount = 0;
+					if (checkData.getType() == CheckDataType.TYPE_ROOM) {
+						issueImageCount = mHotel.getDymicRoomCheckedIssueImageCount(issueItem.getId());
+					} else if (checkData.getType() == CheckDataType.TYPE_PASSWAY) {
+						issueImageCount = mHotel.getDymicPasswayCheckedIssueImageCount(issueItem.getId());
+					} else {
+						issueImageCount = issueItem.getImageCount();
+					}
+					if (issueImageCount > 0) {
+						PhotoChosenActivity.gotoPhotoChosen(mActivity, mPosition,groupPosition,childPosition);
+					}
+				}
+			}
+		};
+		
+		private OnClickListener mReformStateClickListener = new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				final int groupPosition = (Integer) v.getTag(R.id.tv_name);
+				final int childPosition = (Integer) v.getTag(R.id.tv_flag);
+				CheckData checkData = mHotel.getCheckData(groupPosition);
+				IssueItem issueItem = null;
+				if (checkData.getType() == CheckDataType.TYPE_ROOM) {
+					issueItem = mHotel.getDymicRoomCheckedIssue(childPosition);
+				} else if (checkData.getType() == CheckDataType.TYPE_PASSWAY) {
+					issueItem = mHotel.getDymicPasswayCheckedIssue(childPosition);
+				} else {
+					issueItem = checkData.getCheckedIssue(childPosition);
+				}
+				AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());  
+			    builder.setTitle("请选择该问题整改状态"); 
+			    final IssueItem tempIssueItem = issueItem;
+			    int position = -1;
+			    switch (issueItem.getReformState()) {
+				case IssueItem.REFORM_STATE_UN_FIX:
+					position = 0;
+					break;
+				case IssueItem.REFORM_STATE_FIXING:
+					position = 1;
+					break;
+				case IssueItem.REFORM_STATE_FIXED:
+					position = 2;
+					break;
+				default:
+					break;
+				}
+			    builder.setSingleChoiceItems(mStateItems, position, new DialogInterface.OnClickListener() {  
+			        @Override  
+			        public void onClick(DialogInterface dialog, int which) {  
+			            mChoosePosition = which;
+			        }  
+			    });  
+			    builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {  
+			          
+			        @Override  
+			        public void onClick(DialogInterface dialog, int which) {  
+			        	tempIssueItem.setReformState(mStateValues[mChoosePosition]);
+			        	initInfoData();
+			        	mAdapter.notifyDataSetChanged();
+			        }  
+			    });  
+			    builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {  
+			          
+			        @Override  
+			        public void onClick(DialogInterface dialog, int which) {  
+			              
+			        }  
+			    });  
+			    builder.create().show();
+			}
+		};
+		
 		
 		class ViewHolder {
-			private TextView nameTextView;
-			private TextView issueCountTextView;
-			private TextView percentTextView;
-			private TextView flagTextView;
-			private ImageView colorImageView;
+			private TextView mNameTextView;
+			private TextView mIssueCountTextView;
+			private TextView mPercentTextView;
+			private TextView mFlagTextView;
+			private ImageView mColorImageView;
 			private View mNumberView;
-			private TextView statusTextView;
+			private TextView mStatusTextView;
 		}
 	}
 }

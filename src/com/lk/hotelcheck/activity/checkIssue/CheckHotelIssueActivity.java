@@ -223,9 +223,10 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 				}
 				HotelCheck hotelCheck = new HotelCheck(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), imageItem);
 				hotelCheck.save();
-				DataManager.getInstance().saveIssueCheck(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), issueItem.isCheck());
-				mAdapter.notifyItem(mCurrentIssuePosition, mCheckData.getIssue(mCurrentIssuePosition));
-				mCheckData.updateIssueCheck(issueItem);
+//				DataManager.getInstance().saveIssueCheck(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), issueItem.isCheck());
+//				mAdapter.notifyItem(mCurrentIssuePosition, mCheckData.getIssue(mCurrentIssuePosition));
+//				mCheckData.updateIssueCheck(issueItem);
+				initCheckedIssue(mCurrentIssuePosition, issueItem, null);
 			}
 		}
 		
@@ -263,9 +264,10 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 		IssueItem issueItem = mCheckData.getIssue(mCurrentIssuePosition);
 		if (isChecked != issueItem.isCheck()) {
 			issueItem.setCheck(isChecked);
-			mCheckData.updateIssueCheck(issueItem);
-			DataManager.getInstance().saveIssueCheck(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), isChecked);
-			mAdapter.notifyItemChanged(position);
+//			DataManager.getInstance().saveIssueCheck(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), isChecked);
+//			mCheckData.updateIssueCheck(issueItem);
+//			mAdapter.notifyItemChanged(position);
+			initCheckedIssue(position, issueItem, null);
 		}
 		
 	}
@@ -281,9 +283,10 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 		} else {
 			issueItem.setCheck(true);
 		} 
-		mAdapter.notifyItem(position, issueItem);
-		mCheckData.updateIssueCheck(issueItem);
-		DataManager.getInstance().saveIssueContent(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), content, issueItem.isCheck());
+//		mAdapter.notifyItem(position, issueItem);
+//		mCheckData.updateIssueCheck(issueItem);
+//		DataManager.getInstance().saveIssueContent(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), content, issueItem.isCheck());
+		initCheckedIssue(position, issueItem, content);
 	}
 	
 	@Override
@@ -307,6 +310,22 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 		intent.putExtra(IntentKey.INTENT_KEY_NAME, name);
 		startActivityForResult(intent, Constance.REQUEST_CODE_WIFI);
 	}
+	
+	private void initCheckedIssue(int position, IssueItem issueItem, String content) {
+		if (content != null) {
+			DataManager.getInstance().saveIssueContent(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), content, issueItem.isCheck());
+		} else {
+			DataManager.getInstance().saveIssueCheck(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), issueItem.isCheck());
+		}
+		mCheckData.updateIssueCheck(issueItem);
+		if (mCheckData.getType() == CheckDataType.TYPE_ROOM) {
+			mHotel.initDymicRoomCheckedData();
+		} else if (mCheckData.getType() == CheckDataType.TYPE_PASSWAY) {
+			mHotel.initDymicPasswayCheckedData();
+		}
+		mAdapter.notifyItem(position, issueItem);
+	}
+	
 	
 	private void showAddIssue() {
 		if (mHotel.isStatus()) {
