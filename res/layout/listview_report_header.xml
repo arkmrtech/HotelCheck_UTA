@@ -86,7 +86,6 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="20dp"
-            android:text="2015-05-20"
             android:textSize="16sp" />
 
         <ImageView
@@ -120,7 +119,6 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="20dp"
-            android:text="30个"
             android:textSize="16sp" />
 
         <ImageView
@@ -154,7 +152,6 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="20dp"
-            android:text="25个"
             android:textSize="16sp" />
 
         <ImageView
@@ -188,7 +185,6 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="20dp"
-            android:text="20个"
             android:textSize="16sp" />
 
         <ImageView
@@ -222,7 +218,6 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="20dp"
-            android:text="20"
             android:textSize="16sp" />
 
         <ImageView
@@ -263,7 +258,6 @@
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:layout_marginRight="20dp"
-                android:text="20"
                 android:textSize="16sp" />
         </RelativeLayout>
 
@@ -297,7 +291,38 @@
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:layout_marginRight="20dp"
-                android:text="20"
+                android:textSize="16sp" />
+        </RelativeLayout>
+         <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_alignParentBottom="true"
+            android:background="@color/gray" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="20dp"
+                android:gravity="center"
+                android:paddingLeft="28dp"
+                android:text="@string/issue_unfix"
+                android:textColor="@android:color/black"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/tv_issue_unfix"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="20dp"
                 android:textSize="16sp" />
         </RelativeLayout>
 
@@ -331,7 +356,6 @@
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:layout_marginRight="20dp"
-                android:text="20"
                 android:textSize="16sp" />
         </RelativeLayout>
 
