@@ -5,17 +5,19 @@ import android.content.Context;
 import android.graphics.Color;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.RelativeLayout;
 
+import com.lk.hotelcheck.R;
 import com.lk.hotelcheck.util.DrawUtil;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 @SuppressLint("NewApi")
 public class PhotoChosenItem extends RelativeLayout{
 
-//	private CheckBox mCheckBox;
+	private CheckBox mCheckBox;
 	private ImageView mImageView;
 	private static final int IMAGE_ID = 0X000001;
 	
@@ -47,27 +49,28 @@ public class PhotoChosenItem extends RelativeLayout{
 		
 		
 		mImageView = new ImageView(getContext());
-		setBackgroundColor(Color.WHITE);
+//		setBackgroundColor(Color.WHITE);
 		LayoutParams imageParams = new LayoutParams(getImageWidth(), getImageWidth());
 		mImageView.setLayoutParams(imageParams);
 		mImageView.setId(IMAGE_ID);
 		mImageView.setPadding(padding, padding, padding, padding);
-		mImageView.setScaleType(ScaleType.CENTER);
+		mImageView.setScaleType(ScaleType.FIT_XY);
 		imageParams.addRule(CENTER_IN_PARENT, TRUE);
 //		imageParams.setMargins(padding, padding, padding, padding);
 		
 		
-//		mCheckBox = new CheckBox(getContext());
-//		LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-//		params.addRule(ALIGN_RIGHT, IMAGE_ID);
-//		params.addRule(ALIGN_TOP, IMAGE_ID);
-//		mCheckBox.setPadding(padding * 2, padding * 2, padding * 2, padding * 4);
-//		mCheckBox.setButtonDrawable(R.drawable.image_check_box);
-//		mCheckBox.setLayoutParams(params);
+		mCheckBox = new CheckBox(getContext());
+		LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+		params.addRule(ALIGN_RIGHT, IMAGE_ID);
+		params.addRule(ALIGN_TOP, IMAGE_ID);
+		mCheckBox.setPadding(padding * 2, padding * 2, padding * 2, padding * 4);
+		mCheckBox.setButtonDrawable(R.drawable.image_check_box);
+		mCheckBox.setLayoutParams(params);
+		mCheckBox.setClickable(false);
 		
 		
 		addView(mImageView);
-//		addView(mCheckBox);
+		addView(mCheckBox);
 	}
 	
 	public void setImageData(String imageURL) {
@@ -79,25 +82,25 @@ public class PhotoChosenItem extends RelativeLayout{
 	
 	public void setOriginImageData(String imageURL) {
 		if (mImageView != null) {
-			mImageView.setScaleType(ScaleType.FIT_CENTER);
+			mImageView.setScaleType(ScaleType.CENTER);
 			ImageLoader.getInstance().displayImage(imageURL, mImageView);
 		}
 	}
 	
-//	public void setChecked(boolean check) {
-////		if (mCheckBox != null) {
-//			mCheckBox.setChecked(check);
-////		}
-//	}
-//	
-//	public boolean isChecked() {
-//		if (mCheckBox == null) {
-//			return false;
-//		} else {
-//			return mCheckBox.isChecked();
-//		}
-//	}
-//	
+	public void setChecked(boolean check) {
+		if (mCheckBox != null) {
+			mCheckBox.setChecked(check);
+		}
+	}
+
+	public boolean isChecked() {
+		if (mCheckBox == null) {
+			return false;
+		} else {
+			return mCheckBox.isChecked();
+		}
+	}
+
 	
 	private int getImageWidth () {
 		int width = (DrawUtil.sWidthPixels - DrawUtil.dip2px(24)) / 2;

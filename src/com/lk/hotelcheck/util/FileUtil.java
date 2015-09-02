@@ -1208,4 +1208,12 @@ public class FileUtil {
 		}
 		;
 	}
+
+	public static String getFileName(String srcPath) {
+		if (isFileExist(srcPath)) {
+			File file = new File(srcPath);
+			return file.getName();
+		}
+		return null;
+	}
 }

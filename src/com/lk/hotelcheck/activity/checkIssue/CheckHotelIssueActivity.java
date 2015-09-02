@@ -57,9 +57,9 @@ import common.Constance.PreQueType;
 
 public class CheckHotelIssueActivity extends BaseActivity implements CallBackListener{
 	
-	private static final String BUNDLE_POSITION_ID = "position";
-	private static final String BUNDLE_CHECK_DATA_POSITION = "dataPosition";
-	private static final String BUNDLE_TYPE = "type";
+//	private static final String BUNDLE_POSITION_ID = "position";
+//	private static final String BUNDLE_CHECK_DATA_POSITION = "dataPosition";
+//	
 	private int mHotelPosition;
 	private int mCheckDataPosition;
 	private Hotel mHotel;
@@ -75,9 +75,9 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 	public static void gotoCheckHotelIssue(Context context,int hotelPosition, int checkDataPosition, int type) {
 		Intent intent = new Intent();
 		intent.setClass(context, CheckHotelIssueActivity.class);
-		intent.putExtra(BUNDLE_POSITION_ID, hotelPosition);
-		intent.putExtra(BUNDLE_CHECK_DATA_POSITION, checkDataPosition);
-		intent.putExtra(BUNDLE_TYPE, type);
+		intent.putExtra(IntentKey.INTENT_KEY_POSITION, hotelPosition);
+		intent.putExtra(IntentKey.INTENT_KEY_CHECK_DATA_POSITION, checkDataPosition);
+		intent.putExtra(IntentKey.INTENT_KEY_TYPE, type);
 		context.startActivity(intent);
 	}
 	
@@ -98,9 +98,9 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 		});
 		
 		
-		mHotelPosition = getIntent().getIntExtra(BUNDLE_POSITION_ID, -1);
-		mCheckDataPosition = getIntent().getIntExtra(BUNDLE_CHECK_DATA_POSITION, -1);
-		mType = getIntent().getIntExtra(BUNDLE_TYPE, Constance.CheckDataType.TYPE_NORMAL);
+		mHotelPosition = getIntent().getIntExtra(IntentKey.INTENT_KEY_POSITION, -1);
+		mCheckDataPosition = getIntent().getIntExtra(IntentKey.INTENT_KEY_CHECK_DATA_POSITION, -1);
+		mType = getIntent().getIntExtra(IntentKey.INTENT_KEY_TYPE, Constance.CheckDataType.TYPE_NORMAL);
 		mHotel = DataManager.getInstance().getHotel(mHotelPosition);
 		if (mHotel != null) {
 			switch (mType) {
@@ -161,14 +161,15 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 		String localSavePath = "";
 		String serviceSavePath = "";
 		if (resultCode == Activity.RESULT_OK) {
-			IssueItem issueItem = mCheckData.getIssue(mCurrentIssuePosition);
-			ImageItem imageItem = new ImageItem();
-			String fileName = "";
-			boolean result = false;
 			if (requestCode == CAMMER_REQUEST_CODE) {
+				IssueItem issueItem = mCheckData.getIssue(mCurrentIssuePosition);
+				ImageItem imageItem = new ImageItem();
+				String fileName = "";
+				boolean result = false;
 				String sdStatus = Environment.getExternalStorageState();
 				if (!sdStatus.equals(Environment.MEDIA_MOUNTED)) { // 检测sd是否可用
 					Log.i("lxk", "SD card is not avaiable/writeable right now.");
+					Toast.makeText(this, "sdcard不可读写", Toast.LENGTH_SHORT).show();
 					return;
 				}
 				
@@ -194,40 +195,55 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 				}
 				String filepath = Constance.Path.HOTEL_SRC+imagePath;
 				localSavePath = filepath+fileName;
-				
-				
-				
-				
 				result = FileUtil.saveBitmapToSDFile(bitmap,filepath , fileName, CompressFormat.JPEG);
 				bitmap.recycle();
-				
+				serviceSavePath = Constance.Path.SERVER_IMAGE_PATH+mHotel.getCheckId()+"/"+DataManager.getInstance().getUserName()+"/"+fileName;
+				if (result) {
+					imageItem.setLocalImagePath(localSavePath);
+					imageItem.setServiceSavePath(serviceSavePath);
+					issueItem.addImage(imageItem);
+					boolean isWidth = ImageUtil.isWidthPic(imageItem.getLocalImagePath());
+					imageItem.setType(mCheckData.getType());
+					imageItem.setWidth(isWidth);
+					if (!issueItem.isCheck()) {
+						issueItem.setCheck(true);
+					}
+					HotelCheck hotelCheck = new HotelCheck(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), imageItem);
+					hotelCheck.save();
+//					DataManager.getInstance().saveIssueCheck(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), issueItem.isCheck());
+//					mAdapter.notifyItem(mCurrentIssuePosition, mCheckData.getIssue(mCurrentIssuePosition));
+//					mCheckData.updateIssueCheck(issueItem);
+					initCheckedIssue(mCurrentIssuePosition, issueItem, null);
+				}
 			} else if (requestCode == Constance.REQUEST_CODE_WIFI) {
 				mCurrentIssuePosition = data.getIntExtra(IntentKey.INTENT_KEY_ISSUE_POSITION, -99);
-				localSavePath = data.getStringExtra(IntentKey.INTENT_KEY_FILE_PATH);
-				File imageFile = new File(localSavePath);
-				if (imageFile.exists()) {
-					result = true;
-					fileName = imageFile.getName();
-				}
+				IssueItem issueItem = mCheckData.getIssue(mCurrentIssuePosition);
+				mAdapter.notifyItem(mCurrentIssuePosition, issueItem);
+//				localSavePath = data.getStringExtra(IntentKey.INTENT_KEY_FILE_PATH);
+//				File imageFile = new File(localSavePath);
+//				if (imageFile.exists()) {
+//					result = true;
+//					fileName = imageFile.getName();
+//				}
 			}
-			serviceSavePath = Constance.Path.SERVER_IMAGE_PATH+mHotel.getCheckId()+"/"+DataManager.getInstance().getUserName()+"/"+fileName;
-			if (result) {
-				imageItem.setLocalImagePath(localSavePath);
-				imageItem.setServiceSavePath(serviceSavePath);
-				issueItem.addImage(imageItem);
-				boolean isWidth = ImageUtil.isWidthPic(imageItem.getLocalImagePath());
-				imageItem.setType(mCheckData.getType());
-				imageItem.setWidth(isWidth);
-				if (!issueItem.isCheck()) {
-					issueItem.setCheck(true);
-				}
-				HotelCheck hotelCheck = new HotelCheck(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), imageItem);
-				hotelCheck.save();
-//				DataManager.getInstance().saveIssueCheck(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), issueItem.isCheck());
-//				mAdapter.notifyItem(mCurrentIssuePosition, mCheckData.getIssue(mCurrentIssuePosition));
-//				mCheckData.updateIssueCheck(issueItem);
-				initCheckedIssue(mCurrentIssuePosition, issueItem, null);
-			}
+//			serviceSavePath = Constance.Path.SERVER_IMAGE_PATH+mHotel.getCheckId()+"/"+DataManager.getInstance().getUserName()+"/"+fileName;
+//			if (result) {
+//				imageItem.setLocalImagePath(localSavePath);
+//				imageItem.setServiceSavePath(serviceSavePath);
+//				issueItem.addImage(imageItem);
+//				boolean isWidth = ImageUtil.isWidthPic(imageItem.getLocalImagePath());
+//				imageItem.setType(mCheckData.getType());
+//				imageItem.setWidth(isWidth);
+//				if (!issueItem.isCheck()) {
+//					issueItem.setCheck(true);
+//				}
+//				HotelCheck hotelCheck = new HotelCheck(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), imageItem);
+//				hotelCheck.save();
+////				DataManager.getInstance().saveIssueCheck(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), issueItem.isCheck());
+////				mAdapter.notifyItem(mCurrentIssuePosition, mCheckData.getIssue(mCurrentIssuePosition));
+////				mCheckData.updateIssueCheck(issueItem);
+//				initCheckedIssue(mCurrentIssuePosition, issueItem, null);
+//			}
 		}
 		
 	}
@@ -306,8 +322,11 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 		Intent intent = new Intent();
 		intent.setClass(this, PhotoPickerActivity.class);
 		intent.putExtra(IntentKey.INTENT_KEY_ISSUE_POSITION, position);
-		intent.putExtra(IntentKey.INTENT_KEY_FILE_PATH, localSavePath);
-		intent.putExtra(IntentKey.INTENT_KEY_NAME, name);
+		intent.putExtra(IntentKey.INTENT_KEY_CHECK_DATA_POSITION, mCheckDataPosition);
+		intent.putExtra(IntentKey.INTENT_KEY_POSITION, mHotelPosition);
+		intent.putExtra(IntentKey.INTENT_KEY_TYPE, mType);
+//		intent.putExtra(IntentKey.INTENT_KEY_FILE_PATH, localSavePath);
+//		intent.putExtra(IntentKey.INTENT_KEY_NAME, name);
 		startActivityForResult(intent, Constance.REQUEST_CODE_WIFI);
 	}
 	

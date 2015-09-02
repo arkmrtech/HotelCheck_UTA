@@ -24,6 +24,7 @@
         android:paddingRight="4dp"
         android:paddingTop="8dp" 
         android:paddingBottom="50dp"
+        android:background="@color/white"
         android:layout_below="@+id/toolbar"/>
     
      <RelativeLayout
@@ -55,5 +56,26 @@
             android:text="0张"
             android:textColor="@android:color/white" />
     </RelativeLayout>
+ <RelativeLayout
+        android:id="@+id/vg_loadig"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" 
+        android:background="@color/half_transparent">
 
+        <ProgressBar
+            android:id="@+id/pb_loading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true" />
+
+        <TextView
+            android:id="@+id/tv_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/pb_loading"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/white"
+            android:text="数据加载中" />
+    </RelativeLayout>
 </RelativeLayout>

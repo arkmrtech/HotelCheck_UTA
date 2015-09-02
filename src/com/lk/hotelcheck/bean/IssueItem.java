@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.List;
 
 import com.lk.hotelcheck.bean.dao.DymicIssue;
+import com.tencent.bugly.proguard.u;
+
 import common.Constance.DefQueType;
 import common.Constance.PreQueType;
 
@@ -13,7 +15,7 @@ public class IssueItem{
 	private int id;
 	private String name;
 	private String content;
-	private transient List<ImageItem> imagelist;
+	private transient List<ImageItem> imageList;
 	private boolean isCheck;
 	private int isDefQue;//是否自定义问题，0=固定问题，1=自定义问题
 	private int isPreQue;
@@ -54,23 +56,23 @@ public class IssueItem{
 		this.content = content;
 	}
 	public List<ImageItem> getImagelist() {
-		if (imagelist == null) {
+		if (imageList == null) {
 			return Collections.emptyList();
 		}
-		return imagelist;
+		return imageList;
 	}
 	public void setImagelist(List<ImageItem> imagelist) {
-		this.imagelist = imagelist;
+		this.imageList = imagelist;
 	}
 	
 	public void addImage(ImageItem imageItem) {
-		if (imagelist == null) {
-			imagelist = new ArrayList<ImageItem>();
+		if (imageList == null) {
+			imageList = new ArrayList<ImageItem>();
 		}
-		imagelist.add(imageItem);
+		imageList.add(imageItem);
 	}
 	public int getImageCount() {
-		return imagelist == null ? 0 : imagelist.size();
+		return imageList == null ? 0 : imageList.size();
 	}
 	public boolean isCheck() {
 		return isCheck;
@@ -84,16 +86,16 @@ public class IssueItem{
 		}
 	}
 	public ImageItem getImageItem(int i) {
-		if (imagelist == null) {
+		if (imageList == null) {
 			return null;
 		}
-		return imagelist.get(i);
+		return imageList.get(i);
 	}
 	public void removeImageItem(int i) {
-		if (imagelist == null) {
+		if (imageList == null) {
 			return ;
 		}
-		imagelist.remove(i);
+		imageList.remove(i);
 	}
 	
 	public int getIsDefQue() {
@@ -127,10 +129,23 @@ public class IssueItem{
 		this.reformState = reformState;
 	}
 	public void addImageList(List<ImageItem> dataList) {
-		if (imagelist == null) {
-			imagelist = new ArrayList<ImageItem>();
+		if (imageList == null) {
+			imageList = new ArrayList<ImageItem>();
 		}
-		imagelist.addAll(dataList);
+		imageList.addAll(dataList);
+	}
+
+	public void removeImageItem(String imagePath) {
+		if (imageList != null) {
+			for (int i = 0; i < imageList.size(); i++) {
+				ImageItem imageItem = imageList.get(i);
+				if (imageItem.getLocalImagePath().equals(imagePath)) {
+					imageList.remove(i);
+					return;
+				}
+			}
+		}
+		
 	}
 	
 }

@@ -6,18 +6,20 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
@@ -27,26 +29,39 @@ import android.support.v7.widget.RecyclerView.LayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateFormat;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
+import android.view.WindowManager;
+import android.widget.PopupWindow.OnDismissListener;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.PopupWindow.OnDismissListener;
 
 import com.lk.hotelcheck.R;
 import com.lk.hotelcheck.activity.BaseActivity;
 import com.lk.hotelcheck.activity.photochosen.ListImageDirPopupWindow.OnImageDirSelected;
 import com.lk.hotelcheck.activity.photochosen.PhotoPickerAdapter.CallBackListener;
+import com.lk.hotelcheck.bean.CheckData;
+import com.lk.hotelcheck.bean.Hotel;
 import com.lk.hotelcheck.bean.ImageFloder;
+import com.lk.hotelcheck.bean.ImageItem;
+import com.lk.hotelcheck.bean.IssueItem;
+import com.lk.hotelcheck.bean.dao.HotelCheck;
+import com.lk.hotelcheck.manager.DataManager;
+import com.lk.hotelcheck.util.BitmapUtil;
 import com.lk.hotelcheck.util.DrawUtil;
 import com.lk.hotelcheck.util.FileUtil;
+import com.lk.hotelcheck.util.ImageUtil;
+import com.lk.hotelcheck.util.PictureUtil;
 
+import common.Constance;
+import common.Constance.CheckDataType;
 import common.Constance.IntentKey;
+import common.Constance.Path;
 
 public class PhotoPickerActivity extends BaseActivity implements CallBackListener, OnImageDirSelected{
 
@@ -56,9 +71,12 @@ public class PhotoPickerActivity extends BaseActivity implements CallBackListene
 	private RecyclerView mRecycleView;
 	private PhotoPickerAdapter mAdapter;
 	public static final int CAMMER_REQUEST_CODE = 1000;
+	private HashMap<String, String> mSelectedMap;
 	private String mImagePath;
 	private String mImageName;
 	private int mIssuePositon;
+	private int mHotelPosition;
+	private int mCheckDataPosition;
 	/**
 	 * 临时的辅助类，用于防止同一个文件夹的多次扫描
 	 */
@@ -72,26 +90,27 @@ public class PhotoPickerActivity extends BaseActivity implements CallBackListene
 	private RelativeLayout mBottomLy;
 	private TextView mChooseDir;
 	private TextView mImageCount;
-	/**
-	 * 存储文件夹中的图片数量
-	 */
-	private int mPicsSize;
-	/**
-	 * 图片数量最多的文件夹
-	 */
 	private File mImgDir;
 	int totalCount = 0;
 	private int mScreenHeight;
 	private ListImageDirPopupWindow mListImageDirPopupWindow;
-	private ProgressDialog mProgressDialog;
+	private View mLoadingView;
+	private CheckData mCheckData;
+	private Hotel mHotel;
+	private IssueItem mIssueItem;
+	private int mType;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_photo_picker);
 		mIssuePositon = getIntent().getIntExtra(IntentKey.INTENT_KEY_ISSUE_POSITION, -99);
-		mImagePath = getIntent().getStringExtra(IntentKey.INTENT_KEY_FILE_PATH);
-		mImageName = getIntent().getStringExtra(IntentKey.INTENT_KEY_NAME);
+		mCheckDataPosition = getIntent().getIntExtra(IntentKey.INTENT_KEY_CHECK_DATA_POSITION, -99);
+		mHotelPosition = getIntent().getIntExtra(IntentKey.INTENT_KEY_POSITION, -99);
+		mType = getIntent().getIntExtra(IntentKey.INTENT_KEY_TYPE, Constance.CheckDataType.TYPE_NORMAL);
+//		mImagePath = getIntent().getStringExtra(IntentKey.INTENT_KEY_FILE_PATH);
+//		mImageName = getIntent().getStringExtra(IntentKey.INTENT_KEY_NAME);
+		mLoadingView = findViewById(R.id.vg_loadig);
 		Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar);
 		mToolbar.setTitle("选择图片");
 		mToolbar.setNavigationIcon(R.drawable.back);
@@ -103,6 +122,7 @@ public class PhotoPickerActivity extends BaseActivity implements CallBackListene
 			}
 		});
 		setSupportActionBar(mToolbar);
+		
 		myHandler = new MyHandler(this);
 		mDataList = new ArrayList<String>();
 		mRecycleView = (RecyclerView) findViewById(R.id.rv_photo_picker);
@@ -115,12 +135,38 @@ public class PhotoPickerActivity extends BaseActivity implements CallBackListene
 		LayoutManager layoutManager = new GridLayoutManager(this, 2);
 		mRecycleView.setLayoutManager(layoutManager);
 		getImages();
-		initDataFile();
+		initData();
 		initEvent();
 	}
 	
+	private void initData() {
+		mSelectedMap = new HashMap<String, String>();
+		mHotel = DataManager.getInstance().getHotel(mHotelPosition);
+		if (mHotel != null) {
+			switch (mType) {
+			case Constance.CheckDataType.TYPE_NORMAL:
+				mCheckData = mHotel.getCheckData(mCheckDataPosition);
+				break;
+			case Constance.CheckDataType.TYPE_ROOM:
+				mCheckData = mHotel.getRoomData(mCheckDataPosition);
+				break;
+			case Constance.CheckDataType.TYPE_PASSWAY:
+				mCheckData = mHotel.getPasswayData(mCheckDataPosition);
+				break;
+			default:
+				break;
+			}
+		}
+		mIssueItem = mCheckData.getIssue(mIssuePositon);
+		if (mIssueItem.getImageCount() > 0) {
+			for (ImageItem imageItem : mIssueItem.getImagelist()) {
+				mSelectedMap.put(FileUtil.getFileName(imageItem.getLocalImagePath()), imageItem.getLocalImagePath());
+			}
+		}
+	}
+	
 	public void refresh() {
-		mAdapter.updateData(mDataList);
+		mAdapter.updateData(mDataList, mSelectedMap);
 	}
 	
 	private void initDataFile() {
@@ -129,6 +175,76 @@ public class PhotoPickerActivity extends BaseActivity implements CallBackListene
 			imageFile.mkdirs();
 		}
 	} 
+	
+	private String getSavePath() {
+		String imagePath = "";
+		if (mCheckData.getId() == Constance.CHECK_DATA_ID_ROOM) {
+			imagePath = "/"+mHotel.getName()+"/"+"客房"+"/" + mCheckData.getIssue(mIssuePositon).getName()+"/";
+		} else if (mCheckData.getId() == Constance.CHECK_DATA_ID_PASSWAY) {
+			imagePath = "/"+mHotel.getName()+"/"+"楼层"+"/" + mCheckData.getIssue(mIssuePositon).getName()+"/";
+		} else {
+			imagePath = "/"+mHotel.getName()+"/"+mCheckData.getName()+"/" + mCheckData.getIssue(mIssuePositon).getName()+"/";
+		}
+		String localSavePath = Constance.Path.HOTEL_SRC+imagePath;
+		return localSavePath;
+	}
+	
+	private void saveImage(String srcFile, String targetPath) {
+		if (!FileUtil.isFileExist(srcFile)) {
+			return;
+		}
+		String sdStatus = Environment.getExternalStorageState();
+		if (!sdStatus.equals(Environment.MEDIA_MOUNTED)) { // 检测sd是否可用
+			Log.i("lxk", "SD card is not avaiable/writeable right now.");
+			Toast.makeText(this, "sdcard不可读写", Toast.LENGTH_SHORT).show();
+			return;	
+		}
+		String fileName = FileUtil.getFileName(srcFile);
+		
+		Bitmap bitmap = PictureUtil.getSmallBitmap(srcFile);
+		if (mCheckData.getType() == CheckDataType.TYPE_ROOM) {
+			bitmap = BitmapUtil.drawTextToBitmap(bitmap, mCheckData.getName());
+		} else if (mCheckData.getType() == CheckDataType.TYPE_PASSWAY) {
+			bitmap = BitmapUtil.drawTextToBitmap(bitmap, mCheckData.getName());
+		}
+		String localSavePath = targetPath + fileName;
+		boolean	result = FileUtil.saveBitmapToSDFile(bitmap,targetPath , fileName, CompressFormat.JPEG);
+		if (result) {
+			bitmap.recycle();
+			IssueItem issueItem = mCheckData.getIssue(mIssuePositon);
+			ImageItem imageItem = new ImageItem();
+			String serviceSavePath = Constance.Path.SERVER_IMAGE_PATH+mHotel.getCheckId()+"/"+DataManager.getInstance().getUserName()+"/"+fileName;
+			imageItem.setLocalImagePath(localSavePath);
+			imageItem.setServiceSavePath(serviceSavePath);
+			issueItem.addImage(imageItem);
+			boolean isWidth = ImageUtil.isWidthPic(imageItem.getLocalImagePath());
+			imageItem.setType(mCheckData.getType());
+			imageItem.setWidth(isWidth);
+			if (!issueItem.isCheck()) {
+				issueItem.setCheck(true);
+			}
+			HotelCheck hotelCheck = new HotelCheck(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), imageItem);
+			hotelCheck.save();
+			initCheckedIssue(issueItem);
+		}
+		
+	}
+	
+	private void deleteImage(String imagePath) {
+		mIssueItem.removeImageItem(imagePath);
+	}
+	
+	private void initCheckedIssue(IssueItem issueItem) {
+		DataManager.getInstance().saveIssueCheck(mHotel.getCheckId(),
+				mCheckData.getId().intValue(), issueItem.getId(),
+				issueItem.isCheck());
+		mCheckData.updateIssueCheck(issueItem);
+		if (mCheckData.getType() == CheckDataType.TYPE_ROOM) {
+			mHotel.initDymicRoomCheckedData();
+		} else if (mCheckData.getType() == CheckDataType.TYPE_PASSWAY) {
+			mHotel.initDymicPasswayCheckedData();
+		}
+	}
 	
 	static class MyHandler extends Handler {
 		
@@ -150,6 +266,7 @@ public class PhotoPickerActivity extends BaseActivity implements CallBackListene
 			case MSG_OK:
 				mWeak.get().data2View();
 				mWeak.get().initListDirPopupWindw();
+				mWeak.get().mLoadingView.setVisibility(View.GONE);
 				break;
 
 			default:
@@ -164,8 +281,7 @@ public class PhotoPickerActivity extends BaseActivity implements CallBackListene
      */  
     private void getImages() {  
         //显示进度条  
-//        mProgressDialog = ProgressDialog.show(this, null, "正在加载...");  
-          
+    	mLoadingView.setVisibility(View.VISIBLE);
         new Thread(new Runnable() {  
               
             @Override  
@@ -242,23 +358,13 @@ public class PhotoPickerActivity extends BaseActivity implements CallBackListene
 							return false;
 						}
 					}).length;
-					totalCount += picSize;
-
 					imageFloder.setCount(picSize);
 					mImageFloders.add(imageFloder);
 
-//					if (picSize > mPicsSize)
-//					{
-//						mPicsSize = picSize;
-//						mImgDir = parentFile;
-//					}
 				}
-//				mCursor.close();
 
 				// 扫描完成，辅助的HashSet也就可以释放内存了
 				mDirPaths = null;
-//                Collections.reverse(mDataList);
-                  
                 //通知Handler扫描图片完成  
                 myHandler.sendEmptyMessage(MSG_OK);  
                 mCursor.close();  
@@ -272,6 +378,7 @@ public class PhotoPickerActivity extends BaseActivity implements CallBackListene
 		super.onActivityResult(requestCode, resultCode, data);
 		if (resultCode == Activity.RESULT_OK &&
 				requestCode == CAMMER_REQUEST_CODE) {
+			saveImage(mImagePath, getSavePath());
 			sendResult();
 		}
 	}
@@ -279,7 +386,7 @@ public class PhotoPickerActivity extends BaseActivity implements CallBackListene
 	@Override
 	public void onCameraClick(int position) {
 		Intent openCameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-		mImagePath = mImagePath+mImageName+new DateFormat().format("yyyyMMddhhmmss",
+		mImagePath = Path.TEMP_IMAGE_FLOER_PATH+mImageName+new DateFormat().format("yyyyMMddhhmmss",
 				Calendar.getInstance(Locale.CHINA))+".jpg";
 		Uri imageUri = Uri.fromFile(new File(mImagePath));  
 		//指定照片保存路径（SD卡），image.jpg为一个临时文件，每次拍照后这个图片都会被替换  
@@ -293,7 +400,8 @@ public class PhotoPickerActivity extends BaseActivity implements CallBackListene
 		int id = item.getItemId();
 		switch (id) {
 		case android.R.id.home:
-			finish();
+//			finish();
+			sendResult();
 			break;
 		default:
 			break;
@@ -302,23 +410,32 @@ public class PhotoPickerActivity extends BaseActivity implements CallBackListene
 	}
 
 	@Override
-	public void onPhotoPick(int position, String imagePath) {
+	public void onPhotoPick(int position, String imagePath, boolean isCheck) {
+		imagePath = mImgDir.getAbsolutePath()+"/"+imagePath;
 		File imageFile = new File(imagePath);
 		if (imageFile.exists()) {
-			mImagePath = mImagePath+mImageName+imageFile.getName();
-			FileUtil.Copy(imageFile, mImagePath);
-			sendResult();
+//			mImagePath = mImagePath+mImageName+imageFile.getName();
+//			FileUtil.Copy(imageFile, mImagePath);
+//			sendResult();
+			if (isCheck) {
+				saveImage(imagePath, getSavePath());
+			} else {
+				deleteImage(imagePath);
+			}
+			
 		}
 		
 	} 
 	
+	
 	public void sendResult() {
 		Intent intent = new Intent();
 		intent.putExtra(IntentKey.INTENT_KEY_ISSUE_POSITION, mIssuePositon); 
-		intent.putExtra(IntentKey.INTENT_KEY_FILE_PATH, mImagePath);
 		this.setResult(RESULT_OK, intent);
 		finish();
 	}
+	
+	
 	
 	/**
 	 * 为View绑定数据
@@ -334,10 +451,9 @@ public class PhotoPickerActivity extends BaseActivity implements CallBackListene
 		mImgDir = new File(mImageFloders.get(0).getDir());
 		mAdapter.setDirPath(mImgDir.getAbsolutePath());
 		mDataList = new ArrayList<String>(Arrays.asList(mImgDir.list()));;
-		/**
-		 * 可以看到文件夹的路径和图片的路径分开保存，极大的减少了内存的消耗；
-		 */
-		mImageCount.setText(totalCount + "张");
+		/* 可以看到文件夹的路径和图片的路径分开保存，极大的减少了内存的消耗；*/
+		mChooseDir.setText(mImageFloders.get(0).getName());
+		mImageCount.setText(mImageFloders.get(0).getCount() + "张");
 		refresh();
 	};
 	
@@ -367,6 +483,27 @@ public class PhotoPickerActivity extends BaseActivity implements CallBackListene
 		mListImageDirPopupWindow.setOnImageDirSelected(this);
 	}
 
+//	@Override
+//	public void onBackPressed() {
+//		// TODO Auto-generated method stub
+//		super.onBackPressed();
+//		sendResult();
+//	}
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		// TODO Auto-generated method stub
+		switch (keyCode) {
+		case KeyEvent.KEYCODE_BACK:
+			sendResult();
+			return true;
+		default:
+			break;
+		}
+		return super.onKeyDown(keyCode, event);
+	}
+	
+	
 	private void initEvent()
 	{
 		/**
@@ -380,7 +517,6 @@ public class PhotoPickerActivity extends BaseActivity implements CallBackListene
 				mListImageDirPopupWindow
 						.setAnimationStyle(R.style.anim_popup_dir);
 				mListImageDirPopupWindow.showAsDropDown(mBottomLy, 0, 0);
-
 				// 设置背景颜色变暗
 				WindowManager.LayoutParams lp = getWindow().getAttributes();
 				lp.alpha = .3f;
@@ -408,7 +544,7 @@ public class PhotoPickerActivity extends BaseActivity implements CallBackListene
 		 * 可以看到文件夹的路径和图片的路径分开保存，极大的减少了内存的消耗；
 		 */
 		mAdapter.setDirPath(mImgDir.getAbsolutePath());
-		mAdapter.updateData(mDataList);
+		mAdapter.updateData(mDataList, mSelectedMap);
 		mAdapter.notifyDataSetChanged();
 		mImageCount.setText(floder.getCount() + "张");
 		mChooseDir.setText(floder.getName());

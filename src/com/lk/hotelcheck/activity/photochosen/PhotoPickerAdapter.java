@@ -1,7 +1,9 @@
 package com.lk.hotelcheck.activity.photochosen;
 
+import java.util.HashMap;
 import java.util.List;
 
+import android.R.mipmap;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.view.View;
@@ -9,12 +11,14 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 
 import com.lk.hotelcheck.R;
+import com.lk.hotelcheck.util.FileUtil;
 
 public class PhotoPickerAdapter extends RecyclerView.Adapter<ViewHolder>{
 
 	private List<String> mDataList;
 	private CallBackListener mListener;
 	private String mDirPath;
+	private HashMap<String, String> mSelectMap;
 	
 	
 	
@@ -72,11 +76,15 @@ public class PhotoPickerAdapter extends RecyclerView.Adapter<ViewHolder>{
 					@Override
 					public void onClick(View v) {
 						if (mListener != null) {
-							mListener.onPhotoPick(position, imagePath);
+							mItem.setChecked(!mItem.isChecked());
+							mListener.onPhotoPick(position, imagePath, mItem.isChecked());
 						}
 					}
 				});
 			}
+			if (mSelectMap != null) {
+				mItem.setChecked(mSelectMap.containsKey(imagePath));
+			} 
 			mItem.setOriginImageData("file://"+mDirPath+"/"+imagePath);
 		}
 		
@@ -101,11 +109,12 @@ public class PhotoPickerAdapter extends RecyclerView.Adapter<ViewHolder>{
 
 	public interface CallBackListener {
 		void onCameraClick(int position);
-		void onPhotoPick(int position, String imagePath);
+		void onPhotoPick(int position, String imagePath, boolean isCheck);
 	}
 
-	public void updateData(List<String> dataList) {
+	public void updateData(List<String> dataList, HashMap<String, String> selectMap) {
 		mDataList = dataList;
+		mSelectMap = selectMap;
 		notifyDataSetChanged();
 	}
 
