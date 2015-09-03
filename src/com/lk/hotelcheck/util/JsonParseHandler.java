@@ -9,7 +9,7 @@ import org.json.JSONObject;
 
 import android.util.Log;
 
-import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.lk.hotelcheck.bean.CheckData;
 import com.lk.hotelcheck.bean.Hotel;
 import com.lk.hotelcheck.bean.ImageItem;
@@ -56,8 +56,10 @@ public class JsonParseHandler {
 			hotel.setBranchManager(branchObject.optString(NetConstance.PARAM_BRANCH_MANAGER));
 			hotel.setBranchManagerTele(branchObject.optString(NetConstance.PARAM_BRANCH_MANAGER_TELE));
 			hotel.setCheckType(branchObject.optInt(NetConstance.PARAM_CHECK_TYPE));
+			hotel.setRegionalManager(branchObject.optString(NetConstance.PARAM_REGIONAL_MANAGER));
 			int checkState = branchObject.optInt(NetConstance.PARAM_CHECK_STATE);
 			int uploadDataState = branchObject.optInt(NetConstance.PARAM_IS_UPDATE_DATA);
+			
 			boolean status = false;
 			if (checkState == 2) {
 				status = true;
@@ -181,7 +183,8 @@ public class JsonParseHandler {
 		}
 		JSONObject hotelJsonObject = null;
 		try {
-			 hotelJsonObject = new JSONObject(new Gson().toJson(hotel));
+//			 hotelJsonObject = new JSONObject(new Gson().toJson(hotel));
+			hotelJsonObject = new JSONObject(new GsonBuilder().serializeNulls().create().toJson(hotel));
 			 if (hotel.getCheckDatas() != null) {
 				JSONArray jsonArray = new JSONArray();
 				for (CheckData checkData : hotel.getCheckDatas()) {

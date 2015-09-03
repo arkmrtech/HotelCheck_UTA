@@ -151,8 +151,9 @@ public class HotelInfoDetailActivity extends BaseActivity{
 					} else {
 						if (mHotel.getRoomCount() == 0
 								|| mHotel.getRoomInUseCount() == 0
-								|| TextUtils.isEmpty(mHotel.getFloorStart())
-								|| TextUtils.isEmpty(mHotel.getFloorEnd())
+								|| TextUtils.isEmpty(mHotel.getFloor())
+//								|| TextUtils.isEmpty(mHotel.getFloorStart())
+//								|| TextUtils.isEmpty(mHotel.getFloorEnd())
 								|| TextUtils.isEmpty(mHotel.getCheckDate())) {
 							Toast.makeText(HotelInfoDetailActivity.this, "酒店基本信息未填写完整", Toast.LENGTH_SHORT).show();
 							mViewPager.setCurrentItem(0);

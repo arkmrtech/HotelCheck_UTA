@@ -27,6 +27,8 @@ import com.lk.hotelcheck.network.HttpCallback;
 import com.lk.hotelcheck.network.HttpRequest;
 import com.lk.hotelcheck.util.FileUtil;
 import com.lk.hotelcheck.util.JsonParseHandler;
+import com.tencent.bugly.proguard.u;
+
 import common.Constance;
 import common.Constance.CheckDataType;
 import common.Constance.DefQueType;
@@ -231,9 +233,10 @@ public class DataManager {
 			//init normal checkData
 			for (int i = 0; i < mCheckModel.size(); i++) {
 				CheckData checkData = mCheckModel.valueAt(i);
-				initCheckDataIssue(checkData, hotel.getCheckId());
+				initCheckDataIssue(hotel, checkData, hotel.getCheckId());
 				hotel.addCheckData(checkData);
 			}
+			//初始化动态区域的问题
 			List<CheckData> dymicCheckData = CheckData.find(CheckData.class, "CHECK_ID = ?", String.valueOf(hotel.getCheckId()));
 			if (dymicCheckData != null) {
 				for (CheckData checkData : dymicCheckData) {
@@ -245,8 +248,9 @@ public class DataManager {
 					}
 					if (tempCheckData != null) {
 						checkData.setIssuelist(tempCheckData.getIssuelist());
+						//初始化之前检查过的问题数据
+						initCheckDataIssue(hotel, checkData, hotel.getCheckId());
 						checkData.initCheckedIssue();
-						initCheckDataIssue(checkData, hotel.getCheckId());
 						if (checkData.getType() == Constance.CheckDataType.TYPE_ROOM) {
 							if (hotel.hasRoom(checkData.getId())) {
 								hotel.setRoom(checkData.getId(), checkData);
@@ -261,13 +265,14 @@ public class DataManager {
 							}
 						}
 					}
-					
 				}
 			}
+			//初始化复检问题
 			initQuestion(hotel);
 			if (mHotelDataList == null) {
 				mHotelDataList = new ArrayList<Hotel>();
 			}
+			//初始化之前检查过的问题数据
 			hotel.initCheckedData();
 			mHotelDataList.add(hotel);
 			if (hotel.isStatus()) {
@@ -285,15 +290,23 @@ public class DataManager {
 	}
 	
 	
-	private void initCheckDataIssue(CheckData checkData , int checkId) {
+	private void initCheckDataIssue(Hotel hotel, CheckData checkData , int checkId) {
 		if (checkData == null) {
 			return;
 		}
+		//动态问题
 		List<DymicIssue> dataList = DymicIssue.find(DymicIssue.class, "CHECK_ID = ? and AREA_ID = ?", String.valueOf(checkId), String.valueOf(checkData.getId()));
 		if (dataList != null) {
 			for (DymicIssue dymicIssue : dataList) {
 				IssueItem issueItem = new IssueItem(dymicIssue);
 				checkData.addIssue(issueItem);
+				if (hotel != null) {
+					if (checkData.getType() == CheckDataType.TYPE_ROOM) {
+						hotel.addRoomDymicIssue(issueItem);
+					} else if (checkData.getType() == CheckDataType.TYPE_PASSWAY) {
+						hotel.addPasswayDymicIssue(issueItem);
+					}
+				}
 			}
 		}
 		for (IssueItem issueItem : checkData.getIssuelist()) {
@@ -315,6 +328,7 @@ public class DataManager {
 				
 
 			}
+			//问题是否已经检查过
 			CheckIssue checkIssue = getCheckIssue(checkId,
 					checkData.getId(), issueItem.getId());
 			if (checkIssue != null) {
@@ -442,9 +456,9 @@ public class DataManager {
 									 hotelTemp.setBaseInfo(hotel);
 								} 
 								 //for test 
-//								hotelTemp.setStatus(false);
-//								hotelTemp.setDataStatus(false);
-//								hotelTemp.setImageStatus(false);
+								hotelTemp.setStatus(false);
+								hotelTemp.setDataStatus(false);
+								hotelTemp.setImageStatus(false);
 								hotelList.add(hotelTemp);
 							}
 						}

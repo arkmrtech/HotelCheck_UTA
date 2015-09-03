@@ -10,6 +10,7 @@ import android.util.SparseArray;
 
 import com.lk.hotelcheck.bean.dao.AreaIssue;
 import com.lk.hotelcheck.bean.dao.CheckIssue;
+import com.lk.hotelcheck.bean.dao.DymicIssue;
 import com.lk.hotelcheck.bean.dao.HotelCheck;
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
@@ -34,12 +35,15 @@ public class Hotel extends SugarRecord<Hotel>{
 	private String checkDate;
 	private int roomCount;
 	private int roomCheckedCount;
-	private String floorStart;
-	private String floorEnd;
+//	private String floorStart;
+//	private String floorEnd;
+	private String floor;
 	private boolean imageStatus;
 	private boolean dataStatus;
 	private boolean status;
 	private String guardianNumber;
+	@Ignore
+	private transient String regionalManager;
 	private int checkType;
 	private transient String branchManager;
 	private transient String branchManagerTele;
@@ -56,6 +60,10 @@ public class Hotel extends SugarRecord<Hotel>{
 	private transient SparseArray<IssueItem> roomCheckedIsuueArray;
 	@Ignore
 	private transient SparseArray<IssueItem> passwayCheckedIsuueArray;
+	@Ignore
+	private transient List<IssueItem> roomDymicIssueArray;
+	@Ignore
+	private transient List<IssueItem> passwayDymicIssueArray;
 	
 	
 	
@@ -234,18 +242,18 @@ public class Hotel extends SugarRecord<Hotel>{
 		}
 		return allImageItems;
 	}
-	public String getFloorStart() {
-		return floorStart;
-	}
-	public void setFloorStart(String floorStart) {
-		this.floorStart = floorStart;
-	}
-	public String getFloorEnd() {
-		return floorEnd;
-	}
-	public void setFloorEnd(String floorEnd) {
-		this.floorEnd = floorEnd;
-	}
+//	public String getFloorStart() {
+//		return floorStart;
+//	}
+//	public void setFloorStart(String floorStart) {
+//		this.floorStart = floorStart;
+//	}
+//	public String getFloorEnd() {
+//		return floorEnd;
+//	}
+//	public void setFloorEnd(String floorEnd) {
+//		this.floorEnd = floorEnd;
+//	}
 	
 	
 	
@@ -432,8 +440,9 @@ public class Hotel extends SugarRecord<Hotel>{
 		}
 		this.roomCount = hotel.getRoomCount();
 		this.roomCheckedCount = hotel.getRoomCount();
-		this.floorStart = hotel.getFloorStart();
-		this.floorEnd = hotel.getFloorEnd();
+//		this.floorStart = hotel.getFloorStart();
+//		this.floorEnd = hotel.getFloorEnd();
+		this.floor = hotel.getFloor();
 		this.imageStatus = hotel.isImageStatus();
 		this.guardianNumber = hotel.getGuardianNumber();
 //		this.status = hotel.isStatus();
@@ -973,6 +982,90 @@ public class Hotel extends SugarRecord<Hotel>{
 			result = true;
 		}
 		return result;
+	}
+	public String getRegionalManager() {
+		return regionalManager;
+	}
+	public void setRegionalManager(String regionalManager) {
+		this.regionalManager = regionalManager;
+	}
+	public String getFloor() {
+		return floor;
+	}
+	public void setFloor(String floor) {
+		this.floor = floor;
+	}
+	
+	public void addRoomDymicIssue(IssueItem issueItem) {
+		if (roomDymicIssueArray == null) {
+			roomDymicIssueArray = new ArrayList<IssueItem>();
+		}
+		if (roomDymicIssueArray.size() > 0) {
+			for (IssueItem temp : roomDymicIssueArray) {
+				if (temp.getId() == issueItem.getId()) {
+					return;
+				}
+			}
+			
+		}
+			
+		roomDymicIssueArray.add(issueItem);
+		
+		
+	}
+	
+	public void addPasswayDymicIssue(IssueItem issueItem) {
+		if (passwayDymicIssueArray == null) {
+			passwayDymicIssueArray = new ArrayList<IssueItem>();
+		}
+		if (passwayDymicIssueArray.size() > 0) {
+			for (IssueItem temp : passwayDymicIssueArray) {
+				if (temp.getId() == issueItem.getId()) {
+					return;
+				}
+			}
+			
+		}
+		passwayDymicIssueArray.add(issueItem);
+	}
+	
+	public void initRoomDymicIssue(CheckData checkData) {
+		if (checkData == null || roomDymicIssueArray == null) {
+			return;
+		}
+		for (int i = 0; i < roomDymicIssueArray.size(); i++) {
+			IssueItem tempIssueItem = roomDymicIssueArray.get(i);
+			IssueItem issueItem = createDymicIssueItem(tempIssueItem.getName());
+			DymicIssue dymicIssue = new DymicIssue(getId(), checkData.getId(), issueItem);
+			dymicIssue.save();
+			checkData.addIssue(issueItem);
+		}
+	}
+	
+	public void initPasswayDymicIssue(CheckData checkData) {
+		if (checkData == null || passwayDymicIssueArray == null) {
+			return;
+		}
+		for (int i = 0; i < passwayDymicIssueArray.size(); i++) {
+			IssueItem tempIssueItem = passwayDymicIssueArray.get(i);
+			IssueItem issueItem = createDymicIssueItem(tempIssueItem.getName());
+			DymicIssue dymicIssue = new DymicIssue(getId(), checkData.getId(), issueItem);
+			dymicIssue.save();
+			checkData.addIssue(issueItem);
+		}
+	}
+	
+	private IssueItem createDymicIssueItem(String name) {
+		IssueItem issueItem = new IssueItem();
+		issueItem.setName(name);
+		issueItem.setContent("");
+		issueItem.setIsDefQue(DefQueType.TYPE_DYMIC);
+		issueItem.setIsPreQue(PreQueType.TYPE_NEW);
+		issueItem.setDimOneId(1013);
+		issueItem.setDimOneName("其他");
+		int id = Math.abs(name.hashCode());
+		issueItem.setId(id);
+		return issueItem;
 	}
 	
 }

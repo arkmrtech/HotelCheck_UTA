@@ -5,6 +5,12 @@ import java.util.List;
 import com.lk.hotelcheck.bean.ImageItem;
 import com.orm.SugarRecord;
 
+/**
+ * 每一个检查项的检查内容
+ *
+ * @author lk
+ *
+ */
 public class HotelCheck extends SugarRecord<HotelCheck>{
 
 //	public static final int IMAGE_TYPE = 1;

@@ -398,7 +398,60 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 	}
 	
 	
+//	private void addIssue(String name) {
+//		IssueItem issueItem = new IssueItem();
+//		issueItem.setName(name);
+//		issueItem.setContent("");
+//		issueItem.setIsDefQue(DefQueType.TYPE_DYMIC);
+//		issueItem.setIsPreQue(PreQueType.TYPE_NEW);
+//		issueItem.setDimOneId(1013);
+//		issueItem.setDimOneName("其他");
+//		int id = Math.abs(name.hashCode());
+//		issueItem.setId(id);
+//		DymicIssue dymicIssue = new DymicIssue(mHotel.getId(), mCheckData.getId(), issueItem);
+//		dymicIssue.save();
+//		mAdapter.addIssue(issueItem);
+//	}
+	
 	private void addIssue(String name) {
+		IssueItem issueItem = null;
+		DymicIssue dymicIssue = null;
+		switch (mType) {
+		case Constance.CheckDataType.TYPE_NORMAL:
+			issueItem = createDymicIssueItem(name);
+			dymicIssue = new DymicIssue(mHotel.getId(), mCheckData.getId(), issueItem);
+			dymicIssue.save();
+			mCheckData.addIssue(issueItem);
+			break;
+		case Constance.CheckDataType.TYPE_ROOM:
+			for (CheckData checkData : mHotel.getRoomList()) {
+				issueItem = createDymicIssueItem(name);
+				dymicIssue = new DymicIssue(mHotel.getId(), checkData.getId(), issueItem);
+				dymicIssue.save();
+				checkData.addIssue(issueItem);
+			}
+			if (issueItem != null) {
+				mHotel.addRoomDymicIssue(issueItem);
+			}
+			break;
+		case Constance.CheckDataType.TYPE_PASSWAY:
+			for (CheckData checkData : mHotel.getPasswayList()) {
+				issueItem = createDymicIssueItem(name);
+				dymicIssue = new DymicIssue(mHotel.getId(), checkData.getId(), issueItem);
+				dymicIssue.save();
+				checkData.addIssue(issueItem);
+			}
+			if (issueItem != null) {
+				mHotel.addPasswayDymicIssue(issueItem);
+			}
+			break;
+		default:
+			break;
+		}
+		mAdapter.notifyItemInserted(mCheckData.getIssueCount()-1);
+	}
+	
+	private IssueItem createDymicIssueItem(String name) {
 		IssueItem issueItem = new IssueItem();
 		issueItem.setName(name);
 		issueItem.setContent("");
@@ -408,9 +461,7 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 		issueItem.setDimOneName("其他");
 		int id = Math.abs(name.hashCode());
 		issueItem.setId(id);
-		DymicIssue dymicIssue = new DymicIssue(mHotel.getId(), mCheckData.getId(), issueItem);
-		dymicIssue.save();
-		mAdapter.addIssue(issueItem);
+		return issueItem;
 	}
 	
 	private boolean hasIssue(String name) {

@@ -31,7 +31,8 @@ public class IssueItem{
 	}
 	
 	public IssueItem(DymicIssue dymicIssue) {
-		this.id = dymicIssue.getId().intValue();
+//		this.id = dymicIssue.getId().intValue();
+		this.id = dymicIssue.getIssueId();
 		this.name = dymicIssue.getName();
 		this.dimOneId = dymicIssue.getDimOneId();
 		this.dimOneName = dymicIssue.getDimOneName();

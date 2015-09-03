@@ -335,7 +335,8 @@ public class HotelIssueFragment extends Fragment {
 												} else {
 													checkData = DataManager.getInstance().createRoomCheckData();
 													checkData.setName(name);
-//													checkData.setType(Constance.CheckDataType.TYPE_ROOM);
+													checkData.setId((long) areaId);
+													mHotel.initRoomDymicIssue(checkData);
 												}
 												break;
 											case Constance.CheckDataType.TYPE_PASSWAY:
@@ -350,13 +351,13 @@ public class HotelIssueFragment extends Fragment {
 												} else {
 													checkData = DataManager.getInstance().createPasswayCheckData();
 													checkData.setName(name);
-//													checkData.setType(Constance.CheckDataType.TYPE_PASSWAY);
+													checkData.setId((long) areaId);
+													mHotel.initPasswayDymicIssue(checkData);
 												}
 												break;
 											default:
 												break;
 											}
-											checkData.setId((long) areaId);
 											checkData.setCheckId(mHotel.getCheckId());
 											addDymicCheckData(checkData);
 											mEditText.setText("");

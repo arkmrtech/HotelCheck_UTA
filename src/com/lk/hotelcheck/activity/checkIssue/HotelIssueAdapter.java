@@ -315,13 +315,13 @@ public class HotelIssueAdapter extends RecyclerView.Adapter<ViewHolder>{
 		void onDeleteItem(int position);
 	}
 
-	public void addIssue(IssueItem issueItem) {
-		if (issueItem == null) {
-			return;
-		}
-		mDataList.add(issueItem);
-		notifyItemInserted(mDataList.size()-1);
-	}
+//	public void addIssue(IssueItem issueItem) {
+//		if (issueItem == null) {
+//			return;
+//		}
+//		mDataList.add(issueItem);
+//		notifyItemInserted(mDataList.size()-1);
+//	}
 	
 	public void deleteIssue(int position) {
 		IssueItem issueItem = mDataList.get(position);

@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +24,7 @@ import com.lk.hotelcheck.R;
 import com.lk.hotelcheck.bean.Hotel;
 import com.lk.hotelcheck.manager.DataManager;
 import com.lk.hotelcheck.util.StringUtil;
+
 import common.Constance;
 
 public class HotelBaseInfoFragment extends Fragment {
@@ -49,13 +51,14 @@ public class HotelBaseInfoFragment extends Fragment {
 	private RelativeLayout mCheckedDateLayout;
 	private RelativeLayout mFloorLayout;
 	private DatePickerDialog mDatePickerDialog;
-	private AlertDialog alertDialog;
+	private AlertDialog mAlertDialog;
 	private static final int ALERT_DIALOG_ROOM_NUMBER = 1;
 	private static final int ALERT_DIALOG_ROOM_CHECKED_NUMBER = 2;
-	private EditText alertEditText;
-	private AlertDialog mFloorAlertDialog;
-	private EditText mFloorStartEditText;
-	private EditText mFloorEndEditText;
+	private static final int ALERT_DIALOG_FLOOR = 3;
+	private EditText mAlertEditText;
+//	private AlertDialog mFloorAlertDialog;
+//	private EditText mFloorStartEditText;
+//	private EditText mFloorEndEditText;
 
 	public static HotelBaseInfoFragment newInstance(int position) {
 		HotelBaseInfoFragment fragment = new HotelBaseInfoFragment();
@@ -134,25 +137,28 @@ public class HotelBaseInfoFragment extends Fragment {
 		mAddressTextView.setText(mHotel.getAddress());
 		mPhoneTextView.setText("电话："+mHotel.getPhone());
 		memoTextView.setText(mHotel.getMemo());
+		mAreaTextView.setText("区总："+mHotel.getRegionalManager());
 		if (!TextUtils.isEmpty(mHotel.getOpenDate())) {
 			mOpenDateTextView.setText("开业时间：" + mHotel.getOpenDate());
 		}
 		if (!TextUtils.isEmpty(mHotel.getLastCheckedDate())) {
 			mLastCheckedDateTextView.setText("上次检查：" + mHotel.getLastCheckedDate());
 		}
-		StringBuffer floorBuffer = new StringBuffer();
-		if (!TextUtils.isEmpty(mHotel.getFloorStart())) {
-			floorBuffer.append(mHotel.getFloorStart());
-		}
-		floorBuffer.append(" -- ");
-		if (!TextUtils.isEmpty(mHotel.getFloorEnd())) {
-			floorBuffer.append(mHotel.getFloorEnd());
-		}
+//		StringBuffer floorBuffer = new StringBuffer();
+//		if (!TextUtils.isEmpty(mHotel.getFloorStart())) {
+//			floorBuffer.append(mHotel.getFloorStart());
+//		}
+//		floorBuffer.append(" -- ");
+//		if (!TextUtils.isEmpty(mHotel.getFloorEnd())) {
+//			floorBuffer.append(mHotel.getFloorEnd());
+//		}
 		managerTextView.setText("店长:"+mHotel.getBranchManager());
 		managerTelTextView.setText("店长电话:"+mHotel.getBranchManagerTele());
 		mRoomNumberTextView.setText("" + mHotel.getRoomCount());
 		mRoomCheckedNumberTextView.setText("" + mHotel.getRoomCheckedCount());
-		mFloorTextView.setText(floorBuffer.toString());
+		if (!TextUtils.isEmpty(mHotel.getFloor())) {
+			mFloorTextView.setText(mHotel.getFloor());
+		}
 		if (mHotel.getCheckDate() != null) {
 			mCheckedDateTextView.setText(mHotel.getCheckDate());
 		} else {
@@ -171,7 +177,8 @@ public class HotelBaseInfoFragment extends Fragment {
 
 				@Override
 				public void onClick(View v) {
-					showFloor();
+//					showFloor();
+					showDialog(ALERT_DIALOG_FLOOR);
 				}
 			});
 			mRoomNumberLayout.setOnClickListener(new View.OnClickListener() {
@@ -237,8 +244,8 @@ public class HotelBaseInfoFragment extends Fragment {
 	private void showDialog(final int type) {
 		LayoutInflater factory = LayoutInflater.from(mContext);// 提示框
 		View view = factory.inflate(R.layout.alert_dialog_edit, null);// 这里必须是final的
-		alertEditText = (EditText) view.findViewById(R.id.et_content);// 获得输入框对象
-		alertDialog = new AlertDialog.Builder(mContext)
+		mAlertEditText = (EditText) view.findViewById(R.id.et_content);// 获得输入框对象
+		mAlertDialog = new AlertDialog.Builder(mContext)
 				// .setTitle(title)//提示框标题
 				.setView(view)
 				.setPositiveButton("确定",// 提示框的两个按钮
@@ -246,23 +253,27 @@ public class HotelBaseInfoFragment extends Fragment {
 							@Override
 							public void onClick(DialogInterface dialog,
 									int which) {
-								String number = alertEditText.getText()
+								String number = mAlertEditText.getText()
 										.toString();
 								
 								if (TextUtils.isEmpty(number)) {
 									Toast.makeText(mContext, "请输入内容", Toast.LENGTH_SHORT).show();
 									return;
 								}
-								if (!StringUtil.isNumeric(number)) {
-									Toast.makeText(mContext, "只能输入数字", Toast.LENGTH_SHORT).show();
-									return;
-								}
 								switch (type) {
 								case ALERT_DIALOG_ROOM_NUMBER:
+									if (!StringUtil.isNumeric(number)) {
+										Toast.makeText(mContext, "只能输入数字", Toast.LENGTH_SHORT).show();
+										return;
+									}
 									mRoomNumberTextView.setText(number);
 									mHotel.setRoomCount(Integer.valueOf(number));
 									break;
 								case ALERT_DIALOG_ROOM_CHECKED_NUMBER:
+									if (!StringUtil.isNumeric(number)) {
+										Toast.makeText(mContext, "只能输入数字", Toast.LENGTH_SHORT).show();
+										return;
+									}
 									if (Integer.valueOf(number) > mHotel.getRoomCount()) {
 										Toast.makeText(mContext, "在住房数不能大于房间数量", Toast.LENGTH_SHORT).show();
 										return;
@@ -271,10 +282,14 @@ public class HotelBaseInfoFragment extends Fragment {
 									mHotel.setRoomCheckedCount(Integer
 											.valueOf(number));
 									break;
+								case ALERT_DIALOG_FLOOR:
+									mFloorTextView.setText(number);
+									mHotel.setFloor(number);
+									break;
 								default:
 									break;
 								}
-								alertEditText.setText("");
+								mAlertEditText.setText("");
 								// DataManager.getInstance().setHotel(mPosition,
 								// mHotel);
 							}
@@ -285,72 +300,130 @@ public class HotelBaseInfoFragment extends Fragment {
 							@Override
 							public void onClick(DialogInterface dialog,
 									int which) {
-								alertEditText.setText("");
+								mAlertEditText.setText("");
 
 							}
 						}).create();
 		switch (type) {
 		case ALERT_DIALOG_ROOM_NUMBER:
-			alertDialog.setTitle("请输入房间数量");
+			mAlertDialog.setTitle("请输入房间数量");
+			mAlertEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
 			break;
 		case ALERT_DIALOG_ROOM_CHECKED_NUMBER:
-			alertDialog.setTitle("请输入在住房数");
+			mAlertDialog.setTitle("请输入在住房数");
+			mAlertEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
+			break;
+		case ALERT_DIALOG_FLOOR:
+			mAlertDialog.setTitle("请输入楼层范围");
+			mAlertEditText.setInputType(InputType.TYPE_CLASS_TEXT);
 			break;
 		default:
 			break;
 		}
-		alertDialog.show();
+		mAlertDialog.show();
 	}
 
-	private void showFloor() {
-		if (mFloorAlertDialog == null) {
-			LayoutInflater factory = LayoutInflater.from(mContext);// 提示框
-			View view = factory.inflate(R.layout.alert_dialog_floor, null);// 这里必须是final的
-			mFloorStartEditText = (EditText) view.findViewById(R.id.et_start);// 获得输入框对象
-			mFloorEndEditText = (EditText) view.findViewById(R.id.et_end);
-			mFloorAlertDialog = new AlertDialog.Builder(mContext)
-					 .setTitle("请输入楼层范围")//提示框标题
-					.setView(view)
-					.setPositiveButton(
-							"确定",// 提示框的两个按钮
-							new android.content.DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-									String floorStart = mFloorStartEditText
-											.getText().toString();
-									String floorEnd = mFloorEndEditText
-											.getText().toString();
-									if (TextUtils.isEmpty(floorStart)) {
-										Toast.makeText(mContext, "请输入开始楼层", Toast.LENGTH_SHORT).show();
-										return;
-									}
-									if (TextUtils.isEmpty(floorEnd)) {
-										Toast.makeText(mContext, "请输入结束楼层", Toast.LENGTH_SHORT).show();
-										return;
-									}
-									mFloorTextView.setText(floorStart + " - "
-											+ floorEnd);
-									mFloorEndEditText.setText("");
-									mFloorStartEditText.setText("");
-									mHotel.setFloorStart(floorStart);
-									mHotel.setFloorEnd(floorEnd);
-									// DataManager.getInstance().setHotel(mPosition,
-									// mHotel);
-								}
-							})
-					.setNegativeButton(
-							"取消",
-							new android.content.DialogInterface.OnClickListener() {
-
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-									mFloorEndEditText.setText("");
-									mFloorStartEditText.setText("");
-								}
-							}).create();
-		}
-		mFloorAlertDialog.show();
-	}
+//	private void showFloor() {
+//		if (mFloorAlertDialog == null) {
+//			LayoutInflater factory = LayoutInflater.from(mContext);// 提示框
+//			View view = factory.inflate(R.layout.alert_dialog_floor, null);// 这里必须是final的
+//			mFloorStartEditText = (EditText) view.findViewById(R.id.et_start);// 获得输入框对象
+//			mFloorEndEditText = (EditText) view.findViewById(R.id.et_end);
+//			mFloorAlertDialog = new AlertDialog.Builder(mContext)
+//					 .setTitle("请输入楼层范围")//提示框标题
+//					.setView(view)
+//					.setPositiveButton(
+//							"确定",// 提示框的两个按钮
+//							new android.content.DialogInterface.OnClickListener() {
+//								@Override
+//								public void onClick(DialogInterface dialog,
+//										int which) {
+//									String floorStart = mFloorStartEditText
+//											.getText().toString();
+//									String floorEnd = mFloorEndEditText
+//											.getText().toString();
+//									if (TextUtils.isEmpty(floorStart)) {
+//										Toast.makeText(mContext, "请输入开始楼层", Toast.LENGTH_SHORT).show();
+//										return;
+//									}
+//									if (TextUtils.isEmpty(floorEnd)) {
+//										Toast.makeText(mContext, "请输入结束楼层", Toast.LENGTH_SHORT).show();
+//										return;
+//									}
+//									mFloorTextView.setText(floorStart + " - "
+//											+ floorEnd);
+//									mFloorEndEditText.setText("");
+//									mFloorStartEditText.setText("");
+//									mHotel.setFloorStart(floorStart);
+//									mHotel.setFloorEnd(floorEnd);
+//									// DataManager.getInstance().setHotel(mPosition,
+//									// mHotel);
+//								}
+//							})
+//					.setNegativeButton(
+//							"取消",
+//							new android.content.DialogInterface.OnClickListener() {
+//
+//								@Override
+//								public void onClick(DialogInterface dialog,
+//										int which) {
+//									mFloorEndEditText.setText("");
+//									mFloorStartEditText.setText("");
+//								}
+//							}).create();
+//		}
+//		mFloorAlertDialog.show();
+//	}
+	
+//	private void showFloor() {
+//		if (mFloorAlertDialog == null) {
+//			LayoutInflater factory = LayoutInflater.from(mContext);// 提示框
+//			View view = factory.inflate(R.layout.alert_dialog_edit, null);// 这里必须是final的
+//			mFloorStartEditText = (EditText) view.findViewById(R.id.et_start);// 获得输入框对象
+//			mFloorEndEditText = (EditText) view.findViewById(R.id.et_end);
+//			mFloorAlertDialog = new AlertDialog.Builder(mContext)
+//					 .setTitle("请输入楼层范围")//提示框标题
+//					.setView(view)
+//					.setPositiveButton(
+//							"确定",// 提示框的两个按钮
+//							new android.content.DialogInterface.OnClickListener() {
+//								@Override
+//								public void onClick(DialogInterface dialog,
+//										int which) {
+//									String floorStart = mFloorStartEditText
+//											.getText().toString();
+//									String floorEnd = mFloorEndEditText
+//											.getText().toString();
+//									if (TextUtils.isEmpty(floorStart)) {
+//										Toast.makeText(mContext, "请输入开始楼层", Toast.LENGTH_SHORT).show();
+//										return;
+//									}
+//									if (TextUtils.isEmpty(floorEnd)) {
+//										Toast.makeText(mContext, "请输入结束楼层", Toast.LENGTH_SHORT).show();
+//										return;
+//									}
+//									mFloorTextView.setText(floorStart + " - "
+//											+ floorEnd);
+//									mFloorEndEditText.setText("");
+//									mFloorStartEditText.setText("");
+//									mHotel.setFloorStart(floorStart);
+//									mHotel.setFloorEnd(floorEnd);
+//									// DataManager.getInstance().setHotel(mPosition,
+//									// mHotel);
+//								}
+//							})
+//					.setNegativeButton(
+//							"取消",
+//							new android.content.DialogInterface.OnClickListener() {
+//
+//								@Override
+//								public void onClick(DialogInterface dialog,
+//										int which) {
+//									mFloorEndEditText.setText("");
+//									mFloorStartEditText.setText("");
+//								}
+//							}).create();
+//		}
+//		mFloorAlertDialog.show();
+//	}
 }

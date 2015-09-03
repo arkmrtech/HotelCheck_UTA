@@ -9,6 +9,7 @@ public class DymicIssue extends SugarRecord<DymicIssue>{
 	private String name;
 	private int dimOneId;
 	private String dimOneName;
+	private int issueId;
 	
 	public DymicIssue() {
 		super();
@@ -33,7 +34,7 @@ public class DymicIssue extends SugarRecord<DymicIssue>{
 	public DymicIssue(long checkId,long areaId, IssueItem issueItem) {
 		this.checkId = checkId;
 		this.areaId = areaId;
-		this.id = (long) issueItem.getId();
+		this.setIssueId(issueItem.getId());
 		this.name = issueItem.getName();
 		this.dimOneId = issueItem.getDimOneId();
 		this.dimOneName = issueItem.getDimOneName();
@@ -87,6 +88,20 @@ public class DymicIssue extends SugarRecord<DymicIssue>{
 
 	public void setAreaId(long areaId) {
 		this.areaId = areaId;
+	}
+
+
+
+
+	public int getIssueId() {
+		return issueId;
+	}
+
+
+
+
+	public void setIssueId(int issueId) {
+		this.issueId = issueId;
 	}
 	
 	
