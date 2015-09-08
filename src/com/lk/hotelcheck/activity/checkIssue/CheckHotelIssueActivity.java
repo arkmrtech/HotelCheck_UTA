@@ -57,9 +57,6 @@ import common.Constance.PreQueType;
 
 public class CheckHotelIssueActivity extends BaseActivity implements CallBackListener{
 	
-//	private static final String BUNDLE_POSITION_ID = "position";
-//	private static final String BUNDLE_CHECK_DATA_POSITION = "dataPosition";
-//	
 	private int mHotelPosition;
 	private int mCheckDataPosition;
 	private Hotel mHotel;
@@ -210,42 +207,14 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 					}
 					HotelCheck hotelCheck = new HotelCheck(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), imageItem);
 					hotelCheck.save();
-//					DataManager.getInstance().saveIssueCheck(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), issueItem.isCheck());
-//					mAdapter.notifyItem(mCurrentIssuePosition, mCheckData.getIssue(mCurrentIssuePosition));
-//					mCheckData.updateIssueCheck(issueItem);
 					initCheckedIssue(mCurrentIssuePosition, issueItem, null);
 				}
 			} else if (requestCode == Constance.REQUEST_CODE_WIFI) {
 				mCurrentIssuePosition = data.getIntExtra(IntentKey.INTENT_KEY_ISSUE_POSITION, -99);
 				IssueItem issueItem = mCheckData.getIssue(mCurrentIssuePosition);
 				mAdapter.notifyItem(mCurrentIssuePosition, issueItem);
-//				localSavePath = data.getStringExtra(IntentKey.INTENT_KEY_FILE_PATH);
-//				File imageFile = new File(localSavePath);
-//				if (imageFile.exists()) {
-//					result = true;
-//					fileName = imageFile.getName();
-//				}
 			}
-//			serviceSavePath = Constance.Path.SERVER_IMAGE_PATH+mHotel.getCheckId()+"/"+DataManager.getInstance().getUserName()+"/"+fileName;
-//			if (result) {
-//				imageItem.setLocalImagePath(localSavePath);
-//				imageItem.setServiceSavePath(serviceSavePath);
-//				issueItem.addImage(imageItem);
-//				boolean isWidth = ImageUtil.isWidthPic(imageItem.getLocalImagePath());
-//				imageItem.setType(mCheckData.getType());
-//				imageItem.setWidth(isWidth);
-//				if (!issueItem.isCheck()) {
-//					issueItem.setCheck(true);
-//				}
-//				HotelCheck hotelCheck = new HotelCheck(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), imageItem);
-//				hotelCheck.save();
-////				DataManager.getInstance().saveIssueCheck(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), issueItem.isCheck());
-////				mAdapter.notifyItem(mCurrentIssuePosition, mCheckData.getIssue(mCurrentIssuePosition));
-////				mCheckData.updateIssueCheck(issueItem);
-//				initCheckedIssue(mCurrentIssuePosition, issueItem, null);
-//			}
 		}
-		
 	}
 	
 	@Override
@@ -280,12 +249,8 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 		IssueItem issueItem = mCheckData.getIssue(mCurrentIssuePosition);
 		if (isChecked != issueItem.isCheck()) {
 			issueItem.setCheck(isChecked);
-//			DataManager.getInstance().saveIssueCheck(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), isChecked);
-//			mCheckData.updateIssueCheck(issueItem);
-//			mAdapter.notifyItemChanged(position);
 			initCheckedIssue(position, issueItem, null);
 		}
-		
 	}
 
 	@Override
@@ -299,42 +264,36 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 		} else {
 			issueItem.setCheck(true);
 		} 
-//		mAdapter.notifyItem(position, issueItem);
-//		mCheckData.updateIssueCheck(issueItem);
-//		DataManager.getInstance().saveIssueContent(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), content, issueItem.isCheck());
 		initCheckedIssue(position, issueItem, content);
 	}
 	
 	@Override
 	public void onWifiClick(int position) {
 		mCurrentIssuePosition = position;
-		String imagePath = "";
-		String name = mCheckData.getName()+"_";
-		if (mCheckData.getId() == Constance.CHECK_DATA_ID_ROOM) {
-			
-			imagePath = "/"+mHotel.getName()+"/"+"客房"+"/" + mCheckData.getIssue(mCurrentIssuePosition).getName()+"/";
-		} else if (mCheckData.getId() == Constance.CHECK_DATA_ID_PASSWAY) {
-			imagePath = "/"+mHotel.getName()+"/"+"楼层"+"/" + mCheckData.getIssue(mCurrentIssuePosition).getName()+"/";
-		} else {
-			imagePath = "/"+mHotel.getName()+"/"+mCheckData.getName()+"/" + mCheckData.getIssue(mCurrentIssuePosition).getName()+"/";
-		}
-		String localSavePath = Constance.Path.HOTEL_SRC+imagePath;
 		Intent intent = new Intent();
 		intent.setClass(this, PhotoPickerActivity.class);
 		intent.putExtra(IntentKey.INTENT_KEY_ISSUE_POSITION, position);
 		intent.putExtra(IntentKey.INTENT_KEY_CHECK_DATA_POSITION, mCheckDataPosition);
 		intent.putExtra(IntentKey.INTENT_KEY_POSITION, mHotelPosition);
 		intent.putExtra(IntentKey.INTENT_KEY_TYPE, mType);
-//		intent.putExtra(IntentKey.INTENT_KEY_FILE_PATH, localSavePath);
-//		intent.putExtra(IntentKey.INTENT_KEY_NAME, name);
 		startActivityForResult(intent, Constance.REQUEST_CODE_WIFI);
 	}
 	
 	private void initCheckedIssue(int position, IssueItem issueItem, String content) {
 		if (content != null) {
-			DataManager.getInstance().saveIssueContent(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), content, issueItem.isCheck());
+			DataManager.getInstance().saveIssueContent(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), content, issueItem.isCheck(), issueItem.getReformState());
 		} else {
-			DataManager.getInstance().saveIssueCheck(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), issueItem.isCheck());
+			DataManager.getInstance().saveIssueCheck(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), issueItem.isCheck(), issueItem.getReformState());
+		}
+		//保存动态区域的问题修复状态
+		if (mCheckData.getType() == CheckDataType.TYPE_ROOM) {
+			DataManager.getInstance().saveIssueCheck(mHotel.getCheckId(),
+					Constance.CHECK_DATA_ID_ROOM, issueItem.getId(),
+					issueItem.isCheck(), issueItem.getReformState());
+		} else if (mCheckData.getType() == CheckDataType.TYPE_PASSWAY) {
+			DataManager.getInstance().saveIssueCheck(mHotel.getCheckId(),
+					Constance.CHECK_DATA_ID_PASSWAY, issueItem.getId(),
+					issueItem.isCheck(), issueItem.getReformState());
 		}
 		mCheckData.updateIssueCheck(issueItem);
 		if (mCheckData.getType() == CheckDataType.TYPE_ROOM) {

@@ -3,6 +3,7 @@ package com.lk.hotelcheck.activity.hotel;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -121,10 +122,10 @@ public class HotelReportFragment extends Fragment{
 				mReviewGroup.setVisibility(View.GONE);
 			} else {
 				mReviewGroup.setVisibility(View.VISIBLE);
-				mFixedTextView.setText(""+mHotel.getFixedIssueCount());
-				mFixingTextView.setText(""+mHotel.getFixingIssueCount());
+				mFixedTextView.setText(""+mHotel.getFixIssueCount(IssueItem.REFORM_STATE_FIXED));
+				mFixingTextView.setText(""+mHotel.getFixIssueCount(IssueItem.REFORM_STATE_FIXING));
 				mNewTextView.setText(""+mHotel.getNewIssueCount());
-				mUnFixedTextView.setText(""+mHotel.getUnFixIssueCount());
+				mUnFixedTextView.setText(""+mHotel.getFixIssueCount(IssueItem.REFORM_STATE_UN_FIX));
 			}
 		}
 	}
@@ -151,37 +152,6 @@ public class HotelReportFragment extends Fragment{
 		mExpandableListView.addHeaderView(headerView);
 		mAdapter = new IssueListAdapter();
 		mExpandableListView.setAdapter(mAdapter);
-//		mExpandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-//			
-//			@Override
-//			public boolean onChildClick(ExpandableListView parent, View v,
-//					int groupPosition, int childPosition, long id) {
-//				CheckData checkData = mHotel.getCheckData(groupPosition);
-//				IssueItem issueItem = null;
-//				if (checkData.getType() == CheckDataType.TYPE_ROOM) {
-//					issueItem = mHotel.getDymicRoomCheckedIssue(childPosition);
-//				} else if (checkData.getType() == CheckDataType.TYPE_PASSWAY) {
-//					issueItem = mHotel.getDymicPasswayCheckedIssue(childPosition);
-//				} else {
-//					issueItem = checkData.getCheckedIssue(childPosition);
-//				}
-//				
-//				if (issueItem != null ) {
-//					int issueImageCount = 0;
-//					if (checkData.getType() == CheckDataType.TYPE_ROOM) {
-//						issueImageCount = mHotel.getDymicRoomCheckedIssueImageCount(issueItem.getId());
-//					} else if (checkData.getType() == CheckDataType.TYPE_PASSWAY) {
-//						issueImageCount = mHotel.getDymicPasswayCheckedIssueImageCount(issueItem.getId());
-//					} else {
-//						issueImageCount = issueItem.getImageCount();
-//					}
-//					if (issueImageCount > 0) {
-//						PhotoChosenActivity.gotoPhotoChosen(mActivity, mPosition,groupPosition,childPosition);
-//					}
-//				}
-//				return false;
-//			}
-//		});
 		expanAll();
 	}
 	
@@ -360,13 +330,12 @@ public class HotelReportFragment extends Fragment{
 					break;
 				case IssueItem.REFORM_STATE_UN_FIX:
 					viewHolder.mStatusTextView.setText("未整改");
-					viewHolder.mStatusTextView.setTextColor(getResources()
-							.getColor(R.color.color_two));
+					viewHolder.mStatusTextView.setTextColor(Color.RED);
 					break;
 				case IssueItem.REFORM_STATE_FIXING:
 					viewHolder.mStatusTextView.setText("整改中");
 					viewHolder.mStatusTextView.setTextColor(getResources()
-							.getColor(R.color.color_two));
+							.getColor(R.color.color_one));
 					break;
 				default:
 					viewHolder.mStatusTextView.setText("未整改/整改中");
@@ -375,6 +344,7 @@ public class HotelReportFragment extends Fragment{
 					break;
 				}
 			} else {
+				viewHolder.mStatusTextView.setOnClickListener(null);
 				if (mHotel.getCheckType() == CheckType.CHECK_TYPE_REVIEW) {
 					viewHolder.mStatusTextView.setVisibility(View.VISIBLE);
 					viewHolder.mStatusTextView.setText("新发现");
@@ -444,7 +414,7 @@ public class HotelReportFragment extends Fragment{
 			public void onClick(View v) {
 				final int groupPosition = (Integer) v.getTag(R.id.tv_name);
 				final int childPosition = (Integer) v.getTag(R.id.tv_flag);
-				CheckData checkData = mHotel.getCheckData(groupPosition);
+				final CheckData checkData = mHotel.getCheckData(groupPosition);
 				IssueItem issueItem = null;
 				if (checkData.getType() == CheckDataType.TYPE_ROOM) {
 					issueItem = mHotel.getDymicRoomCheckedIssue(childPosition);
@@ -482,6 +452,7 @@ public class HotelReportFragment extends Fragment{
 			        public void onClick(DialogInterface dialog, int which) {  
 			        	tempIssueItem.setReformState(mStateValues[mChoosePosition]);
 			        	initInfoData();
+			        	DataManager.getInstance().saveIssueCheck(mHotel.getCheckId(), checkData.getId().intValue(), tempIssueItem.getId(), tempIssueItem.isCheck(), tempIssueItem.getReformState());
 			        	mAdapter.notifyDataSetChanged();
 			        }  
 			    });  

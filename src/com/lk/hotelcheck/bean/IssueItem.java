@@ -81,9 +81,12 @@ public class IssueItem{
 	public void setCheck(boolean isCheck) {
 		this.isCheck = isCheck;
 		if (isPreQue == PreQueType.TYPE_REVIEW) {
-			if (!isCheck) {
-				this.reformState = REFORM_STATE_FIXED;
+			if (isCheck) {
+				this.reformState = REFORM_STATE_UN_FIX;
 			} 
+//			else {
+//				this.reformState = REFORM_STATE_FIXED;
+//			}
 		}
 	}
 	public ImageItem getImageItem(int i) {
@@ -142,10 +145,23 @@ public class IssueItem{
 				ImageItem imageItem = imageList.get(i);
 				if (imageItem.getLocalImagePath().equals(imagePath)) {
 					imageList.remove(i);
-					return;
+					return ;
 				}
 			}
 		}
+		
+	}
+	
+	public ImageItem getImageItem(String imagePath) {
+		if (imageList != null) {
+			for (int i = 0; i < imageList.size(); i++) {
+				ImageItem imageItem = imageList.get(i);
+				if (imageItem.getLocalImagePath().equals(imagePath)) {
+					return imageItem;
+				}
+			}
+		}
+		return null;
 		
 	}
 	

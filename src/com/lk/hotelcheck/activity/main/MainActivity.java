@@ -318,7 +318,7 @@ public class MainActivity extends BaseActivity {
 					if (hotel != null) {
 						if (hotel.isAllImageUploaded()) {
 							hotel.setImageStatus(true);
-//							int position = DataManager.getInstance().getHotelPosition(hotel.getCheckId());
+//							DataManager.getInstance().updateHotelImageStatus();
 							mAdapter.notifyDataSetChanged();
 						}
 					}

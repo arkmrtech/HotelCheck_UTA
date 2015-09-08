@@ -174,10 +174,10 @@ public class CheckData extends SugarRecord<CheckData> implements Serializable{
 					issueItem.setCheck(false);
 					if (hotelCheck != null) {
 						long id = Long.valueOf(hotelCheck.getCheckId()+""+hotelCheck.getAreaId()+""+hotelCheck.getIssueId());
-						CheckIssue checkIssue = CheckIssue.findById(CheckIssue.class, id);
-						if (checkIssue != null) {
-							checkIssue.delete();
-						} 
+//						CheckIssue checkIssue = CheckIssue.findById(CheckIssue.class, id);
+//						if (checkIssue != null) {
+//							checkIssue.delete();
+//						} 
 					}
 					initCheckedIssue();
 				}
@@ -219,47 +219,61 @@ public class CheckData extends SugarRecord<CheckData> implements Serializable{
 		return data;
 	}
 	
-	public int getFixedIssueCount() {
+//	public int getFixedIssueCount() {
+//		int count = 0;
+//		if (checkedIssueArray != null) {
+//			for (IssueItem issueItem : mIssuelist) {
+//				if (issueItem.getIsPreQue() == PreQueType.TYPE_REVIEW) {
+//					if (issueItem.getReformState() == IssueItem.REFORM_STATE_FIXED) {
+//						count++;
+//					}
+//				}
+//			}
+//		}
+//		return count;
+//	}
+//	
+//	public int getFixingIssueCount() {
+//		int count = 0;
+//		if (checkedIssueArray != null) {
+//			for (IssueItem issueItem : mIssuelist) {
+//				if (issueItem.getIsPreQue() == PreQueType.TYPE_REVIEW ) {
+//					if (issueItem.getReformState() == IssueItem.REFORM_STATE_FIXING) {
+//						count++;
+//					}
+//				}
+//			}
+//		}
+//		return count;
+//	}
+//	
+//	public int getUnFixIssueCount() {
+//		int count = 0;
+//		if (checkedIssueArray != null) {
+//			for (IssueItem issueItem : mIssuelist) {
+//				if (issueItem.getIsPreQue() == PreQueType.TYPE_REVIEW ) {
+//					if (issueItem.getReformState() == IssueItem.REFORM_STATE_UN_FIX) {
+//						count++;
+//					}
+//				}
+//			}
+//		}
+//		return count;
+//	}
+	public int getFixIssueCount(int issueState) {
 		int count = 0;
 		if (checkedIssueArray != null) {
-			for (IssueItem issueItem : mIssuelist) {
-				if (issueItem.getIsPreQue() == PreQueType.TYPE_REVIEW) {
-					if (issueItem.getReformState() == IssueItem.REFORM_STATE_FIXED) {
+			for (int i = 0; i < checkedIssueArray.size(); i++) {
+				IssueItem issueItem = checkedIssueArray.valueAt(i);
+				if (issueItem.getReformState() == issueState) {
 						count++;
-					}
 				}
 			}
 		}
 		return count;
 	}
 	
-	public int getFixingIssueCount() {
-		int count = 0;
-		if (checkedIssueArray != null) {
-			for (IssueItem issueItem : mIssuelist) {
-				if (issueItem.getIsPreQue() == PreQueType.TYPE_REVIEW ) {
-					if (issueItem.getReformState() == IssueItem.REFORM_STATE_FIXING) {
-						count++;
-					}
-				}
-			}
-		}
-		return count;
-	}
 	
-	public int getUnFixIssueCount() {
-		int count = 0;
-		if (checkedIssueArray != null) {
-			for (IssueItem issueItem : mIssuelist) {
-				if (issueItem.getIsPreQue() == PreQueType.TYPE_REVIEW ) {
-					if (issueItem.getReformState() == IssueItem.REFORM_STATE_UN_FIX) {
-						count++;
-					}
-				}
-			}
-		}
-		return count;
-	}
 	
 	public int getNewIssueCount() {
 		int count = 0;

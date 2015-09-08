@@ -27,6 +27,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.LayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -50,6 +51,7 @@ import com.lk.hotelcheck.bean.Hotel;
 import com.lk.hotelcheck.bean.ImageFloder;
 import com.lk.hotelcheck.bean.ImageItem;
 import com.lk.hotelcheck.bean.IssueItem;
+import com.lk.hotelcheck.bean.dao.CheckIssue;
 import com.lk.hotelcheck.bean.dao.HotelCheck;
 import com.lk.hotelcheck.manager.DataManager;
 import com.lk.hotelcheck.util.BitmapUtil;
@@ -211,34 +213,59 @@ public class PhotoPickerActivity extends BaseActivity implements CallBackListene
 		boolean	result = FileUtil.saveBitmapToSDFile(bitmap,targetPath , fileName, CompressFormat.JPEG);
 		if (result) {
 			bitmap.recycle();
-			IssueItem issueItem = mCheckData.getIssue(mIssuePositon);
+//			IssueItem issueItem = mCheckData.getIssue(mIssuePositon);
 			ImageItem imageItem = new ImageItem();
 			String serviceSavePath = Constance.Path.SERVER_IMAGE_PATH+mHotel.getCheckId()+"/"+DataManager.getInstance().getUserName()+"/"+fileName;
 			imageItem.setLocalImagePath(localSavePath);
 			imageItem.setServiceSavePath(serviceSavePath);
-			issueItem.addImage(imageItem);
+			mIssueItem.addImage(imageItem);
 			boolean isWidth = ImageUtil.isWidthPic(imageItem.getLocalImagePath());
 			imageItem.setType(mCheckData.getType());
 			imageItem.setWidth(isWidth);
-			if (!issueItem.isCheck()) {
-				issueItem.setCheck(true);
+			if (!mIssueItem.isCheck()) {
+				mIssueItem.setCheck(true);
 			}
-			HotelCheck hotelCheck = new HotelCheck(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), imageItem);
+			HotelCheck hotelCheck = new HotelCheck(mHotel.getCheckId(), mCheckData.getId().intValue(), mIssueItem.getId(), imageItem);
 			hotelCheck.save();
-			initCheckedIssue(issueItem);
+			initCheckedIssue();
 		}
 		
 	}
 	
 	private void deleteImage(String imagePath) {
-		mIssueItem.removeImageItem(imagePath);
+		String fileName = FileUtil.getFileName(imagePath);
+		String localSavePath = getSavePath() + fileName;
+		mIssueItem.removeImageItem(localSavePath);
+		HotelCheck hotelCheck = HotelCheck.deleteItemByImageLocalPath(localSavePath);
+		if (TextUtils.isEmpty(mIssueItem.getContent())
+				&& mIssueItem.getImageCount() == 0) {
+			mIssueItem.setCheck(false);
+			if (hotelCheck != null) {
+				long id = Long.valueOf(hotelCheck.getCheckId()+""+hotelCheck.getAreaId()+""+hotelCheck.getIssueId());
+				CheckIssue checkIssue = CheckIssue.findById(CheckIssue.class, id);
+				if (checkIssue != null) {
+					checkIssue.delete();
+				} 
+			}
+			initCheckedIssue();
+		}
 	}
 	
-	private void initCheckedIssue(IssueItem issueItem) {
+	private void initCheckedIssue() {
 		DataManager.getInstance().saveIssueCheck(mHotel.getCheckId(),
-				mCheckData.getId().intValue(), issueItem.getId(),
-				issueItem.isCheck());
-		mCheckData.updateIssueCheck(issueItem);
+				mCheckData.getId().intValue(), mIssueItem.getId(),
+				mIssueItem.isCheck(), mIssueItem.getReformState());
+		//保存动态区域的问题修复状态
+		if (mCheckData.getType() == CheckDataType.TYPE_ROOM) {
+			DataManager.getInstance().saveIssueCheck(mHotel.getCheckId(),
+					Constance.CHECK_DATA_ID_ROOM, mIssueItem.getId(),
+					mIssueItem.isCheck(), mIssueItem.getReformState());
+		} else if (mCheckData.getType() == CheckDataType.TYPE_PASSWAY) {
+			DataManager.getInstance().saveIssueCheck(mHotel.getCheckId(),
+					Constance.CHECK_DATA_ID_PASSWAY, mIssueItem.getId(),
+					mIssueItem.isCheck(), mIssueItem.getReformState());
+		}
+		mCheckData.updateIssueCheck(mIssueItem);
 		if (mCheckData.getType() == CheckDataType.TYPE_ROOM) {
 			mHotel.initDymicRoomCheckedData();
 		} else if (mCheckData.getType() == CheckDataType.TYPE_PASSWAY) {
@@ -400,7 +427,6 @@ public class PhotoPickerActivity extends BaseActivity implements CallBackListene
 		int id = item.getItemId();
 		switch (id) {
 		case android.R.id.home:
-//			finish();
 			sendResult();
 			break;
 		default:

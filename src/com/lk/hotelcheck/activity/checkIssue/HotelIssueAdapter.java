@@ -254,19 +254,6 @@ public class HotelIssueAdapter extends RecyclerView.Adapter<ViewHolder>{
 			canmerImageView.setTag(position);
 			mCheckBox.setTag(position);
 			mContentView.setTag(position);
-			mContentView.setOnClickListener(mContentClickListener);
-			if (item.getId() == Constance.ISSUE_ITEM_WIFI) {
-				canmerImageView.setOnClickListener(mWifiOnClickListener);
-			} else {
-				canmerImageView.setOnClickListener(mPhotoOnClickListener);
-			}
-			mView.setTag(position);
-			if (item.getIsDefQue() == DefQueType.TYPE_DYMIC && !item.isCheck()) {
-				mView.setOnLongClickListener(mLongClickListener);
-			} else {
-				mView.setOnLongClickListener(null);
-			}
-			mCheckBox.setOnCheckedChangeListener(mOnCheckedChangeListener);
 			if (item.getIsPreQue() == PreQueType.TYPE_REVIEW) {
 				mReviewTextView.setVisibility(View.VISIBLE);
 				mReviewTextView.setBackgroundResource(R.color.content_orange);
@@ -292,14 +279,28 @@ public class HotelIssueAdapter extends RecyclerView.Adapter<ViewHolder>{
 			} else {
 				mContentRedDot.setVisibility(View.GONE);
 			}
-			mCheckBox.setChecked(item.isCheck());
+			if (mCheckBox.isChecked() != item.isCheck()) {
+				mCheckBox.setChecked(item.isCheck());
+			}
 			if (item.getImageCount() <= 0) {
 				mNumberTextView.setVisibility(View.GONE);
 			} else {
 				mNumberTextView.setVisibility(View.VISIBLE);
 				mNumberTextView.setText(""+item.getImageCount());
 			}
-			
+			mContentView.setOnClickListener(mContentClickListener);
+			if (item.getId() == Constance.ISSUE_ITEM_WIFI) {
+				canmerImageView.setOnClickListener(mWifiOnClickListener);
+			} else {
+				canmerImageView.setOnClickListener(mPhotoOnClickListener);
+			}
+			mView.setTag(position);
+			if (item.getIsDefQue() == DefQueType.TYPE_DYMIC && !item.isCheck()) {
+				mView.setOnLongClickListener(mLongClickListener);
+			} else {
+				mView.setOnLongClickListener(null);
+			}
+			mCheckBox.setOnCheckedChangeListener(mOnCheckedChangeListener);
 		}
 		
 		

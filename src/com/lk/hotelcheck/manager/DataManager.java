@@ -325,8 +325,6 @@ public class DataManager {
 							.getServiceImagePath());
 					issueItem.addImage(imageItem);
 				}
-				
-
 			}
 			//问题是否已经检查过
 			CheckIssue checkIssue = getCheckIssue(checkId,
@@ -334,6 +332,9 @@ public class DataManager {
 			if (checkIssue != null) {
 				issueItem.setCheck(checkIssue.isCheck());
 				issueItem.setContent(checkIssue.getContent());
+				if (checkData.getType() == CheckDataType.TYPE_NORMAL) {
+					issueItem.setReformState(checkIssue.getReformState());
+				}
 			}
 		}
 		checkData.initCheckedIssue();
@@ -399,6 +400,7 @@ public class DataManager {
 							if (issueItem.getId() == areaIssue.getIssueId()) {
 								issueItem.setIsPreQue(areaIssue.getIsPreQue());
 								issueItem.setIsDefQue(areaIssue.getIsDefQue());
+								issueItem.setCheck(issueItem.isCheck());
 							}
 						}
 					} 
@@ -456,9 +458,9 @@ public class DataManager {
 									 hotelTemp.setBaseInfo(hotel);
 								} 
 								 //for test 
-								hotelTemp.setStatus(false);
-								hotelTemp.setDataStatus(false);
-								hotelTemp.setImageStatus(false);
+//								hotelTemp.setStatus(false);
+//								hotelTemp.setDataStatus(false);
+//								hotelTemp.setImageStatus(false);
 								hotelList.add(hotelTemp);
 							}
 						}
@@ -491,7 +493,7 @@ public class DataManager {
 		hotelCheck.save();
 	}
 	
-	public void saveIssueContent(int checkId, int areaId, int issueId, String content, boolean isCheck) {
+	public void saveIssueContent(int checkId, int areaId, int issueId, String content, boolean isCheck, int reformState) {
 		if (content == null) {
 			return;
 		}
@@ -503,11 +505,12 @@ public class DataManager {
 		} 
 		checkIssue.setCheck(isCheck);
 		checkIssue.setContent(content);
+		checkIssue.setReformState(reformState);
 		checkIssue.save();
 	}
 	
 	
-	public void saveIssueCheck(int checkId, int areaId, int issueId, boolean isCheck) {
+	public void saveIssueCheck(int checkId, int areaId, int issueId, boolean isCheck, int reformState) {
 		long id = Long.valueOf(checkId+""+areaId+""+issueId);
 		CheckIssue checkIssue = CheckIssue.findById(CheckIssue.class, id);
 		if (checkIssue == null) {
@@ -515,6 +518,7 @@ public class DataManager {
 			checkIssue.setId(id);
 		} 
 		checkIssue.setCheck(isCheck);
+		checkIssue.setReformState(reformState);
 		checkIssue.save();
 	}
 	
@@ -677,6 +681,11 @@ public class DataManager {
 
 	public String getSession() {
 		return mUser == null ? "" : mUser.getSession();
+	}
+
+	public void updateHotelImageStatus() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	

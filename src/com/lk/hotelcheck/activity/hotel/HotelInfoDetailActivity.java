@@ -99,7 +99,9 @@ public class HotelInfoDetailActivity extends BaseActivity{
 	@Override
 	protected void onStop() {
 		super.onStop();
-		mHotel.save();
+		if (mHotel != null) {
+			mHotel.save();
+		}
 	}
 
 	private void init() {
