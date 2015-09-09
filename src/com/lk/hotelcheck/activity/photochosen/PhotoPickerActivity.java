@@ -241,8 +241,9 @@ public class PhotoPickerActivity extends BaseActivity implements CallBackListene
 				&& mIssueItem.getImageCount() == 0) {
 			mIssueItem.setCheck(false);
 			if (hotelCheck != null) {
-				long id = Long.valueOf(hotelCheck.getCheckId()+""+hotelCheck.getAreaId()+""+hotelCheck.getIssueId());
-				CheckIssue checkIssue = CheckIssue.findById(CheckIssue.class, id);
+//				long id = Long.valueOf(hotelCheck.getCheckId()+""+hotelCheck.getAreaId()+""+hotelCheck.getIssueId());
+//				CheckIssue checkIssue = CheckIssue.findById(CheckIssue.class, id);
+				CheckIssue checkIssue = DataManager.getInstance().getCheckIssue(hotelCheck.getCheckId(), hotelCheck.getAreaId(), hotelCheck.getIssueId());
 				if (checkIssue != null) {
 					checkIssue.delete();
 				} 

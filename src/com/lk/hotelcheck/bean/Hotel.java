@@ -9,12 +9,10 @@ import android.text.TextUtils;
 import android.util.SparseArray;
 
 import com.lk.hotelcheck.bean.dao.AreaIssue;
-import com.lk.hotelcheck.bean.dao.CheckIssue;
 import com.lk.hotelcheck.bean.dao.DymicIssue;
 import com.lk.hotelcheck.bean.dao.HotelCheck;
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
-
 import common.Constance;
 import common.Constance.CheckDataType;
 import common.Constance.CheckType;
@@ -574,18 +572,46 @@ public class Hotel extends SugarRecord<Hotel>{
 				}
 			}
 		}
-		if (roomArray != null) {
-			for (CheckData checkData : roomArray) {
-				count += checkData.getNewIssueCount();
+		if (roomCheckedIsuueArray != null) {
+			for (int i = 0; i < roomCheckedIsuueArray.size(); i++) {
+				IssueItem issueItem = roomCheckedIsuueArray.valueAt(i);
+				if (issueItem.getIsPreQue() != PreQueType.TYPE_REVIEW && issueItem.isCheck()) {
+					count++;
+				}
 			}
 		}
-		if (passwayArray != null) {
-			for (CheckData checkData : passwayArray) {
-				count += checkData.getNewIssueCount();
+		if (passwayCheckedIsuueArray != null) {
+			for (int i = 0; i < passwayCheckedIsuueArray.size(); i++) {
+				IssueItem issueItem = passwayCheckedIsuueArray.valueAt(i);
+				if (issueItem.getIsPreQue() != PreQueType.TYPE_REVIEW && issueItem.isCheck()) {
+					count++;
+				}
 			}
 		}
 		return count;
 	}
+	
+//	public int getNewIssueCount() {
+//		int count = 0;
+//		if (checkDatas != null) {
+//			for (CheckData checkData : checkDatas) {
+//				if (checkData.getType() == CheckDataType.TYPE_NORMAL) {
+//					count += checkData.getNewIssueCount();
+//				}
+//			}
+//		}
+//		if (roomArray != null) {
+//			for (CheckData checkData : roomArray) {
+//				count += checkData.getNewIssueCount();
+//			}
+//		}
+//		if (passwayArray != null) {
+//			for (CheckData checkData : passwayArray) {
+//				count += checkData.getNewIssueCount();
+//			}
+//		}
+//		return count;
+//	}
 	
 	public String getRoomIssuePercent(int issueId) {
 		if (roomArray == null ) {

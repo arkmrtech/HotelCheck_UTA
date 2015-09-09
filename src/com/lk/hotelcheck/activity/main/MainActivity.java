@@ -54,7 +54,6 @@ public class MainActivity extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		UploadProxy.initInstance(this);
-	
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 		toolbar.setTitle(R.string.chose_hotel);
 		toolbar.setNavigationIcon(R.drawable.back);

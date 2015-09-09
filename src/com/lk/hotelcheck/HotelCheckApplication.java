@@ -1,6 +1,9 @@
 package com.lk.hotelcheck;
 
 import java.io.File;
+import java.util.Map;
+
+import android.os.Build;
 
 import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiskCache;
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
@@ -10,6 +13,9 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.orm.SugarApp;
 import com.tencent.bugly.crashreport.CrashReport;
+import com.tencent.bugly.crashreport.CrashReport.CrashHandleCallback;
+import com.tencent.bugly.crashreport.CrashReport.UserStrategy;
+
 import common.Constance;
 
 public class HotelCheckApplication extends SugarApp{
@@ -26,7 +32,20 @@ public class HotelCheckApplication extends SugarApp{
         //bugly
         String appId = "900006006";   //上Bugly(bugly.qq.com)注册产品获取的AppId
         boolean isDebug = false ;  //true代表App处于调试阶段，false代表App发布阶段
-        CrashReport.initCrashReport(this, appId ,isDebug);  //初始化SDK     
+        CrashReport.initCrashReport(this, appId ,isDebug);  //初始化SDK    
+        UserStrategy strategy = new UserStrategy(this); //App的策略Bean
+//        strategy.setAppChannel(getPackageName());     //设置渠道
+//        strategy.setAppVersion(""+Build.VERSION);      //App的版本
+//        strategy.setAppReportDelay(1000);  //设置SDK处理延时，毫秒
+//        strategy.setDeviceID(GlobalUtil.getInstance().getDeviceID(instance));
+        strategy.setCrashHandleCallback(new CrashHandleCallback() {
+        	@Override
+        	public synchronized Map<String, String> onCrashHandleStart(
+        			int arg0, String arg1, String arg2, String arg3) {
+        		android.os.Process.killProcess(android.os.Process.myPid()); 
+        		return super.onCrashHandleStart(arg0, arg1, arg2, arg3);
+        	}
+        });
 	}
 	
 	

@@ -458,9 +458,9 @@ public class DataManager {
 									 hotelTemp.setBaseInfo(hotel);
 								} 
 								 //for test 
-//								hotelTemp.setStatus(false);
-//								hotelTemp.setDataStatus(false);
-//								hotelTemp.setImageStatus(false);
+								hotelTemp.setStatus(false);
+								hotelTemp.setDataStatus(false);
+								hotelTemp.setImageStatus(false);
 								hotelList.add(hotelTemp);
 							}
 						}
@@ -497,11 +497,23 @@ public class DataManager {
 		if (content == null) {
 			return;
 		}
-		long id = Long.valueOf(checkId+""+areaId+""+issueId);
-		CheckIssue checkIssue = CheckIssue.findById(CheckIssue.class, id);
-		if (checkIssue == null) {
+//		long id = Long.valueOf(checkId+""+areaId+""+issueId);
+//		CheckIssue checkIssue = CheckIssue.findById(CheckIssue.class, id);
+//		if (checkIssue == null) {
+//			checkIssue = new CheckIssue();
+//			checkIssue.setId(id);
+//		} 
+//		checkIssue.setCheck(isCheck);
+//		checkIssue.setContent(content);
+//		checkIssue.setReformState(reformState);
+//		checkIssue.save();
+		CheckIssue checkIssue = null;
+		List<CheckIssue> checkIssueList = CheckIssue.find(CheckIssue.class, "CHECK_ID = ? and AREA_ID = ? and ISSUE_ID = ?", ""+checkId, ""+areaId, ""+issueId);
+		if (checkIssueList == null || checkIssueList.size() == 0) {
 			checkIssue = new CheckIssue();
-			checkIssue.setId(id);
+			checkIssue.setCheckId(checkId);
+			checkIssue.setAreaId(areaId);
+			checkIssue.setIssueId(issueId);
 		} 
 		checkIssue.setCheck(isCheck);
 		checkIssue.setContent(content);
@@ -511,11 +523,22 @@ public class DataManager {
 	
 	
 	public void saveIssueCheck(int checkId, int areaId, int issueId, boolean isCheck, int reformState) {
-		long id = Long.valueOf(checkId+""+areaId+""+issueId);
-		CheckIssue checkIssue = CheckIssue.findById(CheckIssue.class, id);
-		if (checkIssue == null) {
+//		long id = Long.valueOf(checkId+""+areaId+""+issueId);
+//		CheckIssue checkIssue = CheckIssue.findById(CheckIssue.class, id);
+//		if (checkIssue == null) {
+//			checkIssue = new CheckIssue();
+//			checkIssue.setId(id);
+//		} 
+//		checkIssue.setCheck(isCheck);
+//		checkIssue.setReformState(reformState);
+//		checkIssue.save();
+		CheckIssue checkIssue = null;
+		List<CheckIssue> checkIssueList = CheckIssue.find(CheckIssue.class, "CHECK_ID = ? and AREA_ID = ? and ISSUE_ID  = ?", ""+checkId, ""+areaId, ""+issueId);
+		if (checkIssueList == null || checkIssueList.size() == 0) {
 			checkIssue = new CheckIssue();
-			checkIssue.setId(id);
+			checkIssue.setCheckId(checkId);
+			checkIssue.setAreaId(areaId);
+			checkIssue.setIssueId(issueId);
 		} 
 		checkIssue.setCheck(isCheck);
 		checkIssue.setReformState(reformState);
@@ -523,26 +546,44 @@ public class DataManager {
 	}
 	
 	public boolean isIssueCheck(int checkId, int areaId, int issueId ) {
-		long id = Long.valueOf(checkId+""+areaId+""+issueId);
-		CheckIssue checkIssue = CheckIssue.findById(CheckIssue.class, id);
-		if (checkIssue == null) {
+//		long id = Long.valueOf(checkId+""+areaId+""+issueId);
+//		CheckIssue checkIssue = CheckIssue.findById(CheckIssue.class, id);
+//		if (checkIssue == null) {
+//			return false;
+//		} 
+//		return checkIssue.isCheck();
+		
+		
+		List<CheckIssue> checkIssueList = CheckIssue.find(CheckIssue.class, "CHECK_ID = ? and AREA_ID = ? and ISSUE_ID = ?", ""+checkId, ""+areaId, ""+issueId);
+		if (checkIssueList == null || checkIssueList.size() == 0) {
 			return false;
 		} 
+		CheckIssue checkIssue = checkIssueList.get(0);
 		return checkIssue.isCheck();
 	}
 	
 	public String getIssueContent(int checkId, long areaId, int issueId ) {
-		long id = Long.valueOf(checkId+""+areaId+""+issueId);
-		CheckIssue checkIssue = CheckIssue.findById(CheckIssue.class, id);
-		if (checkIssue == null) {
+//		long id = Long.valueOf(checkId+""+areaId+""+issueId);
+//		CheckIssue checkIssue = CheckIssue.findById(CheckIssue.class, id);
+		List<CheckIssue> checkIssueList = CheckIssue.find(CheckIssue.class, "CHECK_ID = ? and AREA_ID = ? and ISSUE_ID = ?", ""+checkId, ""+areaId, ""+issueId);
+		if (checkIssueList == null || checkIssueList.size() == 0) {
 			return null;
 		} 
-		return checkIssue.getContent();
+		String content = null;
+		CheckIssue checkIssue = checkIssueList.get(0);
+		content = checkIssue.getContent();
+		return content;
 	}
 	
 	public CheckIssue getCheckIssue(int checkId, long areaId, int issueId ) {
-		long id = Long.valueOf(checkId+""+areaId+""+issueId);
-		return CheckIssue.findById(CheckIssue.class, id);
+//		long id = Long.valueOf(checkId+""+areaId+""+issueId);
+//		return CheckIssue.findById(CheckIssue.class, id);
+		List<CheckIssue> checkIssueList = CheckIssue.find(CheckIssue.class, "CHECK_ID = ? and AREA_ID = ? and ISSUE_ID = ?", ""+checkId, ""+areaId, ""+issueId);
+		if (checkIssueList == null || checkIssueList.size() == 0) {
+			return null;
+		} 
+		CheckIssue checkIssue = checkIssueList.get(0);
+		return checkIssue;
 	}
 
 	public CheckData createRoomCheckData() {

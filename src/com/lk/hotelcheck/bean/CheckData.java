@@ -8,13 +8,10 @@ import java.util.List;
 import android.text.TextUtils;
 import android.util.SparseArray;
 
-import com.lk.hotelcheck.bean.dao.CheckIssue;
 import com.lk.hotelcheck.bean.dao.HotelCheck;
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
-
 import common.Constance;
-import common.NetConstance;
 import common.Constance.PreQueType;
 
 public class CheckData extends SugarRecord<CheckData> implements Serializable{
@@ -173,7 +170,7 @@ public class CheckData extends SugarRecord<CheckData> implements Serializable{
 						&& issueItem.getImageCount() == 0) {
 					issueItem.setCheck(false);
 					if (hotelCheck != null) {
-						long id = Long.valueOf(hotelCheck.getCheckId()+""+hotelCheck.getAreaId()+""+hotelCheck.getIssueId());
+//						long id = Long.valueOf(hotelCheck.getCheckId()+""+hotelCheck.getAreaId()+""+hotelCheck.getIssueId());
 //						CheckIssue checkIssue = CheckIssue.findById(CheckIssue.class, id);
 //						if (checkIssue != null) {
 //							checkIssue.delete();
