@@ -5,7 +5,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import com.lk.hotelcheck.activity.login.LoginActivity;
+
 import android.content.Context;
+import android.content.Intent;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 
@@ -126,5 +129,11 @@ public class CommonUtil {
 		    speed = linkSpeed + WifiInfo.LINK_SPEED_UNITS;
 		}
 		return speed;
+	}
+	
+	public static void goToLogin(Context context) {
+		Intent intent = new Intent();
+		intent.setClass(context, LoginActivity.class);
+		context.startActivity(intent);
 	}
 }

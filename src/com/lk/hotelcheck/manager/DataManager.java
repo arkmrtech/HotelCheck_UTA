@@ -436,7 +436,7 @@ public class DataManager {
 			
 			@Override
 			public void onError(int errorCode, String info) {
-				callback.onFail();
+				callback.onFail(errorCode, info);
 			}
 		});
 	}
@@ -459,9 +459,9 @@ public class DataManager {
 									 hotelTemp.setBaseInfo(hotel);
 								} 
 								 //for test 
-//								hotelTemp.setStatus(false);
-//								hotelTemp.setDataStatus(false);
-//								hotelTemp.setImageStatus(false);
+								hotelTemp.setStatus(false);
+								hotelTemp.setDataStatus(false);
+								hotelTemp.setImageStatus(false);
 								hotelList.add(hotelTemp);
 							}
 						}
@@ -473,7 +473,7 @@ public class DataManager {
 			
 			@Override
 			public void onError(int errorCode, String info) {
-				callback.onFail();
+				callback.onFail(errorCode, info);
 				
 			}
 		});
@@ -661,7 +661,6 @@ public class DataManager {
 	}
 
 	public void updateImageStatus(Context context, UploadBean uploadBean) {
-//		List<UploadBean> uploadBean = UploadBean.listAll(UploadBean.class);
 		if (uploadBean != null) {
 			HttpRequest.getInstance().updateImageStatus(context, uploadBean, getSession(), new HttpCallback() {
 				
@@ -726,7 +725,7 @@ public class DataManager {
 	}
 
 	public String getSession() {
-		return mUser == null ? "" : mUser.getSession();
+		return mUser == null ? "" : mUser.getToken();
 	}
 
 	public void updateHotelImageStatus() {

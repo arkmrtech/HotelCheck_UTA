@@ -165,7 +165,8 @@ public class HotelListAdapter extends BaseExpandableListAdapter {
 		@Override
 		public void onClick(View v) {
 			Hotel hotel = (Hotel) v.getTag(R.id.tv_name);
-			PhotoChosenActivity.gotoPhotoChosen(v.getContext(), hotel.getCheckId(), 0, 0);
+			int hotelPosition = DataManager.getInstance().getHotelPosition(hotel.getCheckId());
+			PhotoChosenActivity.gotoPhotoChosen(v.getContext(), hotelPosition, 0, 0);
 		}
 	};
 	

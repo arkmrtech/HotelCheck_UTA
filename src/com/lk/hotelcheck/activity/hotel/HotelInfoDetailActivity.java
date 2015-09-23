@@ -30,14 +30,18 @@ import android.widget.Toast;
 
 import com.lk.hotelcheck.R;
 import com.lk.hotelcheck.activity.BaseActivity;
+import com.lk.hotelcheck.activity.main.MainActivity;
 import com.lk.hotelcheck.activity.upload.UploadProcessActivity;
 import com.lk.hotelcheck.bean.Hotel;
 import com.lk.hotelcheck.manager.DataManager;
 import com.lk.hotelcheck.network.HttpCallback;
 import com.lk.hotelcheck.network.HttpRequest;
 import com.lk.hotelcheck.upload.UploadProxy;
+import com.lk.hotelcheck.util.CommonUtil;
 import com.lk.hotelcheck.util.Machine;
+
 import common.Constance;
+import common.NetConstance;
 import common.view.SlidingTabLayout;
 
 
@@ -267,6 +271,11 @@ public class HotelInfoDetailActivity extends BaseActivity{
 				public void onError(int errorCode, String info) {
 					Toast.makeText(HotelInfoDetailActivity.this, "酒店数据上传失败，网络异常，请稍后再试", Toast.LENGTH_SHORT).show();
 					mLoadingGroup.setVisibility(View.GONE);
+					if (errorCode == NetConstance.ERROR_CODE_SESSSION_TIME_OUT) {
+						Toast.makeText(HotelInfoDetailActivity.this, "权限过期，请重新登录", Toast.LENGTH_SHORT).show();
+						CommonUtil.goToLogin(HotelInfoDetailActivity.this);
+						finish();
+					} 
 				}
 			});
 	 }
@@ -300,6 +309,11 @@ public class HotelInfoDetailActivity extends BaseActivity{
 				public void onError(int errorCode, String info) {
 					Toast.makeText(HotelInfoDetailActivity.this, "酒店检查失败，网络异常，请稍后再试", Toast.LENGTH_SHORT).show();
 					mLoadingGroup.setVisibility(View.GONE);
+					if (errorCode == NetConstance.ERROR_CODE_SESSSION_TIME_OUT) {
+						Toast.makeText(HotelInfoDetailActivity.this, "权限过期，请重新登录", Toast.LENGTH_SHORT).show();
+						CommonUtil.goToLogin(HotelInfoDetailActivity.this);
+						finish();
+					} 
 				}
 			});
 	 }

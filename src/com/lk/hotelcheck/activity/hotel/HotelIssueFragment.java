@@ -75,8 +75,8 @@ public class HotelIssueFragment extends Fragment {
 		if (mRootView == null) {
 			mRootView = inflater.inflate(R.layout.fragment_issue, container,
 					false);
-			init();
 		}
+		init();
 		return mRootView;
 	}
 	

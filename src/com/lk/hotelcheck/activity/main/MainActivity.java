@@ -34,9 +34,11 @@ import com.lk.hotelcheck.network.DataCallback;
 import com.lk.hotelcheck.network.HttpCallback;
 import com.lk.hotelcheck.network.HttpRequest;
 import com.lk.hotelcheck.upload.UploadProxy;
+import com.lk.hotelcheck.util.CommonUtil;
 import com.lk.hotelcheck.util.DrawUtil;
 import com.lk.hotelcheck.util.Machine;
 import com.lk.hotelcheck.util.SharedPrefsUtil;
+
 import common.Constance.HotelAction;
 import common.Constance.ImageUploadState;
 import common.NetConstance;
@@ -66,7 +68,6 @@ public class MainActivity extends BaseActivity {
 		});
 		setSupportActionBar(toolbar);
 		DrawUtil.resetDensity(this);
-//		DataManager.getInstance().init(this);
 		ExpandableListView listView = (ExpandableListView) findViewById(R.id.elv_hotel);
 		mNameTextView = (TextView) findViewById(R.id.tv_welcome);
 		mNameTextView.setText("欢迎回来："+DataManager.getInstance().getUserName());
@@ -74,7 +75,6 @@ public class MainActivity extends BaseActivity {
 		listView.setAdapter(mAdapter);
 		listView.expandGroup(0);
 		listView.expandGroup(1);
-
 		listView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
 
 			@Override
@@ -149,7 +149,7 @@ public class MainActivity extends BaseActivity {
     	LayoutInflater factory = LayoutInflater.from(this);// 提示框
 		View view = factory.inflate(R.layout.alert_back, null);// 这里必须是final的
 		Button exitButton = (Button) view.findViewById(R.id.btn_exit);
-		Button logoutButton = (Button) view.findViewById(R.id.btn_logout);
+//		Button logoutButton = (Button) view.findViewById(R.id.btn_logout);
 		exitButton.setOnClickListener(new OnClickListener() {
 			
 			@Override
@@ -157,29 +157,29 @@ public class MainActivity extends BaseActivity {
 				exit();
 			}
 		});
-		logoutButton.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				HttpRequest.getInstance().logout(v.getContext(), new HttpCallback() {
-					
-					@Override
-					public void onSuccess(JSONObject response) {
-						Toast.makeText(MainActivity.this, "已注销账户", Toast.LENGTH_SHORT).show();
-						Intent intent = new Intent();
-						intent.setClass(MainActivity.this, LoginActivity.class);
-						startActivity(intent);
-						finish();
-					}
-					
-					@Override
-					public void onError(int errorCode, String info) {
-						Toast.makeText(MainActivity.this, "网络异常，请稍后再试", Toast.LENGTH_SHORT).show();
-					}
-				});
-				
-			}
-		});
+//		logoutButton.setOnClickListener(new OnClickListener() {
+//			
+//			@Override
+//			public void onClick(View v) {
+//				HttpRequest.getInstance().logout(v.getContext(), new HttpCallback() {
+//					
+//					@Override
+//					public void onSuccess(JSONObject response) {
+//						Toast.makeText(MainActivity.this, "已注销账户", Toast.LENGTH_SHORT).show();
+//						Intent intent = new Intent();
+//						intent.setClass(MainActivity.this, LoginActivity.class);
+//						startActivity(intent);
+//						finish();
+//					}
+//					
+//					@Override
+//					public void onError(int errorCode, String info) {
+//						Toast.makeText(MainActivity.this, "网络异常，请稍后再试", Toast.LENGTH_SHORT).show();
+//					}
+//				});
+//				
+//			}
+//		});
     	AlertDialog alertDialog = new AlertDialog.Builder(this).setView(view).create();
     	alertDialog.show();
     }
@@ -200,13 +200,6 @@ public class MainActivity extends BaseActivity {
 		List<Hotel> hotelList = DataManager.getInstance().getCheckedHotelList();
 		if (hotelList != null) {
 			for (Hotel hotel : hotelList) {
-//				if (hotel.isStatus() && !hotel.isAllImageUploaded()) {
-//					if (hotel.get) {
-//						
-//					}
-//					UploadProxy.addUploadTask(hotel);
-////					hotel.setImageStatus(true);
-//				}
 				if (hotel.isStatus() && !hotel.isImageStatus()) {
 					UploadProxy.addUploadTask(hotel);
 					hotel.setImageStatus(true);
@@ -243,6 +236,11 @@ public class MainActivity extends BaseActivity {
 						@Override
 						public void onError(int errorCode, String info) {
 							Toast.makeText(MainActivity.this, hotel.getName()+"数据上传失败", Toast.LENGTH_SHORT).show();
+							if (errorCode == NetConstance.ERROR_CODE_SESSSION_TIME_OUT) {
+								Toast.makeText(MainActivity.this, "权限过期，请重新登录", Toast.LENGTH_SHORT).show();
+								CommonUtil.goToLogin(MainActivity.this);
+								finish();
+							} 
 						}
 					});
 				}
@@ -262,8 +260,13 @@ public class MainActivity extends BaseActivity {
 				}
 				
 				@Override
-				public void onFail() {
+				public void onFail(int errorCode, String info) {
 					mLoadingGroup.setVisibility(View.GONE);
+					if (errorCode == NetConstance.ERROR_CODE_SESSSION_TIME_OUT) {
+						Toast.makeText(MainActivity.this, "权限过期，请重新登录", Toast.LENGTH_SHORT).show();
+						CommonUtil.goToLogin(MainActivity.this);
+						finish();
+					}
 				}
 			});
 		} else {
@@ -288,8 +291,13 @@ public class MainActivity extends BaseActivity {
 			}
 			
 			@Override
-			public void onFail() {
+			public void onFail(int errorCode, String info) {
 				mLoadingGroup.setVisibility(View.GONE);
+				if (errorCode == NetConstance.ERROR_CODE_SESSSION_TIME_OUT) {
+					Toast.makeText(MainActivity.this, "权限过期，请重新登录", Toast.LENGTH_SHORT).show();
+					CommonUtil.goToLogin(MainActivity.this);
+					finish();
+				} 
 			}
 		});
 	}

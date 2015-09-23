@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -19,6 +20,7 @@ import com.lk.hotelcheck.manager.DataManager;
 import com.lk.hotelcheck.network.HttpCallback;
 import com.lk.hotelcheck.network.HttpRequest;
 import com.lk.hotelcheck.util.Machine;
+
 import common.NetConstance;
 
 public class LoginActivity extends Activity{
@@ -64,8 +66,8 @@ public class LoginActivity extends Activity{
 		}
 		mLoadingGroup.setVisibility(View.VISIBLE);
 		v.setClickable(false);
-		String token = DataManager.getInstance().getToken(getApplicationContext());
-		HttpRequest.getInstance().login(this, userId, password, token, new HttpCallback() {
+		final String lastToken = DataManager.getInstance().getToken(getApplicationContext());
+		HttpRequest.getInstance().login(this, userId, password, lastToken, new HttpCallback() {
 			
 			@Override
 			public void onSuccess(JSONObject response) {
@@ -73,16 +75,21 @@ public class LoginActivity extends Activity{
 				User user = new User();
 				user.setDate(date);
 				user.setUserName(userId);
-				user.setSession(response.optString(NetConstance.PARAM_SESSION));
-				DataManager.getInstance().saveToken(getApplicationContext(), user.getSession());;
+				String token = response.optString(NetConstance.PARAM_SESSION);
+				if (!TextUtils.isEmpty(token)) {
+					user.setToken(token);
+					DataManager.getInstance().saveToken(getApplicationContext(), token);
+				}  else {
+					user.setToken(lastToken);
+				}
 				DataManager.getInstance().setUser(user);
 				Intent intent = new Intent();
 				intent.setClass(LoginActivity.this, MainActivity.class);
 				startActivity(intent);
 				Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
 				mLoadingGroup.setVisibility(View.GONE);
-				finish();
 				v.setClickable(true);
+				finish();
 			}
 			
 			@Override

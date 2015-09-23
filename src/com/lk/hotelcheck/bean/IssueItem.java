@@ -21,7 +21,7 @@ public class IssueItem{
 	private int isPreQue;
 	private int dimOneId;
 	private String dimOneName;
-	private int reformState;//整改状态：1.未整改，2整改中，3完成整改
+	private int reformState = 0;//整改状态：1.未整改，2整改中，3完成整改
 	public static final int REFORM_STATE_FIXED = 3;
 	public static final int REFORM_STATE_FIXING = 2;
 	public static final int REFORM_STATE_UN_FIX = 1;
@@ -83,10 +83,9 @@ public class IssueItem{
 		if (isPreQue == PreQueType.TYPE_REVIEW) {
 			if (isCheck) {
 				this.reformState = REFORM_STATE_UN_FIX;
-			} 
-//			else {
-//				this.reformState = REFORM_STATE_FIXED;
-//			}
+			} else if (!isCheck && reformState == 0) {
+				this.reformState = REFORM_STATE_FIXED;
+			}
 		}
 	}
 	public ImageItem getImageItem(int i) {

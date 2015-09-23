@@ -3,7 +3,7 @@ package com.lk.hotelcheck.bean;
 
 public class User {
 	private String userName;
-	private String session;
+	private String token;
 	private long date;
 	
 	public String getUserName() {
@@ -12,11 +12,11 @@ public class User {
 	public void setUserName(String userName) {
 		this.userName = userName;
 	}
-	public String getSession() {
-		return session;
+	public String getToken() {
+		return token;
 	}
-	public void setSession(String session) {
-		this.session = session;
+	public void setToken(String token) {
+		this.token = token;
 	}
 	public long getDate() {
 		return date;

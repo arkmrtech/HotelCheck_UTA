@@ -18,14 +18,17 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.lk.hotelcheck.activity.login.LoginActivity;
+import com.lk.hotelcheck.activity.main.MainActivity;
 import com.lk.hotelcheck.bean.Hotel;
 import com.lk.hotelcheck.bean.UploadBean;
 import com.lk.hotelcheck.manager.DataManager;
+import com.lk.hotelcheck.util.CommonUtil;
 import com.lk.hotelcheck.util.FileUtil;
 import com.lk.hotelcheck.util.JsonParseHandler;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.FileAsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
+
 import common.NetConstance;
 
 public class HttpRequest {
@@ -61,7 +64,7 @@ public class HttpRequest {
 		try {
 			jsonObject.put(NetConstance.REQUEST_PARAM_USER_NAME, userId);
 			jsonObject.put(NetConstance.REQUEST_PARAM_PASSWORD, password);
-			jsonObject.put(NetConstance.REQUEST_PARAM_KEY, key);
+//			jsonObject.put(NetConstance.REQUEST_PARAM_KEY, key);
 		} catch (JSONException e1) {
 			e1.printStackTrace();
 		}
@@ -240,24 +243,16 @@ public class HttpRequest {
 				Log.d("lxk", "<onSuccess>  response = "+response);
 				int state = response.optInt(NetConstance.PARAM_STATE);
 				String info = response.optString(NetConstance.PARAM_INFO);
+				if (state == NetConstance.ERROR_CODE_SESSSION_TIME_OUT) {
+					DataManager.getInstance().saveToken(context.getApplicationContext(), "");
+				}
 				if (state == NetConstance.ERROR_CODE_SUCCESS) {
 					callback.onSuccess(response);
-				} else if (state == NetConstance.ERROR_CODE_SESSSION_TIME_OUT) {
-					Toast.makeText(context, "权限过期，请重新登录", Toast.LENGTH_SHORT).show();
-					goToLogin(context);
 				} else {
 					callback.onError(state, info);
 				}
-				
 			}
-			
 		});
-	}
-	
-	private void goToLogin(Context context) {
-		Intent intent = new Intent();
-		intent.setClass(context, LoginActivity.class);
-		context.startActivity(intent);
 	}
 	
 	

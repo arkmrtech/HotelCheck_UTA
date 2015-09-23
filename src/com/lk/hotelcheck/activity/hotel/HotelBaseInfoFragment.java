@@ -45,7 +45,6 @@ public class HotelBaseInfoFragment extends Fragment {
 	private TextView mRoomCheckedNumberTextView;
 	private TextView mFloorTextView;
 	private TextView mCheckedDateTextView;
-//	private TextView mGuardianNumberTextView;
 	private RelativeLayout mRoomNumberLayout;
 	private RelativeLayout mRoomCheckedNumberLayout;
 	private RelativeLayout mCheckedDateLayout;
@@ -56,9 +55,6 @@ public class HotelBaseInfoFragment extends Fragment {
 	private static final int ALERT_DIALOG_ROOM_CHECKED_NUMBER = 2;
 	private static final int ALERT_DIALOG_FLOOR = 3;
 	private EditText mAlertEditText;
-//	private AlertDialog mFloorAlertDialog;
-//	private EditText mFloorStartEditText;
-//	private EditText mFloorEndEditText;
 
 	public static HotelBaseInfoFragment newInstance(int position) {
 		HotelBaseInfoFragment fragment = new HotelBaseInfoFragment();
@@ -118,7 +114,6 @@ public class HotelBaseInfoFragment extends Fragment {
 					.findViewById(R.id.rl_check_date);
 			mFloorLayout = (RelativeLayout) mRootView
 					.findViewById(R.id.rl_floor_number);
-//			mGuardianNumberTextView = (TextView) mRootView.findViewById(R.id.tv_guardian_number);
 			if (mHotel != null) {
 				init();
 			}
@@ -144,14 +139,6 @@ public class HotelBaseInfoFragment extends Fragment {
 		if (!TextUtils.isEmpty(mHotel.getLastCheckedDate())) {
 			mLastCheckedDateTextView.setText("上次检查：" + mHotel.getLastCheckedDate());
 		}
-//		StringBuffer floorBuffer = new StringBuffer();
-//		if (!TextUtils.isEmpty(mHotel.getFloorStart())) {
-//			floorBuffer.append(mHotel.getFloorStart());
-//		}
-//		floorBuffer.append(" -- ");
-//		if (!TextUtils.isEmpty(mHotel.getFloorEnd())) {
-//			floorBuffer.append(mHotel.getFloorEnd());
-//		}
 		managerTextView.setText("店长:"+mHotel.getBranchManager());
 		managerTelTextView.setText("店长电话:"+mHotel.getBranchManagerTele());
 		mRoomNumberTextView.setText("" + mHotel.getRoomCount());
@@ -177,7 +164,6 @@ public class HotelBaseInfoFragment extends Fragment {
 
 				@Override
 				public void onClick(View v) {
-//					showFloor();
 					showDialog(ALERT_DIALOG_FLOOR);
 				}
 			});
@@ -323,107 +309,4 @@ public class HotelBaseInfoFragment extends Fragment {
 		mAlertDialog.show();
 	}
 
-//	private void showFloor() {
-//		if (mFloorAlertDialog == null) {
-//			LayoutInflater factory = LayoutInflater.from(mContext);// 提示框
-//			View view = factory.inflate(R.layout.alert_dialog_floor, null);// 这里必须是final的
-//			mFloorStartEditText = (EditText) view.findViewById(R.id.et_start);// 获得输入框对象
-//			mFloorEndEditText = (EditText) view.findViewById(R.id.et_end);
-//			mFloorAlertDialog = new AlertDialog.Builder(mContext)
-//					 .setTitle("请输入楼层范围")//提示框标题
-//					.setView(view)
-//					.setPositiveButton(
-//							"确定",// 提示框的两个按钮
-//							new android.content.DialogInterface.OnClickListener() {
-//								@Override
-//								public void onClick(DialogInterface dialog,
-//										int which) {
-//									String floorStart = mFloorStartEditText
-//											.getText().toString();
-//									String floorEnd = mFloorEndEditText
-//											.getText().toString();
-//									if (TextUtils.isEmpty(floorStart)) {
-//										Toast.makeText(mContext, "请输入开始楼层", Toast.LENGTH_SHORT).show();
-//										return;
-//									}
-//									if (TextUtils.isEmpty(floorEnd)) {
-//										Toast.makeText(mContext, "请输入结束楼层", Toast.LENGTH_SHORT).show();
-//										return;
-//									}
-//									mFloorTextView.setText(floorStart + " - "
-//											+ floorEnd);
-//									mFloorEndEditText.setText("");
-//									mFloorStartEditText.setText("");
-//									mHotel.setFloorStart(floorStart);
-//									mHotel.setFloorEnd(floorEnd);
-//									// DataManager.getInstance().setHotel(mPosition,
-//									// mHotel);
-//								}
-//							})
-//					.setNegativeButton(
-//							"取消",
-//							new android.content.DialogInterface.OnClickListener() {
-//
-//								@Override
-//								public void onClick(DialogInterface dialog,
-//										int which) {
-//									mFloorEndEditText.setText("");
-//									mFloorStartEditText.setText("");
-//								}
-//							}).create();
-//		}
-//		mFloorAlertDialog.show();
-//	}
-	
-//	private void showFloor() {
-//		if (mFloorAlertDialog == null) {
-//			LayoutInflater factory = LayoutInflater.from(mContext);// 提示框
-//			View view = factory.inflate(R.layout.alert_dialog_edit, null);// 这里必须是final的
-//			mFloorStartEditText = (EditText) view.findViewById(R.id.et_start);// 获得输入框对象
-//			mFloorEndEditText = (EditText) view.findViewById(R.id.et_end);
-//			mFloorAlertDialog = new AlertDialog.Builder(mContext)
-//					 .setTitle("请输入楼层范围")//提示框标题
-//					.setView(view)
-//					.setPositiveButton(
-//							"确定",// 提示框的两个按钮
-//							new android.content.DialogInterface.OnClickListener() {
-//								@Override
-//								public void onClick(DialogInterface dialog,
-//										int which) {
-//									String floorStart = mFloorStartEditText
-//											.getText().toString();
-//									String floorEnd = mFloorEndEditText
-//											.getText().toString();
-//									if (TextUtils.isEmpty(floorStart)) {
-//										Toast.makeText(mContext, "请输入开始楼层", Toast.LENGTH_SHORT).show();
-//										return;
-//									}
-//									if (TextUtils.isEmpty(floorEnd)) {
-//										Toast.makeText(mContext, "请输入结束楼层", Toast.LENGTH_SHORT).show();
-//										return;
-//									}
-//									mFloorTextView.setText(floorStart + " - "
-//											+ floorEnd);
-//									mFloorEndEditText.setText("");
-//									mFloorStartEditText.setText("");
-//									mHotel.setFloorStart(floorStart);
-//									mHotel.setFloorEnd(floorEnd);
-//									// DataManager.getInstance().setHotel(mPosition,
-//									// mHotel);
-//								}
-//							})
-//					.setNegativeButton(
-//							"取消",
-//							new android.content.DialogInterface.OnClickListener() {
-//
-//								@Override
-//								public void onClick(DialogInterface dialog,
-//										int which) {
-//									mFloorEndEditText.setText("");
-//									mFloorStartEditText.setText("");
-//								}
-//							}).create();
-//		}
-//		mFloorAlertDialog.show();
-//	}
 }
