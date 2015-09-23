@@ -59,8 +59,6 @@ public class PhotoChosenActivity extends BaseActivity {
 	private int mHotelPosition;
 	private int mCheckDataPosition;
 	private int mIssuePosition;
-//	private Button mUploadButton;
-//	private TextView mUploadTextView;
 	private static final int MENU_SELECT_ALL = 0X10086;
 	private boolean mIsSelectAll = false;
 	private HashMap<String, Boolean> mSelectedMap;

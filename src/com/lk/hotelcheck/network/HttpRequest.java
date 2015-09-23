@@ -55,12 +55,13 @@ public class HttpRequest {
 	 * @param password
 	 * @param callback
 	 */
-	public void login(Context context, String userId, String password, HttpCallback callback) {
+	public void login(Context context, String userId, String password, String key,HttpCallback callback) {
 		String url = getRequestURL(NetConstance.METHOD_LOGIN);
 		JSONObject jsonObject = new JSONObject();
 		try {
 			jsonObject.put(NetConstance.REQUEST_PARAM_USER_NAME, userId);
 			jsonObject.put(NetConstance.REQUEST_PARAM_PASSWORD, password);
+			jsonObject.put(NetConstance.REQUEST_PARAM_KEY, key);
 		} catch (JSONException e1) {
 			e1.printStackTrace();
 		}
@@ -239,11 +240,6 @@ public class HttpRequest {
 				Log.d("lxk", "<onSuccess>  response = "+response);
 				int state = response.optInt(NetConstance.PARAM_STATE);
 				String info = response.optString(NetConstance.PARAM_INFO);
-//				if (url.contains(NetConstance.METHOD_UPLOAD_HOTEL_DATA)) {
-//					Toast.makeText(context, "权限过期，请重新登录", Toast.LENGTH_SHORT).show();
-//					goToLogin(context);
-//					return;
-//				}
 				if (state == NetConstance.ERROR_CODE_SUCCESS) {
 					callback.onSuccess(response);
 				} else if (state == NetConstance.ERROR_CODE_SESSSION_TIME_OUT) {
@@ -267,12 +263,6 @@ public class HttpRequest {
 	
 	public void downloadTest(String url, FileAsyncHttpResponseHandler handler) {
 		mHttpClient.get(url, handler);
-//		mHttpClient.get("http://example.com/file.png", new FileAsyncHttpResponseHandler(/* Context */ this) {
-//		    @Override
-//		    public void onSuccess(int statusCode, Header[] headers, File response) {
-//		        // Do something with the file `response`
-//		    }
-//		});
 	}
 	
 	

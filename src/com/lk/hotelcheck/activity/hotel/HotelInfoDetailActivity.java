@@ -92,7 +92,6 @@ public class HotelInfoDetailActivity extends BaseActivity{
 	
 	@Override
 	protected void onPause() {
-		// TODO Auto-generated method stub
 		super.onPause();
 	}
 	
@@ -116,11 +115,6 @@ public class HotelInfoDetailActivity extends BaseActivity{
 				R.color.white));
 		mSlidingTabLayout.setDistributeEvenly(true);
 		mSlidingTabLayout.setViewPager(mViewPager);
-//		Hotel hotel = DataManager.getInstance().getHotel(position);
-//		if (hotel.isStatus()) {
-//			mViewPager.setCurrentItem(2);
-//		}
-		
 		if (mHotel.isStatus()) {
 			mViewPager.setCurrentItem(2);
 		}
@@ -154,8 +148,6 @@ public class HotelInfoDetailActivity extends BaseActivity{
 						if (mHotel.getRoomCount() == 0
 								|| mHotel.getRoomInUseCount() == 0
 								|| TextUtils.isEmpty(mHotel.getFloor())
-//								|| TextUtils.isEmpty(mHotel.getFloorStart())
-//								|| TextUtils.isEmpty(mHotel.getFloorEnd())
 								|| TextUtils.isEmpty(mHotel.getCheckDate())) {
 							Toast.makeText(HotelInfoDetailActivity.this, "酒店基本信息未填写完整", Toast.LENGTH_SHORT).show();
 							mViewPager.setCurrentItem(0);
@@ -183,7 +175,6 @@ public class HotelInfoDetailActivity extends BaseActivity{
 			TextView nameTextView = (TextView) view.findViewById(R.id.tv_name);// 获得输入框对象
 			TextView issueCountTextView = (TextView) view.findViewById(R.id.tv_checked_issue_count);
 			final EditText numberEditText = (EditText) view.findViewById(R.id.et_number);
-//			TextView imageCountTextView = (TextView) view.findViewById(R.id.tv_image_count);
 			ForegroundColorSpan redSpan = new ForegroundColorSpan(Color.RED); 
 			ForegroundColorSpan blackSpan = new ForegroundColorSpan(Color.BLACK); 
 			SpannableStringBuilder hotelName = new SpannableStringBuilder(mHotel.getName());
@@ -198,7 +189,6 @@ public class HotelInfoDetailActivity extends BaseActivity{
 			if (!TextUtils.isEmpty(mHotel.getGuardianNumber())) {
 				numberEditText.setText(mHotel.getGuardianNumber());
 			}
-//			imageCountTextView.setText("已拍摄照片数："+hotel.getImageCount());
 			AlertDialog alertDialog = new AlertDialog.Builder(this)
 //					 .setTitle("完成检查信息确认")//提示框标题
 					.setView(view)
@@ -251,6 +241,10 @@ public class HotelInfoDetailActivity extends BaseActivity{
 	} 
 	    
 	 private void uploadData() {
+		 if (!Machine.isNetworkOK(this)) {
+				Toast.makeText(this, "网络未链接，请检查网络链接", Toast.LENGTH_SHORT).show();
+				return;
+			}
 		if (!mHotel.isStatus()) {
 			Toast.makeText(this, "请先完成酒店检查", Toast.LENGTH_SHORT).show();
 			return;
@@ -278,6 +272,10 @@ public class HotelInfoDetailActivity extends BaseActivity{
 	 }
 	 
 	 private void updateHotelCheckState() {
+		 if (!Machine.isNetworkOK(this)) {
+				Toast.makeText(this, "网络未链接，请检查网络链接", Toast.LENGTH_SHORT).show();
+				return;
+			}
 		 mLoadingGroup.setVisibility(View.VISIBLE);
 			HttpRequest.getInstance().updateHotelCheckStatus(this, mHotel.getCheckId(), DataManager.getInstance().getSession(), new HttpCallback() {
 				

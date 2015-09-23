@@ -272,7 +272,7 @@ public class Hotel extends SugarRecord<Hotel>{
 		if (checkType == CheckType.CHECK_TYPE_REVIEW) {
 			initDymicQuestionCheckData(checkData);
 		}
-		roomArray.add(checkData);
+		roomArray.add(0, checkData);
 	}
 	
 //	public CheckData getRoom(String areaName) {
@@ -303,7 +303,7 @@ public class Hotel extends SugarRecord<Hotel>{
 		if (checkType == CheckType.CHECK_TYPE_REVIEW) {
 			initDymicQuestionCheckData(checkData);
 		}
-		passwayArray.add(checkData);
+		passwayArray.add(0, checkData);
 	}
 	
 	public boolean hasPassway(long areaId) {

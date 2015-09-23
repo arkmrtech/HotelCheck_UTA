@@ -27,6 +27,7 @@ import com.lk.hotelcheck.network.HttpCallback;
 import com.lk.hotelcheck.network.HttpRequest;
 import com.lk.hotelcheck.util.FileUtil;
 import com.lk.hotelcheck.util.JsonParseHandler;
+import com.lk.hotelcheck.util.SharedPreferencesUtil;
 import com.tencent.bugly.proguard.u;
 
 import common.Constance;
@@ -458,9 +459,9 @@ public class DataManager {
 									 hotelTemp.setBaseInfo(hotel);
 								} 
 								 //for test 
-								hotelTemp.setStatus(false);
-								hotelTemp.setDataStatus(false);
-								hotelTemp.setImageStatus(false);
+//								hotelTemp.setStatus(false);
+//								hotelTemp.setDataStatus(false);
+//								hotelTemp.setImageStatus(false);
 								hotelList.add(hotelTemp);
 							}
 						}
@@ -514,7 +515,9 @@ public class DataManager {
 			checkIssue.setCheckId(checkId);
 			checkIssue.setAreaId(areaId);
 			checkIssue.setIssueId(issueId);
-		} 
+		} else {
+			checkIssue = checkIssueList.get(0);
+		}
 		checkIssue.setCheck(isCheck);
 		checkIssue.setContent(content);
 		checkIssue.setReformState(reformState);
@@ -539,7 +542,9 @@ public class DataManager {
 			checkIssue.setCheckId(checkId);
 			checkIssue.setAreaId(areaId);
 			checkIssue.setIssueId(issueId);
-		} 
+		} else {
+			checkIssue = checkIssueList.get(0);
+		}
 		checkIssue.setCheck(isCheck);
 		checkIssue.setReformState(reformState);
 		checkIssue.save();
@@ -727,6 +732,18 @@ public class DataManager {
 	public void updateHotelImageStatus() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public String getToken(Context context) {
+		if (context != null) {
+			return SharedPreferencesUtil.getString(context.getApplicationContext(), NetConstance.PARAM_SESSION);
+		} else {
+			return "";
+		}
+	}
+	
+	public void saveToken(Context context, String token) {
+		SharedPreferencesUtil.putString(context, NetConstance.PARAM_SESSION, token);
 	}
 
 	

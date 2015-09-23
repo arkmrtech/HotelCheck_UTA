@@ -93,9 +93,9 @@ public class HotelIssueFragment extends Fragment {
 				.findViewById(R.id.rv_issue);
 		mAdapter = new CheckDataAdapter();
 		mLayoutManager = new LinearLayoutManager(mContext);
-		mExpandableListView.setHasFixedSize(false);
 		mExpandableListView.setLayoutManager(mLayoutManager);
 		mExpandableListView.setAdapter(mAdapter);
+		mExpandableListView.setHasFixedSize(false);
 	}
 
 	
@@ -116,7 +116,6 @@ public class HotelIssueFragment extends Fragment {
 			} else if (arg0 instanceof MultiCheckDataItemHolder) {
 				((MultiCheckDataItemHolder) arg0).setData(data, arg1);
 			}
-
 		}
 
 		@Override
@@ -289,17 +288,6 @@ public class HotelIssueFragment extends Fragment {
 					return;
 				}
 				showDialog(mType);
-//				switch (mCheckData.getId()) {
-//				case Constance.CHECK_DATA_ID_FLOOR:
-//					showDialog(TYPE_CORRIDOR);
-//					break;
-//				case Constance.CHECK_DATA_ID_ROOM:
-//					showDialog(TYPE_ROOM);
-//					break;
-//				default:
-//					break;
-//				}
-				
 			}
 		};
 
@@ -358,8 +346,10 @@ public class HotelIssueFragment extends Fragment {
 											default:
 												break;
 											}
-											checkData.setCheckId(mHotel.getCheckId());
-											addDymicCheckData(checkData);
+											if (checkData != null) {
+												checkData.setCheckId(mHotel.getCheckId());
+												addDymicCheckData(checkData);
+											}
 											mEditText.setText("");
 									}
 								})
@@ -477,7 +467,6 @@ public class HotelIssueFragment extends Fragment {
 				super(itemView);
 				if (itemView instanceof Button) {
 					mButton = (Button) itemView;
-
 				}
 			}
 

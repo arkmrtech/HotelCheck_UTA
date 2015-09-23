@@ -64,7 +64,8 @@ public class LoginActivity extends Activity{
 		}
 		mLoadingGroup.setVisibility(View.VISIBLE);
 		v.setClickable(false);
-		HttpRequest.getInstance().login(this, userId, password, new HttpCallback() {
+		String token = DataManager.getInstance().getToken(getApplicationContext());
+		HttpRequest.getInstance().login(this, userId, password, token, new HttpCallback() {
 			
 			@Override
 			public void onSuccess(JSONObject response) {
@@ -73,6 +74,7 @@ public class LoginActivity extends Activity{
 				user.setDate(date);
 				user.setUserName(userId);
 				user.setSession(response.optString(NetConstance.PARAM_SESSION));
+				DataManager.getInstance().saveToken(getApplicationContext(), user.getSession());;
 				DataManager.getInstance().setUser(user);
 				Intent intent = new Intent();
 				intent.setClass(LoginActivity.this, MainActivity.class);

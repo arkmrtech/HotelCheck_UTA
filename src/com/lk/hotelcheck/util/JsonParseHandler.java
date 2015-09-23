@@ -200,9 +200,11 @@ public class JsonParseHandler {
 			 if (hotel.getRoomList() != null) {
 				 JSONArray jsonArray = new JSONArray();
 					for (CheckData checkData : hotel.getRoomList()) {
-						JSONObject checkDataObject = parseCheckDataToJson(checkData);
-						if (checkDataObject != null) {
-							jsonArray.put(checkDataObject);
+						if (checkData.getCheckedIssueCount() > 0) {
+							JSONObject checkDataObject = parseCheckDataToJson(checkData);
+							if (checkDataObject != null) {
+								jsonArray.put(checkDataObject);
+							}
 						}
 					}
 					hotelJsonObject.put(NetConstance.PARAM_ROOM_LIST, jsonArray);
@@ -210,9 +212,11 @@ public class JsonParseHandler {
 			 if (hotel.getPasswayList() != null) {
 				 JSONArray jsonArray = new JSONArray();
 					for (CheckData checkData : hotel.getPasswayList()) {
-						JSONObject checkDataObject = parseCheckDataToJson(checkData);
-						if (checkDataObject != null) {
-							jsonArray.put(checkDataObject);
+						if (checkData.getCheckedIssueCount() > 0) {
+							JSONObject checkDataObject = parseCheckDataToJson(checkData);
+							if (checkDataObject != null) {
+								jsonArray.put(checkDataObject);
+							}
 						}
 					}
 					hotelJsonObject.put(NetConstance.PARAM_PASSWAY_LIST, jsonArray);
