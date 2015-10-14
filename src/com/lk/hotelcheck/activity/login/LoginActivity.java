@@ -20,6 +20,7 @@ import com.lk.hotelcheck.manager.DataManager;
 import com.lk.hotelcheck.network.HttpCallback;
 import com.lk.hotelcheck.network.HttpRequest;
 import com.lk.hotelcheck.util.Machine;
+import com.lk.hotelcheck.util.SharedPreferencesUtil;
 
 import common.NetConstance;
 
@@ -39,7 +40,6 @@ public class LoginActivity extends Activity{
 		mLoginButton = (Button) findViewById(R.id.bt_login);
 		mLoadingGroup = findViewById(R.id.vg_loadig);
 		mLoginButton.setOnClickListener(new OnClickListener() {
-			
 			@Override
 			public void onClick(View v) {
 				login(v);
@@ -66,8 +66,7 @@ public class LoginActivity extends Activity{
 		}
 		mLoadingGroup.setVisibility(View.VISIBLE);
 		v.setClickable(false);
-		final String lastToken = DataManager.getInstance().getToken(getApplicationContext());
-		HttpRequest.getInstance().login(this, userId, password, lastToken, new HttpCallback() {
+		HttpRequest.getInstance().login(this, userId, password, new HttpCallback() {
 			
 			@Override
 			public void onSuccess(JSONObject response) {
@@ -79,9 +78,8 @@ public class LoginActivity extends Activity{
 				if (!TextUtils.isEmpty(token)) {
 					user.setToken(token);
 					DataManager.getInstance().saveToken(getApplicationContext(), token);
-				}  else {
-					user.setToken(lastToken);
-				}
+				} 
+				SharedPreferencesUtil.putString(getApplicationContext(), NetConstance.PARAM_NAME, userId);
 				DataManager.getInstance().setUser(user);
 				Intent intent = new Intent();
 				intent.setClass(LoginActivity.this, MainActivity.class);

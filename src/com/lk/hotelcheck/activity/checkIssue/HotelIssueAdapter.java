@@ -335,6 +335,7 @@ public class HotelIssueAdapter extends RecyclerView.Adapter<ViewHolder>{
 			mListener.onDeleteItem(position);
 		}
 		notifyItemRemoved(position);
+		notifyDataSetChanged();
 	}
 
 	

@@ -31,7 +31,7 @@ import common.Constance.UPAI;
 public class UploadService extends Service {
 	
 	private ServiceBinder mServiceBinder = new ServiceBinder();
-	private static final int MAX_DOWNLOAD_SIZE = 6;
+	private static final int MAX_DOWNLOAD_SIZE = 4;
 	private Executor mTaskExecutor = Executors.newFixedThreadPool(MAX_DOWNLOAD_SIZE);
 	private ConcurrentHashMap<String, UploadBean> mRuningTaskQueue = new ConcurrentHashMap<String, UploadBean>();
 	

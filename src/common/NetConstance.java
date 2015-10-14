@@ -23,6 +23,7 @@ public class NetConstance {
 	public static final String METHOD_UPLOAD_HOTEL_DATA = "updateProblem.html";
 	public static final String METHOD_UPLOAD_IMAGE_STATUS = "updatePhoto.html";
 	public static final String METHOD_LOGOUT = "logout.html";
+	public static final String METHOD_VALID_TOKEN = "token.html";
 	
 	public static final String PARAM_AREA_ID = "area_id";
 	public static final String PARAM_AREA_NAME = "area_name";

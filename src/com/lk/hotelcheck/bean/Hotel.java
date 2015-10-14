@@ -808,13 +808,13 @@ public class Hotel extends SugarRecord<Hotel>{
 									if (TextUtils.isEmpty(issueItem.getContent())
 											&& issueItem.getImageCount() == 0) {
 										issueItem.setCheck(false);
-										if (hotelCheck != null) {
-											long id = Long.valueOf(hotelCheck.getCheckId()+""+hotelCheck.getAreaId()+""+hotelCheck.getIssueId());
+//										if (hotelCheck != null) {
+//											long id = Long.valueOf(hotelCheck.getCheckId()+""+hotelCheck.getAreaId()+""+hotelCheck.getIssueId());
 //											CheckIssue checkIssue = CheckIssue.findById(CheckIssue.class, id);
 //											if (checkIssue != null) {
 //												checkIssue.delete();
 //											} 
-										}
+//										}
 										checkData.initCheckedIssue();
 										initDymicRoomCheckedData();
 									}
@@ -844,13 +844,13 @@ public class Hotel extends SugarRecord<Hotel>{
 									if (TextUtils.isEmpty(issueItem.getContent())
 											&& issueItem.getImageCount() == 0) {
 										issueItem.setCheck(false);
-										if (hotelCheck != null) {
-											long id = Long.valueOf(hotelCheck.getCheckId()+""+hotelCheck.getAreaId()+""+hotelCheck.getIssueId());
+//										if (hotelCheck != null) {
+//											long id = Long.valueOf(hotelCheck.getCheckId()+""+hotelCheck.getAreaId()+""+hotelCheck.getIssueId());
 //											CheckIssue checkIssue = CheckIssue.findById(CheckIssue.class, id);
 //											if (checkIssue != null) {
 //												checkIssue.delete();
 //											} 
-										}
+//										}
 										checkData.initCheckedIssue();
 //										initDymicRoomCheckedData();
 										initDymicPasswayCheckedData();

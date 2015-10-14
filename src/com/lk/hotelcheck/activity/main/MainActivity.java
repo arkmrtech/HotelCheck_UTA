@@ -37,6 +37,7 @@ import com.lk.hotelcheck.upload.UploadProxy;
 import com.lk.hotelcheck.util.CommonUtil;
 import com.lk.hotelcheck.util.DrawUtil;
 import com.lk.hotelcheck.util.Machine;
+import com.lk.hotelcheck.util.SharedPreferencesUtil;
 import com.lk.hotelcheck.util.SharedPrefsUtil;
 
 import common.Constance.HotelAction;
@@ -187,6 +188,8 @@ public class MainActivity extends BaseActivity {
     private void exit() {
 //    	UploadProxy.initInstance(this).doUnbindService();
 //    	DataManager.getInstance().clear();
+    	DataManager.getInstance().saveToken(getApplicationContext(), "");
+    	SharedPreferencesUtil.putString(getApplicationContext(), NetConstance.PARAM_NAME, "");
     	UploadProxy.initInstance(this).saveData();
     	finish();
     	System.exit(0);

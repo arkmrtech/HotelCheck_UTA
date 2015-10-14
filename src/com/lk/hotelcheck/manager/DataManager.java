@@ -459,9 +459,10 @@ public class DataManager {
 									 hotelTemp.setBaseInfo(hotel);
 								} 
 								 //for test 
-								hotelTemp.setStatus(false);
-								hotelTemp.setDataStatus(false);
-								hotelTemp.setImageStatus(false);
+//								hotelTemp.setStatus(false);
+//								hotelTemp.setDataStatus(false);
+//								hotelTemp.setImageStatus(false);
+								 
 								hotelList.add(hotelTemp);
 							}
 						}
@@ -743,6 +744,11 @@ public class DataManager {
 	
 	public void saveToken(Context context, String token) {
 		SharedPreferencesUtil.putString(context, NetConstance.PARAM_SESSION, token);
+	}
+
+	public void resetUser() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	

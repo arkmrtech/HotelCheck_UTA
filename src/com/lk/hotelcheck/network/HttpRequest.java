@@ -12,6 +12,7 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.content.Intent;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -58,13 +59,12 @@ public class HttpRequest {
 	 * @param password
 	 * @param callback
 	 */
-	public void login(Context context, String userId, String password, String key,HttpCallback callback) {
+	public void login(Context context, String userId, String password, HttpCallback callback) {
 		String url = getRequestURL(NetConstance.METHOD_LOGIN);
 		JSONObject jsonObject = new JSONObject();
 		try {
 			jsonObject.put(NetConstance.REQUEST_PARAM_USER_NAME, userId);
 			jsonObject.put(NetConstance.REQUEST_PARAM_PASSWORD, password);
-//			jsonObject.put(NetConstance.REQUEST_PARAM_KEY, key);
 		} catch (JSONException e1) {
 			e1.printStackTrace();
 		}
@@ -200,6 +200,24 @@ public class HttpRequest {
 		postRequest(context, url, jsonObject, callback);
 	}
 	
+	public void validToken(Context context, String lastToken, final HttpCallback callback) {
+		if (TextUtils.isEmpty(lastToken)) {
+			Log.d("lxk", "validToken lastToken is null");
+			return;
+		}
+		String url = getRequestURL(NetConstance.METHOD_VALID_TOKEN);
+		JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject.put(NetConstance.REQUEST_PARAM_KEY, lastToken);
+		} catch (JSONException e1) {
+			e1.printStackTrace();
+		}
+		
+		postRequest(context, url, jsonObject, callback);
+		
+	}
+	
+	
 	private void postRequest(final Context context, final String url, JSONObject jsonObject, final HttpCallback callback) {
 		StringEntity entity = null;
 		try {
@@ -243,9 +261,9 @@ public class HttpRequest {
 				Log.d("lxk", "<onSuccess>  response = "+response);
 				int state = response.optInt(NetConstance.PARAM_STATE);
 				String info = response.optString(NetConstance.PARAM_INFO);
-				if (state == NetConstance.ERROR_CODE_SESSSION_TIME_OUT) {
-					DataManager.getInstance().saveToken(context.getApplicationContext(), "");
-				}
+//				if (state == NetConstance.ERROR_CODE_SESSSION_TIME_OUT) {
+//					DataManager.getInstance().saveToken(context.getApplicationContext(), "");
+//				}
 				if (state == NetConstance.ERROR_CODE_SUCCESS) {
 					callback.onSuccess(response);
 				} else {
@@ -264,5 +282,6 @@ public class HttpRequest {
 	private String getRequestURL(String method) {
 		return NetConstance.BASE_URL + method;
 	}
+
 	
 }

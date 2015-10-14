@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
@@ -20,6 +21,7 @@ public class PhotoChosenItem extends RelativeLayout{
 	private CheckBox mCheckBox;
 	private ImageView mImageView;
 	private static final int IMAGE_ID = 0X000001;
+	private boolean mHideCheckBox;
 	
 	public PhotoChosenItem(Context context, AttributeSet attrs,
 			int defStyleAttr, int defStyleRes) {
@@ -41,7 +43,14 @@ public class PhotoChosenItem extends RelativeLayout{
 		super(context);
 		init();
 	}
-
+	
+	public PhotoChosenItem(Context context, boolean isHideCheckBox) {
+		super(context);
+		mHideCheckBox = isHideCheckBox;
+		init();
+	}
+	
+	
 	private void init() {
 		DrawUtil.resetDensity(getContext());
 		int padding = DrawUtil.dip2px(4);
@@ -71,6 +80,9 @@ public class PhotoChosenItem extends RelativeLayout{
 		
 		addView(mImageView);
 		addView(mCheckBox);
+		if (mHideCheckBox) {
+			mCheckBox.setVisibility(View.GONE);
+		}
 	}
 	
 	public void setImageData(String imageURL) {

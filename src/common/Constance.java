@@ -30,14 +30,14 @@ public class Constance {
 	
 	public static final class UPAI {
 //		// 空间名
-//		public static final String BUCKET = "sevenday-qctest";
+		public static final String BUCKET = "sevenday-qctest";
 //		// 表单密钥
-//		public static final String FORM_API_SECRET = "7zkTYpfFXWK43AeiXw2pfryVi2A=";
+		public static final String FORM_API_SECRET = "7zkTYpfFXWK43AeiXw2pfryVi2A=";
 		
 		// 空间名
-		public static final String BUCKET = "bayes-space";
+//		public static final String BUCKET = "bayes-space";
 		// 表单密钥
-		public static final String FORM_API_SECRET = "aI2nEa+I9lFx5CSGl8QOyo08FoM=";
+//		public static final String FORM_API_SECRET = "aI2nEa+I9lFx5CSGl8QOyo08FoM=";
 		
 	}
 	

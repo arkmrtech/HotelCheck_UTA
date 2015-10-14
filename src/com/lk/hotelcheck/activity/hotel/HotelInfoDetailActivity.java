@@ -227,6 +227,9 @@ public class HotelInfoDetailActivity extends BaseActivity{
 	    
 	    
 	private void uploadImage() {
+		if (mHotel == null) {
+			return;
+		}
 		if (!Machine.isNetworkOK(this)) {
 			Toast.makeText(this, "网络未链接，请检查网络链接", Toast.LENGTH_SHORT).show();
 			return;

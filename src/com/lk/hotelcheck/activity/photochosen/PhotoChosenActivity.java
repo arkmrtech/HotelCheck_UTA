@@ -396,7 +396,7 @@ public class PhotoChosenActivity extends BaseActivity {
 
 		@Override
 		public ViewHolder onCreateViewHolder(ViewGroup arg0, int arg1) {
-			PhotoChosenItem itemView = new PhotoChosenItem(arg0.getContext());
+			PhotoChosenItem itemView = new PhotoChosenItem(arg0.getContext(), true);
 			PhotoItemViewHolder holder = new PhotoItemViewHolder(itemView);
 			GridLayoutManager.LayoutParams params = (LayoutParams) holder.itemView
 					.getLayoutParams();
