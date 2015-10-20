@@ -30,6 +30,7 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.FileAsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
+import common.Constance;
 import common.NetConstance;
 
 public class HttpRequest {
@@ -188,9 +189,22 @@ public class HttpRequest {
 		JSONObject jsonObject = new JSONObject();
 		try {
 			 Gson gson = new GsonBuilder()
-			    .excludeFieldsWithoutExposeAnnotation() // <---
+			    .excludeFieldsWithoutExposeAnnotation() 
 			    .create();
 			JSONObject json = new JSONObject(gson.toJson(uploadBean));
+			if (json != null) {
+				int type = json.optInt("type");
+				switch (type) {
+				case Constance.CheckDataType.TYPE_ROOM:
+					json.put("areaId", Constance.CHECK_DATA_ID_ROOM);
+					break;
+				case Constance.CheckDataType.TYPE_PASSWAY:
+					json.put("areaId", Constance.CHECK_DATA_ID_PASSWAY);
+					break;
+				default:
+					break;
+				}
+			}
 			jsonObject.put(NetConstance.PARAM_IMAGE_LIST, json);
 			jsonObject.put(NetConstance.REQUEST_PARAM_KEY, session);
 		} catch (JSONException e1) {

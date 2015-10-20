@@ -1015,7 +1015,10 @@ public class BitmapUtil {
 		return new BitmapDrawable(base);
 	}
 
-	public static  Bitmap drawTextToBitmap(Bitmap bitmap, String gText) {  
+	public static  Bitmap drawTextToBitmap(Bitmap bitmap, String gText) { 
+		if (bitmap == null) {
+			return null;
+		}
 			  android.graphics.Bitmap.Config bitmapConfig =  
 			      bitmap.getConfig();  
 			  

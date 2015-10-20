@@ -204,6 +204,9 @@ public class PhotoPickerActivity extends BaseActivity implements CallBackListene
 		String fileName = FileUtil.getFileName(srcFile);
 		
 		Bitmap bitmap = PictureUtil.getSmallBitmap(srcFile);
+		if (bitmap == null) {
+			return;
+		}
 		if (mCheckData.getType() == CheckDataType.TYPE_ROOM) {
 			bitmap = BitmapUtil.drawTextToBitmap(bitmap, mCheckData.getName());
 		} else if (mCheckData.getType() == CheckDataType.TYPE_PASSWAY) {

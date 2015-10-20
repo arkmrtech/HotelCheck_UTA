@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Locale;
 
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.SparseArray;
 
 import com.lk.hotelcheck.bean.dao.AreaIssue;
@@ -13,6 +14,7 @@ import com.lk.hotelcheck.bean.dao.DymicIssue;
 import com.lk.hotelcheck.bean.dao.HotelCheck;
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
+
 import common.Constance;
 import common.Constance.CheckDataType;
 import common.Constance.CheckType;
@@ -172,20 +174,41 @@ public class Hotel extends SugarRecord<Hotel>{
 	public int getRoomHadCheckedCount() {
 		return roomArray == null ? 0 : roomArray.size();
 	}
-
+	
 	public int getIssueCount() {
+//		int count = 0;
+//		if (checkDatas != null) {
+//			for (CheckData checkData : checkDatas) {
+//				if (checkData.getCheckId() != Constance.CHECK_DATA_ID_PASSWAY 
+//						&& checkData.getCheckId() != Constance.CHECK_DATA_ID_ROOM) {
+//					count += checkData.getCheckedIssueCount();
+//				}
+//			}
+//		}
+//		Log.d("lxk", "");
+//		count += getDymicRoomCheckedIssueCount();
+//		count += getDymicPasswayCheckedIssueCount();
+//		if (roomCheckedIsuueArray != null) {
+//			count += roomCheckedIsuueArray.size();
+//		}
+//		if (passwayCheckedIsuueArray != null) {
+//			count += passwayCheckedIsuueArray.size();
+//		}
 		int count = 0;
 		if (checkDatas != null) {
 			for (CheckData checkData : checkDatas) {
-				count += checkData.getCheckedIssueCount();
+				if (checkData.getType() == CheckDataType.TYPE_ROOM) {
+					count += getDymicRoomCheckedIssueCount();
+				} else if (checkData.getType() == CheckDataType.TYPE_PASSWAY) {
+					count += getDymicPasswayCheckedIssueCount();
+				} else {
+					count += checkData.getCheckedIssueCount();
+				}
 			}
 		}
-		if (roomCheckedIsuueArray != null) {
-			count += roomCheckedIsuueArray.size();
-		}
-		if (passwayCheckedIsuueArray != null) {
-			count += passwayCheckedIsuueArray.size();
-		}
+
+		
+		
 		return count;
 	}
 	
