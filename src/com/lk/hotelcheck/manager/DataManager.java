@@ -310,6 +310,7 @@ public class DataManager {
 				}
 			}
 		}
+		//初始化上次保存的检查点拍摄的图片
 		for (IssueItem issueItem : checkData.getIssuelist()) {
 			List<HotelCheck> hotelCheckList = HotelCheck.find(
 					HotelCheck.class,
@@ -374,6 +375,7 @@ public class DataManager {
 							if (issueItem.getId() == areaIssue.getIssueId()) {
 								issueItem.setIsPreQue(areaIssue.getIsPreQue());
 								issueItem.setIsDefQue(areaIssue.getIsDefQue());
+								issueItem.setCheck(issueItem.isCheck());
 							}
 						}
 					} 
@@ -454,6 +456,7 @@ public class DataManager {
 							JSONObject jsonObject = jsonArray.optJSONObject(i);
 							 Hotel hotelTemp = JsonParseHandler.parseHotel(jsonObject);
 							 if (hotelTemp != null) {
+								 //初始化保存的酒店基本数据
 								 Hotel hotel = Hotel.findById(Hotel.class, hotelTemp.getId());
 								 if (hotel != null) {
 									 hotelTemp.setBaseInfo(hotel);

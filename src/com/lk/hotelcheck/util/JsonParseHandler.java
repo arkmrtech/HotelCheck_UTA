@@ -94,29 +94,29 @@ public class JsonParseHandler {
 				}
 			}
 		} 
-//		if (dymicList != null) {
-//			for (int i = 0; i < dymicList.length(); i++) {
-//				try {
-//					CheckData checkData = parseDymicData(dymicList.getJSONObject(i), hotel.getName());
-//					if (checkData.getType() == Constance.CheckDataType.TYPE_ROOM) {
-//						if (hotel.hasRoom(checkData.getId())) {
-//							hotel.setRoom(checkData.getId(), checkData);
-//						} else {
-//							hotel.addRoom(checkData);
-//						}
-//					} else if (checkData.getType() == Constance.CheckDataType.TYPE_PASSWAY) {
-//						if (hotel.hasPassway(checkData.getId())) {
-//							hotel.setPassway(checkData.getId(), checkData);
-//						} else {
-//							hotel.addPassway(checkData);
-//						}
-//						
-//					}
-//				} catch (JSONException e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		}
+		if (dymicList != null) {
+			for (int i = 0; i < dymicList.length(); i++) {
+				try {
+					CheckData checkData = parseDymicData(dymicList.getJSONObject(i), hotel.getName());
+					if (checkData.getType() == Constance.CheckDataType.TYPE_ROOM) {
+						if (hotel.hasRoom(checkData.getId())) {
+							hotel.setRoom(checkData.getId(), checkData);
+						} else {
+							hotel.addRoom(checkData);
+						}
+					} else if (checkData.getType() == Constance.CheckDataType.TYPE_PASSWAY) {
+						if (hotel.hasPassway(checkData.getId())) {
+							hotel.setPassway(checkData.getId(), checkData);
+						} else {
+							hotel.addPassway(checkData);
+						}
+						
+					}
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 		return hotel;
 	}
 	
@@ -135,7 +135,7 @@ public class JsonParseHandler {
 		areaIssue.setIsPreQue(jsonObject.optInt(NetConstance.PARAM_PRE_QUE));
 		if (areaIssue.getAreaId() == Constance.CHECK_DATA_ID_ROOM) {
 			areaIssue.setType(CheckDataType.TYPE_ROOM);
-		} else if (areaIssue.getAreaId() == CheckDataType.TYPE_PASSWAY) {
+		} else if (areaIssue.getAreaId() == Constance.CHECK_DATA_ID_PASSWAY) {
 			areaIssue.setType(CheckDataType.TYPE_PASSWAY);
 		} else {
 			areaIssue.setType(CheckDataType.TYPE_NORMAL);

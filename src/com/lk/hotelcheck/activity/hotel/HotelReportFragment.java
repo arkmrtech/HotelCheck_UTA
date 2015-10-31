@@ -320,7 +320,9 @@ public class HotelReportFragment extends Fragment{
 			if (issueItem.getIsPreQue() == PreQueType.TYPE_REVIEW) {
 				viewHolder.mStatusTextView.setTag(R.id.tv_name, groupPosition);
 				viewHolder.mStatusTextView.setTag(R.id.tv_flag, childPosition);
-				viewHolder.mStatusTextView.setOnClickListener(mReformStateClickListener);
+				if (!mHotel.isStatus()) {
+					viewHolder.mStatusTextView.setOnClickListener(mReformStateClickListener);
+				}
 				viewHolder.mStatusTextView.setVisibility(View.VISIBLE);
 				switch (issueItem.getReformState()) {
 				case IssueItem.REFORM_STATE_FIXED:

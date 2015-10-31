@@ -53,6 +53,7 @@ public class HotelInfoDetailActivity extends BaseActivity{
 	private SlidingTabLayout mSlidingTabLayout;
 	private DetailAdapter mAdapter;
 	private View mLoadingGroup;
+	private boolean mIsLoading = false;
 	
 	
 	public static void goToHotel(Context context , int id) {
@@ -260,27 +261,34 @@ public class HotelInfoDetailActivity extends BaseActivity{
 			Toast.makeText(this, "酒店数据已经上传", Toast.LENGTH_SHORT).show();
 			return;
 		}
-		 mLoadingGroup.setVisibility(View.VISIBLE);
-			HttpRequest.getInstance().uploadHotelData(this, mHotel, DataManager.getInstance().getSession(), new HttpCallback() {
-				
-				@Override
-				public void onSuccess(JSONObject response) {
-					Toast.makeText(HotelInfoDetailActivity.this, "酒店数据上传成功", Toast.LENGTH_SHORT).show();
-					mHotel.setDataStatus(true);
-					mLoadingGroup.setVisibility(View.GONE);
-				}
-				
-				@Override
-				public void onError(int errorCode, String info) {
-					Toast.makeText(HotelInfoDetailActivity.this, "酒店数据上传失败，网络异常，请稍后再试", Toast.LENGTH_SHORT).show();
-					mLoadingGroup.setVisibility(View.GONE);
-					if (errorCode == NetConstance.ERROR_CODE_SESSSION_TIME_OUT) {
-						Toast.makeText(HotelInfoDetailActivity.this, "权限过期，请重新登录", Toast.LENGTH_SHORT).show();
-						CommonUtil.goToLogin(HotelInfoDetailActivity.this);
-						finish();
-					} 
-				}
-			});
+		if (mIsLoading) {
+			Toast.makeText(this, "酒店数据上传中", Toast.LENGTH_SHORT).show();
+			return;
+		}
+		mIsLoading = true;
+		mLoadingGroup.setVisibility(View.VISIBLE);
+		HttpRequest.getInstance().uploadHotelData(this, mHotel, DataManager.getInstance().getSession(), new HttpCallback() {
+			
+			@Override
+			public void onSuccess(JSONObject response) {
+				Toast.makeText(HotelInfoDetailActivity.this, "酒店数据上传成功", Toast.LENGTH_SHORT).show();
+				mHotel.setDataStatus(true);
+				mLoadingGroup.setVisibility(View.GONE);
+				mIsLoading = false;
+			}
+			
+			@Override
+			public void onError(int errorCode, String info) {
+				Toast.makeText(HotelInfoDetailActivity.this, "酒店数据上传失败，网络异常，请稍后再试", Toast.LENGTH_SHORT).show();
+				mLoadingGroup.setVisibility(View.GONE);
+				mIsLoading = false;
+				if (errorCode == NetConstance.ERROR_CODE_SESSSION_TIME_OUT) {
+					Toast.makeText(HotelInfoDetailActivity.this, "权限过期，请重新登录", Toast.LENGTH_SHORT).show();
+					CommonUtil.goToLogin(HotelInfoDetailActivity.this);
+					finish();
+				} 
+			}
+		});
 	 }
 	 
 	 private void updateHotelCheckState() {
@@ -288,37 +296,44 @@ public class HotelInfoDetailActivity extends BaseActivity{
 				Toast.makeText(this, "网络未链接，请检查网络链接", Toast.LENGTH_SHORT).show();
 				return;
 			}
+		 if (mIsLoading) {
+				Toast.makeText(this, "酒店数据上传中", Toast.LENGTH_SHORT).show();
+				return;
+			}
+		 mIsLoading = true;
 		 mLoadingGroup.setVisibility(View.VISIBLE);
-			HttpRequest.getInstance().updateHotelCheckStatus(this, mHotel.getCheckId(), DataManager.getInstance().getSession(), new HttpCallback() {
-				
-				@Override
-				public void onSuccess(JSONObject response) {
+		 HttpRequest.getInstance().updateHotelCheckStatus(this, mHotel.getCheckId(), DataManager.getInstance().getSession(), new HttpCallback() {
+			
+			@Override
+			public void onSuccess(JSONObject response) {
 //					((HotelBaseInfoFragment)mAdapter.getItem(0)).setGuardianNumber(number);
 //					DataManager.getInstance().setHotelChecked(position, hotel);
-					Toast.makeText(HotelInfoDetailActivity.this, "酒店检查状态上传成功", Toast.LENGTH_SHORT).show();
-					mHotel.setStatus(true);
-					DataManager.getInstance().initCheckedData(mHotel);
-					if (mViewPager.getCurrentItem() != 2) {
-						mViewPager.setCurrentItem(2);
-					}
-					Fragment fragment = (HotelReportFragment) mAdapter.getItem(2);
-					if (fragment instanceof HotelReportFragment) {
-						((HotelReportFragment)fragment).refreshInfo();
-					}
-					mLoadingGroup.setVisibility(View.GONE);
+				Toast.makeText(HotelInfoDetailActivity.this, "酒店检查状态上传成功", Toast.LENGTH_SHORT).show();
+				mHotel.setStatus(true);
+				DataManager.getInstance().initCheckedData(mHotel);
+				if (mViewPager.getCurrentItem() != 2) {
+					mViewPager.setCurrentItem(2);
 				}
-				
-				@Override
-				public void onError(int errorCode, String info) {
-					Toast.makeText(HotelInfoDetailActivity.this, "酒店检查失败，网络异常，请稍后再试", Toast.LENGTH_SHORT).show();
-					mLoadingGroup.setVisibility(View.GONE);
-					if (errorCode == NetConstance.ERROR_CODE_SESSSION_TIME_OUT) {
-						Toast.makeText(HotelInfoDetailActivity.this, "权限过期，请重新登录", Toast.LENGTH_SHORT).show();
-						CommonUtil.goToLogin(HotelInfoDetailActivity.this);
-						finish();
-					} 
+				Fragment fragment = (HotelReportFragment) mAdapter.getItem(2);
+				if (fragment instanceof HotelReportFragment) {
+					((HotelReportFragment)fragment).refreshInfo();
 				}
-			});
+				mLoadingGroup.setVisibility(View.GONE);
+				mIsLoading = false;
+			}
+			
+			@Override
+			public void onError(int errorCode, String info) {
+				Toast.makeText(HotelInfoDetailActivity.this, "酒店检查失败，网络异常，请稍后再试", Toast.LENGTH_SHORT).show();
+				mLoadingGroup.setVisibility(View.GONE);
+				mIsLoading = false;
+				if (errorCode == NetConstance.ERROR_CODE_SESSSION_TIME_OUT) {
+					Toast.makeText(HotelInfoDetailActivity.this, "权限过期，请重新登录", Toast.LENGTH_SHORT).show();
+					CommonUtil.goToLogin(HotelInfoDetailActivity.this);
+					finish();
+				} 
+			}
+		});
 	 }
 	
 	class DetailAdapter extends FragmentStatePagerAdapter{
