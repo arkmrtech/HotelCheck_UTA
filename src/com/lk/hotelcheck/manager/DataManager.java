@@ -28,8 +28,6 @@ import com.lk.hotelcheck.network.HttpRequest;
 import com.lk.hotelcheck.util.FileUtil;
 import com.lk.hotelcheck.util.JsonParseHandler;
 import com.lk.hotelcheck.util.SharedPreferencesUtil;
-import com.tencent.bugly.proguard.u;
-
 import common.Constance;
 import common.Constance.CheckDataType;
 import common.Constance.DefQueType;
@@ -462,9 +460,9 @@ public class DataManager {
 									 hotelTemp.setBaseInfo(hotel);
 								} 
 								 //for test 
-//								hotelTemp.setStatus(false);
-//								hotelTemp.setDataStatus(false);
-//								hotelTemp.setImageStatus(false);
+								hotelTemp.setStatus(false);
+								hotelTemp.setDataStatus(false);
+								hotelTemp.setImageStatus(false);
 								 
 								hotelList.add(hotelTemp);
 							}

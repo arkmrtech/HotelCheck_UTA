@@ -296,6 +296,7 @@ public class Hotel extends SugarRecord<Hotel>{
 			initDymicQuestionCheckData(checkData);
 		}
 		roomArray.add(0, checkData);
+		initDymicCheckedData();
 	}
 	
 //	public CheckData getRoom(String areaName) {
@@ -327,6 +328,7 @@ public class Hotel extends SugarRecord<Hotel>{
 			initDymicQuestionCheckData(checkData);
 		}
 		passwayArray.add(0, checkData);
+		initDymicCheckedData();
 	}
 	
 	public boolean hasPassway(long areaId) {
@@ -739,10 +741,13 @@ public class Hotel extends SugarRecord<Hotel>{
 				for (IssueItem issueItem : checkData.getCheckedIssue()) {
 					if (roomCheckedIsuueArray.indexOfKey(issueItem.getId()) > -1) {
 						IssueItem tempIssueItem = roomCheckedIsuueArray.get(issueItem.getId());
-						if (issueItem.getReformState() == IssueItem.REFORM_STATE_FIXED 
-							&& tempIssueItem.getReformState() == IssueItem.REFORM_STATE_FIXED) {
-							tempIssueItem.setReformState(issueItem.getReformState());
-						} 
+//						if (issueItem.getReformState() == IssueItem.REFORM_STATE_FIXED 
+//							&& tempIssueItem.getReformState() == IssueItem.REFORM_STATE_FIXED) {
+//							tempIssueItem.setReformState(issueItem.getReformState());
+//						}
+						if (issueItem.getReformState() == IssueItem.REFORM_STATE_DEFAULT) {
+								tempIssueItem.setReformState(issueItem.getReformState());
+						}
 					} else {
 						roomCheckedIsuueArray.put(issueItem.getId(), issueItem);
 					}
@@ -762,10 +767,13 @@ public class Hotel extends SugarRecord<Hotel>{
 				for (IssueItem issueItem : checkData.getCheckedIssue()) {
 					if (passwayCheckedIsuueArray.indexOfKey(issueItem.getId()) > -1) {
 						IssueItem tempIssueItem = passwayCheckedIsuueArray.get(issueItem.getId());
-						if (issueItem.getReformState() == IssueItem.REFORM_STATE_FIXED 
-							&& tempIssueItem.getReformState() == IssueItem.REFORM_STATE_FIXED) {
+//						if (issueItem.getReformState() == IssueItem.REFORM_STATE_FIXED 
+//							&& tempIssueItem.getReformState() == IssueItem.REFORM_STATE_FIXED) {
+//							tempIssueItem.setReformState(issueItem.getReformState());
+//						} 
+						if (issueItem.getReformState() == IssueItem.REFORM_STATE_DEFAULT) {
 							tempIssueItem.setReformState(issueItem.getReformState());
-						} 
+						}
 					} else {
 						passwayCheckedIsuueArray.put(issueItem.getId(), issueItem);
 					}
@@ -1025,6 +1033,7 @@ public class Hotel extends SugarRecord<Hotel>{
 							if (issueItem.getId() == areaIssue.getIssueId()) {
 								issueItem.setIsPreQue(areaIssue.getIsPreQue());
 								issueItem.setIsDefQue(areaIssue.getIsDefQue());
+								issueItem.setCheck(issueItem.isCheck());
 							}
 						}
 					}
@@ -1041,7 +1050,7 @@ public class Hotel extends SugarRecord<Hotel>{
 				for (CheckData checkData : checkDatas) {
 					for (IssueItem issueItem : checkData.getCheckedIssue()) {
 						if (issueItem.getIsPreQue() == PreQueType.TYPE_REVIEW 
-								&& issueItem.getReformState() == 0) {
+								&& issueItem.getReformState() == IssueItem.REFORM_STATE_DEFAULT) {
 							return false;
 						}
 					}
@@ -1050,7 +1059,7 @@ public class Hotel extends SugarRecord<Hotel>{
 			if (roomCheckedIsuueArray != null) {
 				for (int i = 0; i < roomCheckedIsuueArray.size(); i++) {
 					if (roomCheckedIsuueArray.valueAt(i).getIsPreQue() == PreQueType.TYPE_REVIEW  
-							&& roomCheckedIsuueArray.valueAt(i).getReformState() == 0) {
+							&& roomCheckedIsuueArray.valueAt(i).getReformState() == IssueItem.REFORM_STATE_DEFAULT) {
 						return false;
 					}
 				}
@@ -1058,7 +1067,7 @@ public class Hotel extends SugarRecord<Hotel>{
 			if (passwayCheckedIsuueArray != null) {
 				for (int i = 0; i < passwayCheckedIsuueArray.size(); i++) {
 					if (passwayCheckedIsuueArray.valueAt(i).getIsPreQue() == PreQueType.TYPE_REVIEW  
-							&& passwayCheckedIsuueArray.valueAt(i).getReformState() == 0) {
+							&& passwayCheckedIsuueArray.valueAt(i).getReformState() == IssueItem.REFORM_STATE_DEFAULT) {
 						return false;
 					}
 				}

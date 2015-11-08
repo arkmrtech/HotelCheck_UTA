@@ -20,6 +20,7 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,6 +34,7 @@ import com.lk.hotelcheck.activity.BaseActivity;
 import com.lk.hotelcheck.activity.main.MainActivity;
 import com.lk.hotelcheck.activity.upload.UploadProcessActivity;
 import com.lk.hotelcheck.bean.Hotel;
+import com.lk.hotelcheck.bean.MessageEvent;
 import com.lk.hotelcheck.manager.DataManager;
 import com.lk.hotelcheck.network.HttpCallback;
 import com.lk.hotelcheck.network.HttpRequest;
@@ -43,6 +45,7 @@ import com.lk.hotelcheck.util.Machine;
 import common.Constance;
 import common.NetConstance;
 import common.view.SlidingTabLayout;
+import de.greenrobot.event.EventBus;
 
 
 public class HotelInfoDetailActivity extends BaseActivity{
@@ -72,7 +75,6 @@ public class HotelInfoDetailActivity extends BaseActivity{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_hotel);
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-		
 		position = -1;
 		if (getIntent().hasExtra(Constance.IntentKey.INTENT_KEY_POSITION)) {
 			position = getIntent().getIntExtra(Constance.IntentKey.INTENT_KEY_POSITION, -1);
@@ -94,6 +96,10 @@ public class HotelInfoDetailActivity extends BaseActivity{
 		setSupportActionBar(toolbar);
 		mLoadingGroup = findViewById(R.id.vg_loadig);
 	}
+	
+//	public void onEvent(MessageEvent event) {
+//		Log.d("lxk", "get event bus message");
+//	};
 	
 	@Override
 	protected void onPause() {
@@ -273,6 +279,7 @@ public class HotelInfoDetailActivity extends BaseActivity{
 			public void onSuccess(JSONObject response) {
 				Toast.makeText(HotelInfoDetailActivity.this, "酒店数据上传成功", Toast.LENGTH_SHORT).show();
 				mHotel.setDataStatus(true);
+				DataManager.getInstance().setHotel(position, mHotel);
 				mLoadingGroup.setVisibility(View.GONE);
 				mIsLoading = false;
 			}
@@ -310,6 +317,7 @@ public class HotelInfoDetailActivity extends BaseActivity{
 //					DataManager.getInstance().setHotelChecked(position, hotel);
 				Toast.makeText(HotelInfoDetailActivity.this, "酒店检查状态上传成功", Toast.LENGTH_SHORT).show();
 				mHotel.setStatus(true);
+				DataManager.getInstance().setHotel(position, mHotel);
 				DataManager.getInstance().initCheckedData(mHotel);
 				if (mViewPager.getCurrentItem() != 2) {
 					mViewPager.setCurrentItem(2);
@@ -320,6 +328,7 @@ public class HotelInfoDetailActivity extends BaseActivity{
 				}
 				mLoadingGroup.setVisibility(View.GONE);
 				mIsLoading = false;
+				EventBus.getDefault().post(new MessageEvent(MessageEvent.MESSAGE_UPDATE_HOTEL_DATA));
 			}
 			
 			@Override

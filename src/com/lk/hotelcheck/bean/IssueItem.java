@@ -25,6 +25,7 @@ public class IssueItem{
 	public static final int REFORM_STATE_FIXED = 3;
 	public static final int REFORM_STATE_FIXING = 2;
 	public static final int REFORM_STATE_UN_FIX = 1;
+	public static final int REFORM_STATE_DEFAULT = 0;
 	
 	public IssueItem() {
 		super();
@@ -80,14 +81,19 @@ public class IssueItem{
 	}
 	public void setCheck(boolean isCheck) {
 		this.isCheck = isCheck;
+		initIssueState();
+	}
+	
+	private void initIssueState() {
 		if (isPreQue == PreQueType.TYPE_REVIEW) {
 			if (isCheck) {
-				this.reformState = REFORM_STATE_UN_FIX;
+				this.reformState = REFORM_STATE_DEFAULT;
 			} else if (!isCheck && reformState == 0) {
 				this.reformState = REFORM_STATE_FIXED;
 			}
 		}
 	}
+	
 	public ImageItem getImageItem(int i) {
 		if (imageList == null) {
 			return null;
@@ -112,6 +118,7 @@ public class IssueItem{
 	}
 	public void setIsPreQue(int isPreQue) {
 		this.isPreQue = isPreQue;
+		initIssueState();
 	}
 	public int getDimOneId() {
 		return dimOneId;

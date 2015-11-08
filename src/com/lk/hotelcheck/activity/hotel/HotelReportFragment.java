@@ -22,6 +22,7 @@ import com.lk.hotelcheck.activity.photochosen.PhotoChosenActivity;
 import com.lk.hotelcheck.bean.CheckData;
 import com.lk.hotelcheck.bean.Hotel;
 import com.lk.hotelcheck.bean.IssueItem;
+import com.lk.hotelcheck.bean.MessageEvent;
 import com.lk.hotelcheck.manager.DataManager;
 import com.lk.hotelcheck.util.DrawUtil;
 
@@ -29,6 +30,8 @@ import common.Constance;
 import common.Constance.CheckDataType;
 import common.Constance.CheckType;
 import common.Constance.PreQueType;
+import de.greenrobot.event.EventBus;
+import de.greenrobot.event.Subscribe;
 
 public class HotelReportFragment extends Fragment{
 	
@@ -81,6 +84,7 @@ public class HotelReportFragment extends Fragment{
 		super.onCreate(savedInstanceState);
 		mPosition = getArguments().getInt(Constance.IntentKey.INTENT_KEY_POSITION);
 		mHotel = DataManager.getInstance().getHotel(mPosition);
+		EventBus.getDefault().register(this);
 	}
 	
 	@Override
@@ -103,6 +107,14 @@ public class HotelReportFragment extends Fragment{
 		mAdapter.notifyDataSetChanged();
 		expanAll();
 	}
+	
+	@Subscribe
+	public void onEvent(MessageEvent event) {
+		if (event.getMessageType() == MessageEvent.MESSAGE_UPDATE_HOTEL_DATA) {
+			mHotel = DataManager.getInstance().getHotel(mPosition);
+		}
+	};
+
 	
 	
 	public void refreshInfo() {
@@ -280,7 +292,7 @@ public class HotelReportFragment extends Fragment{
 			ViewHolder viewHolder = null;
 			if (convertView == null) {
 				convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.listview_report_check_issue_item, parent,false);
-				convertView.setPadding(DrawUtil.dip2px(10), 0, DrawUtil.dip2px(10), 0);
+				convertView.setPadding(DrawUtil.dip2px(10), 0, DrawUtil.dip2px(2), 0);
 				viewHolder = new ViewHolder();
 				viewHolder.mNameTextView = (TextView) convertView.findViewById(R.id.tv_name);
 				viewHolder.mFlagTextView = (TextView) convertView.findViewById(R.id.tv_flag);
@@ -322,6 +334,8 @@ public class HotelReportFragment extends Fragment{
 				viewHolder.mStatusTextView.setTag(R.id.tv_flag, childPosition);
 				if (!mHotel.isStatus()) {
 					viewHolder.mStatusTextView.setOnClickListener(mReformStateClickListener);
+				} else {
+					viewHolder.mStatusTextView.setOnClickListener(null);
 				}
 				viewHolder.mStatusTextView.setVisibility(View.VISIBLE);
 				switch (issueItem.getReformState()) {

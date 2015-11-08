@@ -16,8 +16,10 @@ import com.lk.hotelcheck.bean.ImageItem;
 import com.lk.hotelcheck.bean.IssueItem;
 import com.lk.hotelcheck.bean.dao.AreaIssue;
 import com.lk.hotelcheck.manager.DataManager;
+
 import common.Constance;
 import common.Constance.CheckDataType;
+import common.Constance.DefQueType;
 import common.NetConstance;
 
 public class JsonParseHandler {
@@ -408,7 +410,13 @@ public class JsonParseHandler {
 			} else {
 				jsonObject.put(NetConstance.PARAM_DIM_ONE_NAME, issueItem.getDimOneName());
 			}
-			jsonObject.put(NetConstance.PARAM_DIM_TWO_ID, issueItem.getId());
+			
+			if (issueItem.getIsDefQue() == DefQueType.TYPE_DYMIC) {
+				jsonObject.put(NetConstance.PARAM_DIM_TWO_ID, 0);
+				jsonObject.put(NetConstance.PARAM_DIM_ONE_ID, 1013);
+			} else {
+				jsonObject.put(NetConstance.PARAM_DIM_TWO_ID, issueItem.getId());
+			}
 			if (issueItem.getName() == null) {
 				jsonObject.put(NetConstance.PARAM_DIM_TWO_NAME, JSONObject.NULL);
 			} else {
