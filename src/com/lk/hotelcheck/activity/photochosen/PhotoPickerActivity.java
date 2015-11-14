@@ -244,8 +244,6 @@ public class PhotoPickerActivity extends BaseActivity implements CallBackListene
 				&& mIssueItem.getImageCount() == 0) {
 			mIssueItem.setCheck(false);
 			if (hotelCheck != null) {
-//				long id = Long.valueOf(hotelCheck.getCheckId()+""+hotelCheck.getAreaId()+""+hotelCheck.getIssueId());
-//				CheckIssue checkIssue = CheckIssue.findById(CheckIssue.class, id);
 				CheckIssue checkIssue = DataManager.getInstance().getCheckIssue(hotelCheck.getCheckId(), hotelCheck.getAreaId(), hotelCheck.getIssueId());
 				if (checkIssue != null) {
 					checkIssue.delete();
@@ -256,25 +254,31 @@ public class PhotoPickerActivity extends BaseActivity implements CallBackListene
 	}
 	
 	private void initCheckedIssue() {
-		DataManager.getInstance().saveIssueCheck(mHotel.getCheckId(),
-				mCheckData.getId().intValue(), mIssueItem.getId(),
-				mIssueItem.isCheck(), mIssueItem.getReformState());
-		//保存动态区域的问题修复状态
-		if (mCheckData.getType() == CheckDataType.TYPE_ROOM) {
-			DataManager.getInstance().saveIssueCheck(mHotel.getCheckId(),
-					Constance.CHECK_DATA_ID_ROOM, mIssueItem.getId(),
-					mIssueItem.isCheck(), mIssueItem.getReformState());
-		} else if (mCheckData.getType() == CheckDataType.TYPE_PASSWAY) {
-			DataManager.getInstance().saveIssueCheck(mHotel.getCheckId(),
-					Constance.CHECK_DATA_ID_PASSWAY, mIssueItem.getId(),
-					mIssueItem.isCheck(), mIssueItem.getReformState());
-		}
+//		DataManager.getInstance().saveIssueCheck(mHotel.getCheckId(),
+//				mCheckData.getId().intValue(), mIssueItem.getId(),
+//				mIssueItem.isCheck(), mIssueItem.getReformState());
+//		//保存动态区域的问题修复状态
+//		if (mCheckData.getType() == CheckDataType.TYPE_ROOM) {
+//			DataManager.getInstance().saveIssueCheck(mHotel.getCheckId(),
+//					Constance.CHECK_DATA_ID_ROOM, mIssueItem.getId(),
+//					mIssueItem.isCheck(), mIssueItem.getReformState());
+//		} else if (mCheckData.getType() == CheckDataType.TYPE_PASSWAY) {
+//			DataManager.getInstance().saveIssueCheck(mHotel.getCheckId(),
+//					Constance.CHECK_DATA_ID_PASSWAY, mIssueItem.getId(),
+//					mIssueItem.isCheck(), mIssueItem.getReformState());
+//		}
+//		mCheckData.updateIssueCheck(mIssueItem);
+//		if (mCheckData.getType() == CheckDataType.TYPE_ROOM) {
+//			mHotel.initDymicRoomCheckedData();
+//		} else if (mCheckData.getType() == CheckDataType.TYPE_PASSWAY) {
+//			mHotel.initDymicPasswayCheckedData();
+//		}
+		DataManager.getInstance().saveIssueCheck(mHotel.getCheckId(), mCheckData.getId().intValue(), mIssueItem.getId(), mIssueItem.isCheck(), mIssueItem.getReformState());
 		mCheckData.updateIssueCheck(mIssueItem);
-		if (mCheckData.getType() == CheckDataType.TYPE_ROOM) {
-			mHotel.initDymicRoomCheckedData();
-		} else if (mCheckData.getType() == CheckDataType.TYPE_PASSWAY) {
-			mHotel.initDymicPasswayCheckedData();
-		}
+		if (mCheckData.getType() == CheckDataType.TYPE_ROOM || 
+				mCheckData.getType() == CheckDataType.TYPE_PASSWAY) {
+			mHotel.updateDymicCheckedData(mIssuePositon, mCheckData, mIssueItem);
+		} 
 	}
 	
 	static class MyHandler extends Handler {

@@ -9,6 +9,9 @@ public class NetConstance {
 	/*内测环境*/
 	public static final String BASE_URL = "http://203.195.172.191:8080/app/service/";
 	
+	/* 用户介入测试环境*/
+//	public static final String BASE_URL = "http://112.74.24.177:8080/app/service/";
+	
 	/*生产环境*/
 //	public static final String BASE_URL = "http://203.195.134.141:9080/app/service/";
 

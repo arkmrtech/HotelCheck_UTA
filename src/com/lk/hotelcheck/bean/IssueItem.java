@@ -21,7 +21,7 @@ public class IssueItem{
 	private int isPreQue;
 	private int dimOneId;
 	private String dimOneName;
-	private int reformState = 0;//整改状态：1.未整改，2整改中，3完成整改
+	private int reformState = REFORM_STATE_DEFAULT;//整改状态：1.未整改，2整改中，3完成整改
 	public static final int REFORM_STATE_FIXED = 3;
 	public static final int REFORM_STATE_FIXING = 2;
 	public static final int REFORM_STATE_UN_FIX = 1;
@@ -29,6 +29,19 @@ public class IssueItem{
 	
 	public IssueItem() {
 		super();
+	}
+	
+	public void clone(IssueItem issueItem) {
+		if (issueItem != null) {
+			this.id = issueItem.getId();
+			this.name = issueItem.getName();
+			this.isCheck = issueItem.isCheck;
+			this.dimOneId = issueItem.getDimOneId();
+			this.dimOneName = issueItem.getDimOneName();
+			this.isDefQue = issueItem.getIsDefQue();
+			this.isPreQue = issueItem.getIsPreQue();
+			this.reformState = issueItem.getReformState();
+		}
 	}
 	
 	public IssueItem(DymicIssue dymicIssue) {
@@ -88,7 +101,7 @@ public class IssueItem{
 		if (isPreQue == PreQueType.TYPE_REVIEW) {
 			if (isCheck) {
 				this.reformState = REFORM_STATE_DEFAULT;
-			} else if (!isCheck && reformState == 0) {
+			} else {
 				this.reformState = REFORM_STATE_FIXED;
 			}
 		}

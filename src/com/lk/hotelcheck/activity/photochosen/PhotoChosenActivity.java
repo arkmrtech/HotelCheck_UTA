@@ -269,10 +269,21 @@ public class PhotoChosenActivity extends BaseActivity {
 									ImageItem imageItem = mAdapter
 											.getDataItem(position);
 									CheckData checkData = mHotel.getCheckData(mCheckDataPosition);
-									if (checkData.getType() == CheckDataType.TYPE_ROOM) {
-										mHotel.deleteRoomCheckedIssueImage(imageItem);
-									} else if (checkData.getType() == CheckDataType.TYPE_PASSWAY) {
-										mHotel.deletePasswayCheckedIssueImage(imageItem);
+//									if (checkData.getType() == CheckDataType.TYPE_ROOM) {
+////										mHotel.deleteRoomCheckedIssueImage(imageItem);
+//										mHotel.deleteDymicCheckedIssueImage(imageItem, type);
+//									} else if (checkData.getType() == CheckDataType.TYPE_PASSWAY) {
+////										mHotel.deletePasswayCheckedIssueImage(imageItem);
+//									} else {
+//										if (mIssuePosition == 0) {
+//											checkData.deleteCheckedIssueImage(imageItem);
+//										} else {
+//											checkData.deleteCheckedIssueImage(mIssuePosition -1, imageItem);
+//										}
+//									}
+									if (checkData.getType() == CheckDataType.TYPE_ROOM || checkData.getType() == CheckDataType.TYPE_PASSWAY) {
+//										mHotel.deleteRoomCheckedIssueImage(imageItem);
+										mHotel.deleteDymicCheckedIssueImage(imageItem, checkData.getType());
 									} else {
 										if (mIssuePosition == 0) {
 											checkData.deleteCheckedIssueImage(imageItem);

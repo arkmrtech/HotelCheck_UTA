@@ -7,9 +7,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.util.Log;
-
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.lk.hotelcheck.bean.CheckData;
 import com.lk.hotelcheck.bean.Hotel;
 import com.lk.hotelcheck.bean.ImageItem;
@@ -78,7 +77,6 @@ public class JsonParseHandler {
 			if (openDate > 0) {
 				String openDateStr = sFormat.format(new Date(openDate));
 				hotel.setOpenDate(openDateStr);
-				Log.d("lxk", "openDate = "+openDate+" openDateStr = "+openDateStr);
 			}
 			if (lastCheckDate > 0) {
 				hotel.setLastCheckedDate(sFormat.format(new Date(lastCheckDate)));
@@ -250,40 +248,41 @@ public class JsonParseHandler {
 					IssueItem issueItem = hotel.getDymicRoomCheckedIssue(i);
 					String percent = hotel.getRoomIssuePercent(issueItem
 							.getId());
-					tempObject.put(NetConstance.PARAM_DIM_ONE_ID,
-							issueItem.getDimOneId());
-					if (issueItem.getDimOneName() == null) {
-						tempObject.put(NetConstance.PARAM_DIM_ONE_NAME,
-								JSONObject.NULL);
-					} else {
-						tempObject.put(NetConstance.PARAM_DIM_ONE_NAME,
-								issueItem.getDimOneName());
-					}
-					tempObject.put(NetConstance.PARAM_DIM_TWO_ID,
-							issueItem.getId());
-					if (issueItem.getName() == null) {
-						tempObject.put(NetConstance.PARAM_DIM_TWO_NAME,
-								JSONObject.NULL);
-					} else {
-						tempObject.put(NetConstance.PARAM_DIM_TWO_NAME,
-								issueItem.getName());
-					}
-					tempObject.put(NetConstance.PARAM_DEF_QUE,
-							issueItem.getIsDefQue());
-					tempObject.put(NetConstance.PARAM_PRE_QUE,
-							issueItem.getIsPreQue());
-					tempObject.put(NetConstance.PARAM_IS_CHECK,
-							issueItem.isCheck());
-					if (issueItem.getContent() == null) {
-						tempObject.put(NetConstance.PARAM_CONTENT,
-								JSONObject.NULL);
-					} else {
-						tempObject.put(NetConstance.PARAM_CONTENT,
-								issueItem.getContent());
-					}
-					tempObject.put(NetConstance.PARAM_REFORM_STATE,
-							issueItem.getReformState());
-					tempObject.put(NetConstance.PARAM_PERCENT, percent);
+//					tempObject.put(NetConstance.PARAM_DIM_ONE_ID,
+//							issueItem.getDimOneId());
+//					if (issueItem.getDimOneName() == null) {
+//						tempObject.put(NetConstance.PARAM_DIM_ONE_NAME,
+//								JSONObject.NULL);
+//					} else {
+//						tempObject.put(NetConstance.PARAM_DIM_ONE_NAME,
+//								issueItem.getDimOneName());
+//					}
+//					tempObject.put(NetConstance.PARAM_DIM_TWO_ID,
+//							issueItem.getId());
+//					if (issueItem.getName() == null) {
+//						tempObject.put(NetConstance.PARAM_DIM_TWO_NAME,
+//								JSONObject.NULL);
+//					} else {
+//						tempObject.put(NetConstance.PARAM_DIM_TWO_NAME,
+//								issueItem.getName());
+//					}
+//					tempObject.put(NetConstance.PARAM_DEF_QUE,
+//							issueItem.getIsDefQue());
+//					tempObject.put(NetConstance.PARAM_PRE_QUE,
+//							issueItem.getIsPreQue());
+//					tempObject.put(NetConstance.PARAM_IS_CHECK,
+//							issueItem.isCheck());
+//					if (issueItem.getContent() == null) {
+//						tempObject.put(NetConstance.PARAM_CONTENT,
+//								JSONObject.NULL);
+//					} else {
+//						tempObject.put(NetConstance.PARAM_CONTENT,
+//								issueItem.getContent());
+//					}
+//					tempObject.put(NetConstance.PARAM_REFORM_STATE,
+//							issueItem.getReformState());
+//					tempObject.put(NetConstance.PARAM_PERCENT, percent);
+					initDymicIssueItem(tempObject, issueItem, percent);
 					roomArray.put(tempObject);
 				}
 			}
@@ -293,40 +292,41 @@ public class JsonParseHandler {
 					IssueItem issueItem = hotel.getDymicPasswayCheckedIssue(i);
 					String percent = hotel.getPasswayIssuePercent(issueItem
 							.getId());
-					tempObject.put(NetConstance.PARAM_DIM_ONE_ID,
-							issueItem.getDimOneId());
-					if (issueItem.getDimOneName() == null) {
-						tempObject.put(NetConstance.PARAM_DIM_ONE_NAME,
-								JSONObject.NULL);
-					} else {
-						tempObject.put(NetConstance.PARAM_DIM_ONE_NAME,
-								issueItem.getDimOneName());
-					}
-					tempObject.put(NetConstance.PARAM_DIM_TWO_ID,
-							issueItem.getId());
-					if (issueItem.getName() == null) {
-						tempObject.put(NetConstance.PARAM_DIM_TWO_NAME,
-								JSONObject.NULL);
-					} else {
-						tempObject.put(NetConstance.PARAM_DIM_TWO_NAME,
-								issueItem.getName());
-					}
-					tempObject.put(NetConstance.PARAM_DEF_QUE,
-							issueItem.getIsDefQue());
-					tempObject.put(NetConstance.PARAM_PRE_QUE,
-							issueItem.getIsPreQue());
-					tempObject.put(NetConstance.PARAM_IS_CHECK,
-							issueItem.isCheck());
-					if (issueItem.getContent() == null) {
-						tempObject.put(NetConstance.PARAM_CONTENT,
-								JSONObject.NULL);
-					} else {
-						tempObject.put(NetConstance.PARAM_CONTENT,
-								issueItem.getContent());
-					}
-					tempObject.put(NetConstance.PARAM_REFORM_STATE,
-							issueItem.getReformState());
-					tempObject.put(NetConstance.PARAM_PERCENT, percent);
+//					tempObject.put(NetConstance.PARAM_DIM_ONE_ID,
+//							issueItem.getDimOneId());
+//					if (issueItem.getDimOneName() == null) {
+//						tempObject.put(NetConstance.PARAM_DIM_ONE_NAME,
+//								JSONObject.NULL);
+//					} else {
+//						tempObject.put(NetConstance.PARAM_DIM_ONE_NAME,
+//								issueItem.getDimOneName());
+//					}
+//					tempObject.put(NetConstance.PARAM_DIM_TWO_ID,
+//							issueItem.getId());
+//					if (issueItem.getName() == null) {
+//						tempObject.put(NetConstance.PARAM_DIM_TWO_NAME,
+//								JSONObject.NULL);
+//					} else {
+//						tempObject.put(NetConstance.PARAM_DIM_TWO_NAME,
+//								issueItem.getName());
+//					}
+//					tempObject.put(NetConstance.PARAM_DEF_QUE,
+//							issueItem.getIsDefQue());
+//					tempObject.put(NetConstance.PARAM_PRE_QUE,
+//							issueItem.getIsPreQue());
+//					tempObject.put(NetConstance.PARAM_IS_CHECK,
+//							issueItem.isCheck());
+//					if (issueItem.getContent() == null) {
+//						tempObject.put(NetConstance.PARAM_CONTENT,
+//								JSONObject.NULL);
+//					} else {
+//						tempObject.put(NetConstance.PARAM_CONTENT,
+//								issueItem.getContent());
+//					}
+//					tempObject.put(NetConstance.PARAM_REFORM_STATE,
+//							issueItem.getReformState());
+//					tempObject.put(NetConstance.PARAM_PERCENT, percent);
+					initDymicIssueItem(tempObject, issueItem, percent);
 					passwayArray.put(tempObject);
 				}
 			}
@@ -339,6 +339,52 @@ public class JsonParseHandler {
 		}
 		
 		return jsonObject;
+	}
+	
+	private static void initDymicIssueItem(JSONObject tempObject, IssueItem issueItem,
+			String percent) {
+		if (tempObject == null || issueItem == null) {
+			return;
+		}
+		try {
+			tempObject.put(NetConstance.PARAM_DIM_ONE_ID,
+					issueItem.getDimOneId());
+			if (issueItem.getDimOneName() == null) {
+				tempObject
+						.put(NetConstance.PARAM_DIM_ONE_NAME, JSONObject.NULL);
+			} else {
+				tempObject.put(NetConstance.PARAM_DIM_ONE_NAME,
+						issueItem.getDimOneName());
+			}
+			if (issueItem.getIsDefQue() == DefQueType.TYPE_DYMIC) {
+				tempObject.put(NetConstance.PARAM_DIM_TWO_ID, 0);
+				tempObject.put(NetConstance.PARAM_DIM_ONE_ID, 1013);
+			} else {
+				tempObject.put(NetConstance.PARAM_DIM_TWO_ID, issueItem.getId());
+			}
+//			tempObject.put(NetConstance.PARAM_DIM_TWO_ID, issueItem.getId());
+			if (issueItem.getName() == null) {
+				tempObject
+						.put(NetConstance.PARAM_DIM_TWO_NAME, JSONObject.NULL);
+			} else {
+				tempObject.put(NetConstance.PARAM_DIM_TWO_NAME,
+						issueItem.getName());
+			}
+			tempObject.put(NetConstance.PARAM_DEF_QUE, issueItem.getIsDefQue());
+			tempObject.put(NetConstance.PARAM_PRE_QUE, issueItem.getIsPreQue());
+			tempObject.put(NetConstance.PARAM_IS_CHECK, issueItem.isCheck());
+			if (issueItem.getContent() == null) {
+				tempObject.put(NetConstance.PARAM_CONTENT, JSONObject.NULL);
+			} else {
+				tempObject.put(NetConstance.PARAM_CONTENT,
+						issueItem.getContent());
+			}
+			tempObject.put(NetConstance.PARAM_REFORM_STATE,
+					issueItem.getReformState());
+			tempObject.put(NetConstance.PARAM_PERCENT, percent);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public static JSONObject parseCheckDataToJson(CheckData checkData) {

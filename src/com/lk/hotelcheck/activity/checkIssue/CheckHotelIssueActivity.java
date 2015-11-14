@@ -156,66 +156,73 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		if (mCheckData != null) {
-			String localSavePath = "";
-			String serviceSavePath = "";
 			if (resultCode == Activity.RESULT_OK) {
 				if (requestCode == CAMMER_REQUEST_CODE) {
-					IssueItem issueItem = mCheckData.getIssue(mCurrentIssuePosition);
-					ImageItem imageItem = new ImageItem();
-					String fileName = "";
-					boolean result = false;
-					String sdStatus = Environment.getExternalStorageState();
-					if (!sdStatus.equals(Environment.MEDIA_MOUNTED)) { // 检测sd是否可用
-						Log.i("lxk", "SD card is not avaiable/writeable right now.");
-						Toast.makeText(this, "sdcard不可读写", Toast.LENGTH_SHORT).show();
-						return;
-					}
-					
-					String imagePath = "";
-					Bitmap bitmap = PictureUtil.getSmallBitmap(Constance.Path.TEMP_IMAGE);
-					if (mCheckData.getType() == CheckDataType.TYPE_ROOM) {
-						fileName = mCheckData.getName()+"_"+new DateFormat().format("yyyyMMddhhmmss",
-								Calendar.getInstance(Locale.CHINA))
-								+ ".jpg";
-						imagePath = "/"+mHotel.getName()+"/"+"客房"+"/" + mCheckData.getIssue(mCurrentIssuePosition).getName()+"/";
-						bitmap = BitmapUtil.drawTextToBitmap(bitmap, mCheckData.getName());
-					} else if (mCheckData.getType() == CheckDataType.TYPE_PASSWAY) {
-						fileName = mCheckData.getName()+"_"+new DateFormat().format("yyyyMMddhhmmss",
-								Calendar.getInstance(Locale.CHINA))
-								+ ".jpg";
-						imagePath = "/"+mHotel.getName()+"/"+"楼层"+"/" + mCheckData.getIssue(mCurrentIssuePosition).getName()+"/";
-						bitmap = BitmapUtil.drawTextToBitmap(bitmap, mCheckData.getName());
-					} else {
-						fileName = new DateFormat().format("yyyyMMddhhmmss",
-								Calendar.getInstance(Locale.CHINA))
-								+ ".jpg";
-						imagePath = "/"+mHotel.getName()+"/"+mCheckData.getName()+"/" + mCheckData.getIssue(mCurrentIssuePosition).getName()+"/";
-					}
-					String filepath = Constance.Path.HOTEL_SRC+imagePath;
-					localSavePath = filepath+fileName;
-					result = FileUtil.saveBitmapToSDFile(bitmap,filepath , fileName, CompressFormat.JPEG);
-					bitmap.recycle();
-					serviceSavePath = Constance.Path.SERVER_IMAGE_PATH+mHotel.getCheckId()+"/"+DataManager.getInstance().getUserName()+"/"+fileName;
-					if (result) {
-						imageItem.setLocalImagePath(localSavePath);
-						imageItem.setServiceSavePath(serviceSavePath);
-						issueItem.addImage(imageItem);
-						boolean isWidth = ImageUtil.isWidthPic(imageItem.getLocalImagePath());
-						imageItem.setType(mCheckData.getType());
-						imageItem.setWidth(isWidth);
-						if (!issueItem.isCheck()) {
-							issueItem.setCheck(true);
-						}
-						HotelCheck hotelCheck = new HotelCheck(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), imageItem);
-						hotelCheck.save();
-						initCheckedIssue(mCurrentIssuePosition, issueItem, null);
-					}
+					saveImage();
 				} else if (requestCode == Constance.REQUEST_CODE_WIFI) {
 					mCurrentIssuePosition = data.getIntExtra(IntentKey.INTENT_KEY_ISSUE_POSITION, -99);
 					IssueItem issueItem = mCheckData.getIssue(mCurrentIssuePosition);
 					mAdapter.notifyItem(mCurrentIssuePosition, issueItem);
 				}
 			}
+		}
+	}
+	
+	/**
+	 * 保存拍摄图片的数据
+	 */
+	private void saveImage() {
+		String localSavePath = "";
+		String serviceSavePath = "";
+		IssueItem issueItem = mCheckData.getIssue(mCurrentIssuePosition);
+		ImageItem imageItem = new ImageItem();
+		String fileName = "";
+		boolean result = false;
+		String sdStatus = Environment.getExternalStorageState();
+		if (!sdStatus.equals(Environment.MEDIA_MOUNTED)) { // 检测sd是否可用
+			Log.i("lxk", "SD card is not avaiable/writeable right now.");
+			Toast.makeText(this, "sdcard不可读写", Toast.LENGTH_SHORT).show();
+			return;
+		}
+		
+		String imagePath = "";
+		Bitmap bitmap = PictureUtil.getSmallBitmap(Constance.Path.TEMP_IMAGE);
+		if (mCheckData.getType() == CheckDataType.TYPE_ROOM) {
+			fileName = mCheckData.getName()+"_"+new DateFormat().format("yyyyMMddhhmmss",
+					Calendar.getInstance(Locale.CHINA))
+					+ ".jpg";
+			imagePath = "/"+mHotel.getName()+"/"+"客房"+"/" + mCheckData.getIssue(mCurrentIssuePosition).getName()+"/";
+			bitmap = BitmapUtil.drawTextToBitmap(bitmap, mCheckData.getName());
+		} else if (mCheckData.getType() == CheckDataType.TYPE_PASSWAY) {
+			fileName = mCheckData.getName()+"_"+new DateFormat().format("yyyyMMddhhmmss",
+					Calendar.getInstance(Locale.CHINA))
+					+ ".jpg";
+			imagePath = "/"+mHotel.getName()+"/"+"楼层"+"/" + mCheckData.getIssue(mCurrentIssuePosition).getName()+"/";
+			bitmap = BitmapUtil.drawTextToBitmap(bitmap, mCheckData.getName());
+		} else {
+			fileName = new DateFormat().format("yyyyMMddhhmmss",
+					Calendar.getInstance(Locale.CHINA))
+					+ ".jpg";
+			imagePath = "/"+mHotel.getName()+"/"+mCheckData.getName()+"/" + mCheckData.getIssue(mCurrentIssuePosition).getName()+"/";
+		}
+		String filepath = Constance.Path.HOTEL_SRC+imagePath;
+		localSavePath = filepath+fileName;
+		result = FileUtil.saveBitmapToSDFile(bitmap,filepath , fileName, CompressFormat.JPEG);
+		bitmap.recycle();
+		serviceSavePath = Constance.Path.SERVER_IMAGE_PATH+mHotel.getCheckId()+"/"+DataManager.getInstance().getUserName()+"/"+fileName;
+		if (result) {
+			imageItem.setLocalImagePath(localSavePath);
+			imageItem.setServiceSavePath(serviceSavePath);
+			issueItem.addImage(imageItem);
+			boolean isWidth = ImageUtil.isWidthPic(imageItem.getLocalImagePath());
+			imageItem.setType(mCheckData.getType());
+			imageItem.setWidth(isWidth);
+			if (!issueItem.isCheck()) {
+				issueItem.setCheck(true);
+			}
+			HotelCheck hotelCheck = new HotelCheck(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), imageItem);
+			hotelCheck.save();
+			updateIssue(mCurrentIssuePosition, issueItem, null);
 		}
 	}
 	
@@ -251,7 +258,7 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 		IssueItem issueItem = mCheckData.getIssue(mCurrentIssuePosition);
 		if (isChecked != issueItem.isCheck()) {
 			issueItem.setCheck(isChecked);
-			initCheckedIssue(position, issueItem, null);
+			updateIssue(position, issueItem, null);
 		}
 	}
 
@@ -266,7 +273,7 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 		} else {
 			issueItem.setCheck(true);
 		} 
-		initCheckedIssue(position, issueItem, content);
+		updateIssue(position, issueItem, content);
 	}
 	
 	@Override
@@ -281,28 +288,23 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 		startActivityForResult(intent, Constance.REQUEST_CODE_WIFI);
 	}
 	
-	private void initCheckedIssue(int position, IssueItem issueItem, String content) {
+	/**
+	 * 更新问题的质检状态和数据
+	 * @param position
+	 * @param issueItem
+	 * @param content
+	 */
+	private void updateIssue(int position, IssueItem issueItem, String content) {
 		if (content != null) {
 			DataManager.getInstance().saveIssueContent(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), content, issueItem.isCheck(), issueItem.getReformState());
 		} else {
 			DataManager.getInstance().saveIssueCheck(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), issueItem.isCheck(), issueItem.getReformState());
 		}
-		//保存动态区域的问题修复状态
-		if (mCheckData.getType() == CheckDataType.TYPE_ROOM) {
-			DataManager.getInstance().saveIssueCheck(mHotel.getCheckId(),
-					Constance.CHECK_DATA_ID_ROOM, issueItem.getId(),
-					issueItem.isCheck(), issueItem.getReformState());
-		} else if (mCheckData.getType() == CheckDataType.TYPE_PASSWAY) {
-			DataManager.getInstance().saveIssueCheck(mHotel.getCheckId(),
-					Constance.CHECK_DATA_ID_PASSWAY, issueItem.getId(),
-					issueItem.isCheck(), issueItem.getReformState());
-		}
 		mCheckData.updateIssueCheck(issueItem);
-		if (mCheckData.getType() == CheckDataType.TYPE_ROOM) {
-			mHotel.initDymicRoomCheckedData();
-		} else if (mCheckData.getType() == CheckDataType.TYPE_PASSWAY) {
-			mHotel.initDymicPasswayCheckedData();
-		}
+		if (mCheckData.getType() == CheckDataType.TYPE_ROOM || 
+				mCheckData.getType() == CheckDataType.TYPE_PASSWAY) {
+			mHotel.updateDymicCheckedData(position, mCheckData, issueItem);
+		} 
 		mAdapter.notifyItem(position, issueItem);
 	}
 	
@@ -358,21 +360,6 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 		}
 	}
 	
-	
-//	private void addIssue(String name) {
-//		IssueItem issueItem = new IssueItem();
-//		issueItem.setName(name);
-//		issueItem.setContent("");
-//		issueItem.setIsDefQue(DefQueType.TYPE_DYMIC);
-//		issueItem.setIsPreQue(PreQueType.TYPE_NEW);
-//		issueItem.setDimOneId(1013);
-//		issueItem.setDimOneName("其他");
-//		int id = Math.abs(name.hashCode());
-//		issueItem.setId(id);
-//		DymicIssue dymicIssue = new DymicIssue(mHotel.getId(), mCheckData.getId(), issueItem);
-//		dymicIssue.save();
-//		mAdapter.addIssue(issueItem);
-//	}
 	
 	private void addIssue(String name) {
 		IssueItem issueItem = null;

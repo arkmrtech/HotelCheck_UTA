@@ -5,13 +5,16 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import android.R.integer;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
 
 import com.lk.hotelcheck.bean.dao.AreaIssue;
+import com.lk.hotelcheck.bean.dao.CheckIssue;
 import com.lk.hotelcheck.bean.dao.DymicIssue;
 import com.lk.hotelcheck.bean.dao.HotelCheck;
+import com.lk.hotelcheck.manager.DataManager;
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
 
@@ -57,9 +60,9 @@ public class Hotel extends SugarRecord<Hotel>{
 	@Ignore
 	private transient List<AreaIssue> questionList;
 	@Ignore
-	private transient SparseArray<IssueItem> roomCheckedIsuueArray;
+	private transient SparseArray<IssueItem> roomCheckedIsuueArray = new SparseArray<IssueItem>();
 	@Ignore
-	private transient SparseArray<IssueItem> passwayCheckedIsuueArray;
+	private transient SparseArray<IssueItem> passwayCheckedIsuueArray = new SparseArray<IssueItem>();
 	@Ignore
 	private transient List<IssueItem> roomDymicIssueArray;
 	@Ignore
@@ -296,7 +299,8 @@ public class Hotel extends SugarRecord<Hotel>{
 			initDymicQuestionCheckData(checkData);
 		}
 		roomArray.add(0, checkData);
-		initDymicCheckedData();
+//		initDymicCheckedData();
+		initDymicRoomCheckedData();
 	}
 	
 //	public CheckData getRoom(String areaName) {
@@ -328,7 +332,8 @@ public class Hotel extends SugarRecord<Hotel>{
 			initDymicQuestionCheckData(checkData);
 		}
 		passwayArray.add(0, checkData);
-		initDymicCheckedData();
+//		initDymicCheckedData();
+		initDymicPasswayCheckedData();
 	}
 	
 	public boolean hasPassway(long areaId) {
@@ -495,68 +500,6 @@ public class Hotel extends SugarRecord<Hotel>{
 		}
 	}
 	
-//	public int getFixedIssueCount() {
-//		int count = 0;
-//		if (checkDatas != null) {
-//			for (CheckData checkData : checkDatas) {
-//				if (checkData.getType() == CheckDataType.TYPE_NORMAL) {
-//					count += checkData.getFixedIssueCount();
-//				}
-//			}
-//		}
-//		if (roomArray != null) {
-//			for (CheckData checkData : roomArray) {
-//				count += checkData.getFixedIssueCount();
-//			}
-//		}
-//		if (passwayArray != null) {
-//			for (CheckData checkData : passwayArray) {
-//				count += checkData.getFixedIssueCount();
-//			}
-//		}
-//		return count;
-//	}
-//	
-//	public int getUnFixIssueCount() {
-//		int count = 0;
-//		if (checkDatas != null) {
-//			for (CheckData checkData : checkDatas) {
-//				count += checkData.getUnFixIssueCount();
-//			}
-//		}
-//		if (roomArray != null) {
-//			for (CheckData checkData : roomArray) {
-//				count += checkData.getUnFixIssueCount();
-//			}
-//		}
-//		if (passwayArray != null) {
-//			for (CheckData checkData : passwayArray) {
-//				count += checkData.getUnFixIssueCount();
-//			}
-//		}
-//		return count;
-//	}
-//	
-//	public int getFixingIssueCount() {
-//		int count = 0;
-//		if (checkDatas != null) {
-//			for (CheckData checkData : checkDatas) {
-//				count += checkData.getFixingIssueCount();
-//			}
-//		}
-//		if (roomArray != null) {
-//			for (CheckData checkData : roomArray) {
-//				count += checkData.getFixingIssueCount();
-//			}
-//		}
-//		if (passwayArray != null) {
-//			for (CheckData checkData : passwayArray) {
-//				count += checkData.getFixingIssueCount();
-//			}
-//		}
-//		return count;
-//	}
-	
 	public int getFixIssueCount(int issueState) {
 		int count = 0;
 		if (checkDatas != null) {
@@ -616,28 +559,6 @@ public class Hotel extends SugarRecord<Hotel>{
 		return count;
 	}
 	
-//	public int getNewIssueCount() {
-//		int count = 0;
-//		if (checkDatas != null) {
-//			for (CheckData checkData : checkDatas) {
-//				if (checkData.getType() == CheckDataType.TYPE_NORMAL) {
-//					count += checkData.getNewIssueCount();
-//				}
-//			}
-//		}
-//		if (roomArray != null) {
-//			for (CheckData checkData : roomArray) {
-//				count += checkData.getNewIssueCount();
-//			}
-//		}
-//		if (passwayArray != null) {
-//			for (CheckData checkData : passwayArray) {
-//				count += checkData.getNewIssueCount();
-//			}
-//		}
-//		return count;
-//	}
-	
 	public String getRoomIssuePercent(int issueId) {
 		if (roomArray == null ) {
 			return "";
@@ -687,36 +608,6 @@ public class Hotel extends SugarRecord<Hotel>{
 	public void setBranchNumber(int branchNumber) {
 		this.branchNumber = branchNumber;
 	}
-//	public int getDymicRoomCheckedIssueCount() {
-//		if (roomCheckedIsuueArray == null) {
-//			roomCheckedIsuueArray = new SparseArray<IssueItem>();
-//		} else {
-//			roomCheckedIsuueArray.clear();
-//		}
-//		if (roomArray != null) {
-//			for (CheckData checkData : roomArray) {
-//				for (IssueItem issueItem : checkData.getCheckedIssue()) {
-//					roomCheckedIsuueArray.put(issueItem.getId(), issueItem);
-//				}
-//			}
-//		}
-//		return roomCheckedIsuueArray.size();
-//	}
-//	public int getDymicPasswayCheckedIssueCount() {
-//		if (passwayCheckedIsuueArray == null) {
-//			passwayCheckedIsuueArray = new SparseArray<IssueItem>();
-//		} else {
-//			passwayCheckedIsuueArray.clear();
-//		}
-//		if (passwayArray != null) {
-//			for (CheckData checkData : passwayArray) {
-//				for (IssueItem issueItem : checkData.getCheckedIssue()) {
-//					passwayCheckedIsuueArray.put(issueItem.getId(), issueItem);
-//				}
-//			}
-//		}
-//		return passwayCheckedIsuueArray.size();
-//	}
 	
 	public int getDymicRoomCheckedIssueCount() {
 		return roomCheckedIsuueArray == null ? 0 : roomCheckedIsuueArray.size();
@@ -725,59 +616,106 @@ public class Hotel extends SugarRecord<Hotel>{
 		return passwayCheckedIsuueArray == null ? 0 : passwayCheckedIsuueArray.size();
 	}
 	
-	public void initDymicCheckedData() {
-		initDymicRoomCheckedData();
-		initDymicPasswayCheckedData();
-	}
 	
-	public void initDymicRoomCheckedData() {
-		if (roomCheckedIsuueArray == null) {
-			roomCheckedIsuueArray = new SparseArray<IssueItem>();
-		} else {
-			roomCheckedIsuueArray.clear();
-		}
-		if (roomArray != null) {
-			for (CheckData checkData : roomArray) {
+	public void initDymicCheckedData(List<CheckData> dymicDatas,
+			SparseArray<IssueItem> checkedIssueDatas) {
+		if (dymicDatas != null && checkedIssueDatas != null) {
+			for (CheckData checkData : dymicDatas) {
 				for (IssueItem issueItem : checkData.getCheckedIssue()) {
-					if (roomCheckedIsuueArray.indexOfKey(issueItem.getId()) > -1) {
-						IssueItem tempIssueItem = roomCheckedIsuueArray.get(issueItem.getId());
-//						if (issueItem.getReformState() == IssueItem.REFORM_STATE_FIXED 
-//							&& tempIssueItem.getReformState() == IssueItem.REFORM_STATE_FIXED) {
-//							tempIssueItem.setReformState(issueItem.getReformState());
-//						}
-						if (issueItem.getReformState() == IssueItem.REFORM_STATE_DEFAULT) {
-								tempIssueItem.setReformState(issueItem.getReformState());
-						}
-					} else {
-						roomCheckedIsuueArray.put(issueItem.getId(), issueItem);
+					if (checkedIssueDatas.indexOfKey(issueItem.getId()) < 0) {
+						IssueItem tempItem = new IssueItem();
+						tempItem.clone(issueItem);
+						checkedIssueDatas.put(issueItem.getId(), tempItem);
 					}
 				}
 			}
 		}
 	}
 	
+	public void initDymicRoomCheckedData() {
+		initDymicCheckedData(roomArray, roomCheckedIsuueArray);
+	}
+
 	public void initDymicPasswayCheckedData() {
-		if (passwayCheckedIsuueArray == null) {
-			passwayCheckedIsuueArray = new SparseArray<IssueItem>();
-		} else {
-			passwayCheckedIsuueArray.clear();
+		initDymicCheckedData(passwayArray, passwayCheckedIsuueArray);
+	}
+	
+//	public void initDymicRoomCheckedData() {
+//		if (roomCheckedIsuueArray == null) {
+//			roomCheckedIsuueArray = new SparseArray<IssueItem>();
+//		} else {
+//			roomCheckedIsuueArray.clear();
+//		}
+//		if (roomArray != null) {
+//			for (CheckData checkData : roomArray) {
+//				for (IssueItem issueItem : checkData.getCheckedIssue()) {
+////					if (roomCheckedIsuueArray.indexOfKey(issueItem.getId()) > -1) {
+////						IssueItem tempIssueItem = roomCheckedIsuueArray.get(issueItem.getId());
+////						if (issueItem.getReformState() == IssueItem.REFORM_STATE_DEFAULT) {
+////								tempIssueItem.setReformState(issueItem.getReformState());
+////						}
+////					} else {
+//						roomCheckedIsuueArray.put(issueItem.getId(), issueItem);
+////					}
+//				}
+//			}
+//		}
+//	}
+//	
+//	public void initDymicPasswayCheckedData() {
+//		if (passwayCheckedIsuueArray == null) {
+//			passwayCheckedIsuueArray = new SparseArray<IssueItem>();
+//		} else {
+//			passwayCheckedIsuueArray.clear();
+//		}
+//		if (passwayArray != null) {
+//			for (CheckData checkData : passwayArray) {
+//				for (IssueItem issueItem : checkData.getCheckedIssue()) {
+////					if (passwayCheckedIsuueArray.indexOfKey(issueItem.getId()) > -1) {
+////						IssueItem tempIssueItem = passwayCheckedIsuueArray.get(issueItem.getId());
+//////						if (issueItem.getReformState() == IssueItem.REFORM_STATE_FIXED 
+//////							&& tempIssueItem.getReformState() == IssueItem.REFORM_STATE_FIXED) {
+//////							tempIssueItem.setReformState(issueItem.getReformState());
+//////						} 
+////						if (issueItem.getReformState() == IssueItem.REFORM_STATE_DEFAULT) {
+////							tempIssueItem.setReformState(issueItem.getReformState());
+////						}
+////					} else {
+//						passwayCheckedIsuueArray.put(issueItem.getId(), issueItem);
+////					}
+//				}
+//			}
+//		}
+//	}
+	
+	public void updateDymicCheckedData(int position, CheckData checkData, IssueItem issueItem) {
+		if (checkData.getType() == CheckDataType.TYPE_PASSWAY) {
+			updateDymicCheckedIssue(position, checkData, passwayArray, passwayCheckedIsuueArray, issueItem);
+		} else if (checkData.getType() == CheckDataType.TYPE_ROOM) {
+			updateDymicCheckedIssue(position, checkData, roomArray, roomCheckedIsuueArray, issueItem);
 		}
-		if (passwayArray != null) {
-			for (CheckData checkData : passwayArray) {
-				for (IssueItem issueItem : checkData.getCheckedIssue()) {
-					if (passwayCheckedIsuueArray.indexOfKey(issueItem.getId()) > -1) {
-						IssueItem tempIssueItem = passwayCheckedIsuueArray.get(issueItem.getId());
-//						if (issueItem.getReformState() == IssueItem.REFORM_STATE_FIXED 
-//							&& tempIssueItem.getReformState() == IssueItem.REFORM_STATE_FIXED) {
-//							tempIssueItem.setReformState(issueItem.getReformState());
-//						} 
-						if (issueItem.getReformState() == IssueItem.REFORM_STATE_DEFAULT) {
-							tempIssueItem.setReformState(issueItem.getReformState());
-						}
+	}
+	
+	private void updateDymicCheckedIssue(int position, CheckData checkData, List<CheckData> checkDatas, SparseArray<IssueItem> dataArray, IssueItem issueItem) {
+		if (checkDatas != null && issueItem != null) {
+			if (dataArray.indexOfKey(issueItem.getId()) > -1) {
+				IssueItem tempIssueItem = dataArray.get(issueItem.getId());
+				if (tempIssueItem.getReformState() != issueItem.getReformState()) {
+					if (issueItem.getReformState() == IssueItem.REFORM_STATE_DEFAULT) {
+						tempIssueItem.setReformState(IssueItem.REFORM_STATE_DEFAULT);
 					} else {
-						passwayCheckedIsuueArray.put(issueItem.getId(), issueItem);
+							for (CheckData tempCheckData : checkDatas) {
+								IssueItem issueItem2 = tempCheckData.getIssue(position);
+								if (issueItem2.getReformState() != IssueItem.REFORM_STATE_FIXED) {
+									return;
+								}
+							}
+							tempIssueItem.setReformState(issueItem.getReformState());
+							DataManager.getInstance().saveIssueCheck(getId().intValue(), checkData.getId().intValue(), tempIssueItem.getId(), tempIssueItem.isCheck(), tempIssueItem.getReformState());
 					}
 				}
+			} else {
+				dataArray.put(issueItem.getId(), issueItem);
 			}
 		}
 	}
@@ -825,45 +763,90 @@ public class Hotel extends SugarRecord<Hotel>{
 		}
 		return dataList;
 	}
-	public void deleteRoomCheckedIssueImage(ImageItem imageItem) {
-		if (roomArray != null) {
-			for (CheckData checkData : roomArray) {
-				if (checkData.getCheckedIssueCount() > 0) {
-					for (IssueItem issueItem : checkData.getCheckedIssue()) {
-						if (issueItem.getImageCount() > 0) {
-							for (int i = 0; i < issueItem.getImageCount(); i++) {
-								ImageItem temp = issueItem.getImageItem(i);
-								if (temp.getLocalImagePath().equals(imageItem.getLocalImagePath())) {
-									issueItem.removeImageItem(i);
-									HotelCheck hotelCheck = HotelCheck.deleteItemByImageLocalPath(imageItem.getLocalImagePath());
-									if (TextUtils.isEmpty(issueItem.getContent())
-											&& issueItem.getImageCount() == 0) {
-										issueItem.setCheck(false);
-//										if (hotelCheck != null) {
-//											long id = Long.valueOf(hotelCheck.getCheckId()+""+hotelCheck.getAreaId()+""+hotelCheck.getIssueId());
-//											CheckIssue checkIssue = CheckIssue.findById(CheckIssue.class, id);
-//											if (checkIssue != null) {
-//												checkIssue.delete();
-//											} 
-//										}
-										checkData.initCheckedIssue();
-										initDymicRoomCheckedData();
-									}
-//									getDymicRoomCheckedIssueCount();
-									return;
-								}
-							}
-						}
-					}
-				}
-				
-			}
+	
+//	public void deleteRoomCheckedIssueImage(ImageItem imageItem) {
+//		if (roomArray != null) {
+//			for (CheckData checkData : roomArray) {
+//				if (checkData.getCheckedIssueCount() > 0) {
+//					for (IssueItem issueItem : checkData.getCheckedIssue()) {
+//						if (issueItem.getImageCount() > 0) {
+//							for (int i = 0; i < issueItem.getImageCount(); i++) {
+//								ImageItem temp = issueItem.getImageItem(i);
+//								if (temp.getLocalImagePath().equals(imageItem.getLocalImagePath())) {
+//									issueItem.removeImageItem(i);
+//									HotelCheck hotelCheck = HotelCheck.deleteItemByImageLocalPath(imageItem.getLocalImagePath());
+//									if (TextUtils.isEmpty(issueItem.getContent())
+//											&& issueItem.getImageCount() == 0) {
+//										issueItem.setCheck(false);
+////										if (hotelCheck != null) {
+////											long id = Long.valueOf(hotelCheck.getCheckId()+""+hotelCheck.getAreaId()+""+hotelCheck.getIssueId());
+////											CheckIssue checkIssue = CheckIssue.findById(CheckIssue.class, id);
+////											if (checkIssue != null) {
+////												checkIssue.delete();
+////											} 
+////										}
+//										checkData.initCheckedIssue();
+//										initDymicCheckedData(roomArray, roomCheckedIsuueArray);
+//									}
+////									getDymicRoomCheckedIssueCount();
+//									return;
+//								}
+//							}
+//						}
+//					}
+//				}
+//				
+//			}
+//		}
+//		
+//	}
+//	public void deletePasswayCheckedIssueImage(ImageItem imageItem) {
+//		if (passwayArray != null) {
+//			for (CheckData checkData : passwayArray) {
+//				if (checkData.getCheckedIssueCount() > 0) {
+//					for (IssueItem issueItem : checkData.getCheckedIssue()) {
+//						if (issueItem.getImageCount() > 0) {
+//							for (int i = 0; i < issueItem.getImageCount(); i++) {
+//								ImageItem temp = issueItem.getImageItem(i);
+//								if (temp.getLocalImagePath().equals(imageItem.getLocalImagePath())) {
+//									issueItem.removeImageItem(i);
+//									HotelCheck hotelCheck = HotelCheck.deleteItemByImageLocalPath(imageItem.getLocalImagePath());
+//									if (TextUtils.isEmpty(issueItem.getContent())
+//											&& issueItem.getImageCount() == 0) {
+//										issueItem.setCheck(false);
+////										if (hotelCheck != null) {
+////											long id = Long.valueOf(hotelCheck.getCheckId()+""+hotelCheck.getAreaId()+""+hotelCheck.getIssueId());
+////											CheckIssue checkIssue = CheckIssue.findById(CheckIssue.class, id);
+////											if (checkIssue != null) {
+////												checkIssue.delete();
+////											} 
+////										}
+//										checkData.initCheckedIssue();
+////										initDymicRoomCheckedData();
+////										initDymicPasswayCheckedData();
+//										initDymicCheckedData(passwayArray, passwayCheckedIsuueArray);
+//									}
+////									getDymicPasswayCheckedIssueCount();
+//									return;
+//								}
+//							}
+//						}
+//					}
+//				}
+//				
+//			}
+//		}
+//	}
+	
+		public void deleteDymicCheckedIssueImage(ImageItem imageItem, int type) {
+		List<CheckData> data = null;
+		if (type == CheckDataType.TYPE_ROOM) {
+			data = roomArray;
+		} else if (type == CheckDataType.TYPE_PASSWAY) {
+			data = passwayArray;
 		}
-		
-	}
-	public void deletePasswayCheckedIssueImage(ImageItem imageItem) {
-		if (passwayArray != null) {
-			for (CheckData checkData : passwayArray) {
+		if (data != null) {
+			for (CheckData checkData : data) {
 				if (checkData.getCheckedIssueCount() > 0) {
 					for (IssueItem issueItem : checkData.getCheckedIssue()) {
 						if (issueItem.getImageCount() > 0) {
@@ -884,7 +867,13 @@ public class Hotel extends SugarRecord<Hotel>{
 //										}
 										checkData.initCheckedIssue();
 //										initDymicRoomCheckedData();
-										initDymicPasswayCheckedData();
+//										initDymicPasswayCheckedData();
+										if (type == CheckDataType.TYPE_ROOM) {
+											initDymicCheckedData(roomArray, roomCheckedIsuueArray);
+										} else if (type == CheckDataType.TYPE_PASSWAY) {
+											initDymicCheckedData(passwayArray, passwayCheckedIsuueArray);
+										}
+										
 									}
 //									getDymicPasswayCheckedIssueCount();
 									return;
@@ -897,6 +886,8 @@ public class Hotel extends SugarRecord<Hotel>{
 			}
 		}
 	}
+	
+	
 	
 	public List<ImageItem> getAllRoomCheckedImageList(int i) {
 		List<ImageItem> dataList = new ArrayList<ImageItem>();
@@ -936,10 +927,29 @@ public class Hotel extends SugarRecord<Hotel>{
 	}
 	
 	public void initCheckedData() {
-			initDymicCheckedData();
-			if (checkDatas != null) {
-				for (CheckData checkData : checkDatas) {
-					checkData.initCheckedIssue();
+			initDymicCheckedData(roomArray, roomCheckedIsuueArray);
+			initDymicCheckedData(passwayArray, passwayCheckedIsuueArray);
+			//提取在报告页修改过的问题整改状态
+			if (roomCheckedIsuueArray != null) {
+				for (int i = 0; i < roomCheckedIsuueArray.size(); i++) {
+					IssueItem issueItem = roomCheckedIsuueArray.valueAt(i);
+					//问题是否已经检查过
+					CheckIssue checkIssue = DataManager.getInstance().getCheckIssue(id.intValue(),
+							(long)Constance.CHECK_DATA_ID_ROOM, issueItem.getId());
+					if (checkIssue != null) {
+						issueItem.setReformState(checkIssue.getReformState());
+					}
+				}
+			}
+			if (passwayCheckedIsuueArray != null) {
+				for (int i = 0; i < passwayCheckedIsuueArray.size(); i++) {
+					IssueItem issueItem = passwayCheckedIsuueArray.valueAt(i);
+					//问题是否已经检查过
+					CheckIssue checkIssue = DataManager.getInstance().getCheckIssue(id.intValue(),
+							(long)Constance.CHECK_DATA_ID_PASSWAY, issueItem.getId());
+					if (checkIssue != null) {
+						issueItem.setReformState(checkIssue.getReformState());
+					}
 				}
 			}
 	}

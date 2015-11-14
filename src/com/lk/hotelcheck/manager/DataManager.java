@@ -8,6 +8,7 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.SparseArray;
 
 import com.google.gson.Gson;
@@ -28,6 +29,7 @@ import com.lk.hotelcheck.network.HttpRequest;
 import com.lk.hotelcheck.util.FileUtil;
 import com.lk.hotelcheck.util.JsonParseHandler;
 import com.lk.hotelcheck.util.SharedPreferencesUtil;
+
 import common.Constance;
 import common.Constance.CheckDataType;
 import common.Constance.DefQueType;
@@ -232,7 +234,10 @@ public class DataManager {
 			//init normal checkData
 			for (int i = 0; i < mCheckModel.size(); i++) {
 				CheckData checkData = mCheckModel.valueAt(i);
-				initCheckDataIssue(hotel, checkData, hotel.getCheckId());
+				if (checkData.getType() != Constance.CheckDataType.TYPE_ROOM
+						|| checkData.getType() != Constance.CheckDataType.TYPE_PASSWAY) {
+					initCheckDataIssue(hotel, checkData, hotel.getCheckId());
+				}
 				hotel.addCheckData(checkData);
 			}
 			//初始化动态区域的问题
@@ -332,9 +337,10 @@ public class DataManager {
 			if (checkIssue != null) {
 				issueItem.setCheck(checkIssue.isCheck());
 				issueItem.setContent(checkIssue.getContent());
-				if (checkData.getType() == CheckDataType.TYPE_NORMAL) {
-					issueItem.setReformState(checkIssue.getReformState());
-				}
+//				if (checkData.getType() == CheckDataType.TYPE_NORMAL) {
+				Log.d("lxk", "hotel checked issue hotel name = "+hotel.getName()+" checkData = "+checkData.getName()+ " issue name = "+issueItem.getName()+" issue reform status = "+checkIssue.getReformState());
+				issueItem.setReformState(checkIssue.getReformState());
+//				}
 			}
 		}
 		checkData.initCheckedIssue();
@@ -344,28 +350,37 @@ public class DataManager {
 		if (hotel.getQuestionList() != null) {
 			for (AreaIssue areaIssue : hotel.getQuestionList()) {
 				if (areaIssue.getType() == CheckDataType.TYPE_ROOM) {
-					initDymicQuestionCheckData(areaIssue, hotel.getRoomList());
+					initDymicQuestionCheckData(hotel.getCheckId(), areaIssue, hotel.getRoomList());
 				} else if (areaIssue.getType() == CheckDataType.TYPE_PASSWAY) {
-					initDymicQuestionCheckData(areaIssue, hotel.getPasswayList());
+					initDymicQuestionCheckData(hotel.getCheckId(), areaIssue, hotel.getPasswayList());
 				} else {
-					initQuestionCheckData(areaIssue, hotel.getCheckDatas());
+					initQuestionCheckData(hotel.getCheckId(), areaIssue, hotel.getCheckDatas());
 				}
 				
 			}
 		}
 	}
 	
-	private void initDymicQuestionCheckData(AreaIssue areaIssue, List<CheckData> dataList) {
+	private void initDymicQuestionCheckData(int checkId, AreaIssue areaIssue, List<CheckData> dataList) {
 		if (dataList == null) {
 			return;
 		}
 		for (CheckData checkData : dataList) {
 				if (areaIssue.getIsDefQue() == DefQueType.TYPE_DYMIC) {
+					
 					IssueItem issueItem = new IssueItem();
 					issueItem.setId(areaIssue.getIssueId());
 					issueItem.setName(areaIssue.getIssueName());
 					issueItem.setIsPreQue(areaIssue.getIsPreQue());
 					issueItem.setIsDefQue(areaIssue.getIsDefQue());
+					//问题是否已经检查过
+					CheckIssue checkIssue = getCheckIssue(checkId,
+							checkData.getId(), areaIssue.getIssueId());
+					if (checkIssue != null) {
+						issueItem.setCheck(checkIssue.isCheck());
+						issueItem.setContent(checkIssue.getContent());
+						issueItem.setReformState(checkIssue.getReformState());
+					} 
 					checkData.addIssue(issueItem);
 				} else {
 					if (areaIssue.getIsPreQue() == PreQueType.TYPE_REVIEW) {
@@ -373,7 +388,10 @@ public class DataManager {
 							if (issueItem.getId() == areaIssue.getIssueId()) {
 								issueItem.setIsPreQue(areaIssue.getIsPreQue());
 								issueItem.setIsDefQue(areaIssue.getIsDefQue());
-								issueItem.setCheck(issueItem.isCheck());
+//								if (issueItem.getReformState() == IssueItem.REFORM_STATE_DEFAULT) {
+//									issueItem.setReformState(IssueItem.REFORM_STATE_FIXED);
+//								}
+//								issueItem.setCheck(issueItem.isCheck());
 							}
 						}
 					} 
@@ -382,7 +400,7 @@ public class DataManager {
 		}
 	}
 	
-	private void initQuestionCheckData(AreaIssue areaIssue, List<CheckData> dataList) {
+	private void initQuestionCheckData(int checkId, AreaIssue areaIssue, List<CheckData> dataList) {
 		if (dataList == null) {
 			return;
 		}
@@ -394,6 +412,14 @@ public class DataManager {
 					issueItem.setName(areaIssue.getIssueName());
 					issueItem.setIsPreQue(areaIssue.getIsPreQue());
 					issueItem.setIsDefQue(areaIssue.getIsDefQue());
+					//问题是否已经检查过
+					CheckIssue checkIssue = getCheckIssue(checkId,
+							checkData.getId(), areaIssue.getIssueId());
+					if (checkIssue != null) {
+						issueItem.setCheck(checkIssue.isCheck());
+						issueItem.setContent(checkIssue.getContent());
+						issueItem.setReformState(checkIssue.getReformState());
+					} 
 					checkData.addIssue(issueItem);
 				} else {
 					if (areaIssue.getIsPreQue() == PreQueType.TYPE_REVIEW) {
@@ -401,7 +427,10 @@ public class DataManager {
 							if (issueItem.getId() == areaIssue.getIssueId()) {
 								issueItem.setIsPreQue(areaIssue.getIsPreQue());
 								issueItem.setIsDefQue(areaIssue.getIsDefQue());
-								issueItem.setCheck(issueItem.isCheck());
+//								if (issueItem.getReformState() == IssueItem.REFORM_STATE_DEFAULT) {
+//									issueItem.setReformState(IssueItem.REFORM_STATE_FIXED);
+//								}
+//								issueItem.setCheck(issueItem.isCheck());
 							}
 						}
 					} 
@@ -460,9 +489,9 @@ public class DataManager {
 									 hotelTemp.setBaseInfo(hotel);
 								} 
 								 //for test 
-								hotelTemp.setStatus(false);
-								hotelTemp.setDataStatus(false);
-								hotelTemp.setImageStatus(false);
+//								hotelTemp.setStatus(false);
+//								hotelTemp.setDataStatus(false);
+//								hotelTemp.setImageStatus(false);
 								 
 								hotelList.add(hotelTemp);
 							}
