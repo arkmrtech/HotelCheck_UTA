@@ -179,7 +179,6 @@ public class PhotoChosenActivity extends BaseActivity {
 					});
 		}
 		if (mCheckDataPosition != -1 && mIssuePosition != -1) {
-			Log.d("lxk", "mCheckDataPosition = "+mCheckDataPosition +" mIssuePosition "+mIssuePosition);
 			mIsFristTime = true;
 			mNameSpinner.setSelection(mCheckDataPosition);
 		}
@@ -187,7 +186,6 @@ public class PhotoChosenActivity extends BaseActivity {
 	
 	private void updatePhotoData() {
 		List<ImageItem> data = null;
-		Log.d("lxk", "mCheckDataPosition = "+mCheckDataPosition +" mIssuePosition "+mIssuePosition);
 		CheckData checkData = mHotel.getCheckData(mCheckDataPosition);
 		if (checkData.getType() == CheckDataType.TYPE_ROOM) {
 			if (mIssuePosition == 0) {
@@ -257,7 +255,7 @@ public class PhotoChosenActivity extends BaseActivity {
 				Toast.makeText(v.getContext(), "酒店已完成检查，不能再删除图片", Toast.LENGTH_SHORT).show();
 				return;
 			}
-			final int position = (Integer) v.getTag();
+			final int position = (Integer) mDetailViewPager.getCurrentItem();
 			AlertDialog alertDialog = new AlertDialog.Builder(v.getContext())
 					.setTitle("确认删除这张图片？")
 					.setPositiveButton("确定",
@@ -269,20 +267,7 @@ public class PhotoChosenActivity extends BaseActivity {
 									ImageItem imageItem = mAdapter
 											.getDataItem(position);
 									CheckData checkData = mHotel.getCheckData(mCheckDataPosition);
-//									if (checkData.getType() == CheckDataType.TYPE_ROOM) {
-////										mHotel.deleteRoomCheckedIssueImage(imageItem);
-//										mHotel.deleteDymicCheckedIssueImage(imageItem, type);
-//									} else if (checkData.getType() == CheckDataType.TYPE_PASSWAY) {
-////										mHotel.deletePasswayCheckedIssueImage(imageItem);
-//									} else {
-//										if (mIssuePosition == 0) {
-//											checkData.deleteCheckedIssueImage(imageItem);
-//										} else {
-//											checkData.deleteCheckedIssueImage(mIssuePosition -1, imageItem);
-//										}
-//									}
 									if (checkData.getType() == CheckDataType.TYPE_ROOM || checkData.getType() == CheckDataType.TYPE_PASSWAY) {
-//										mHotel.deleteRoomCheckedIssueImage(imageItem);
 										mHotel.deleteDymicCheckedIssueImage(imageItem, checkData.getType());
 									} else {
 										if (mIssuePosition == 0) {
@@ -294,11 +279,11 @@ public class PhotoChosenActivity extends BaseActivity {
 									
 									
 									mAdapter.remove(position);
+									mDetailAdapter.notifyDataSetChanged();
 									if (mAdapter.getItemCount() == 0) {
 										mDetailLayout.setVisibility(View.GONE);
 										showError();
 									} 
-									mDetailAdapter.notifyDataSetChanged();
 									FileUtil.deleteFile(imageItem.getLocalImagePath());
 									
 									
@@ -554,7 +539,7 @@ public class PhotoChosenActivity extends BaseActivity {
 				int position = (Integer) v.getTag(R.id.iv_delete);
 				mDetailLayout.setVisibility(View.VISIBLE);
 				mDetailViewPager.setCurrentItem(position);
-				mDetailDeleteImageView.setTag(position);
+//				mDetailDeleteImageView.setTag(position);
 				
 			}
 		};

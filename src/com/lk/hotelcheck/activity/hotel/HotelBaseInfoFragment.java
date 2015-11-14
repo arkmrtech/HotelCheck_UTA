@@ -2,13 +2,10 @@ package com.lk.hotelcheck.activity.hotel;
 
 import java.util.Calendar;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -21,16 +18,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lk.hotelcheck.R;
-import com.lk.hotelcheck.bean.Hotel;
-import com.lk.hotelcheck.manager.DataManager;
 import com.lk.hotelcheck.util.StringUtil;
-
 import common.Constance;
 
-public class HotelBaseInfoFragment extends Fragment {
-	private Context mContext;
+public class HotelBaseInfoFragment extends BaseHotelFragment {
+//	private Context mContext;
 	private int mPosition;
-	private Hotel mHotel;
+//	private Hotel mHotel;
 	private View mRootView;
 	private TextView mNameTextView;
 	private TextView mAddressTextView;
@@ -64,11 +58,14 @@ public class HotelBaseInfoFragment extends Fragment {
 		return fragment;
 	}
 
-	@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-		mContext = activity;
-	}
+//	@Override
+//	public void onAttach(Activity activity) {
+//		super.onAttach(activity);
+//		mContext = activity;
+//		if (activity instanceof HotelInfoDetailActivity) {
+//			mHotel 
+//		}
+//	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -76,7 +73,7 @@ public class HotelBaseInfoFragment extends Fragment {
 		if (getArguments() != null) {
 			mPosition = getArguments().getInt(
 					Constance.IntentKey.INTENT_KEY_POSITION, -1);
-			mHotel = DataManager.getInstance().getHotel(mPosition);
+//			mHotel = DataManager.getInstance().getHotel(mPosition);
 		}
 	}
 

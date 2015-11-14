@@ -21,6 +21,7 @@ import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -50,7 +51,7 @@ import de.greenrobot.event.EventBus;
 
 public class HotelInfoDetailActivity extends BaseActivity{
 	
-	private int position;
+	private int mPosition;
 	private Hotel mHotel;
 	private ViewPager mViewPager;
 	private SlidingTabLayout mSlidingTabLayout;
@@ -67,7 +68,9 @@ public class HotelInfoDetailActivity extends BaseActivity{
 		context.startActivity(intent);
 	}
 	
-
+	public Hotel getHotel() {
+		return mHotel;
+	}
 
 	
 	@Override
@@ -75,10 +78,10 @@ public class HotelInfoDetailActivity extends BaseActivity{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_hotel);
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-		position = -1;
+		mPosition = -1;
 		if (getIntent().hasExtra(Constance.IntentKey.INTENT_KEY_POSITION)) {
-			position = getIntent().getIntExtra(Constance.IntentKey.INTENT_KEY_POSITION, -1);
-			mHotel = DataManager.getInstance().getHotel(position);
+			mPosition = getIntent().getIntExtra(Constance.IntentKey.INTENT_KEY_POSITION, -1);
+			mHotel = DataManager.getInstance().getHotel(mPosition);
 			if (mHotel != null) {
 				String name = mHotel.getName();
 				toolbar.setTitle(name);
@@ -117,7 +120,7 @@ public class HotelInfoDetailActivity extends BaseActivity{
 	private void init() {
 		mSlidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
 		mViewPager = (ViewPager) findViewById(R.id.vp_detail);
-		mAdapter = new DetailAdapter(getSupportFragmentManager(), position);
+		mAdapter = new DetailAdapter(getSupportFragmentManager(), mPosition);
 		mViewPager.setAdapter(mAdapter);
 		mViewPager.setOffscreenPageLimit(3);
 		mSlidingTabLayout.setCustomTabView(R.layout.tab_indicator,
@@ -279,7 +282,7 @@ public class HotelInfoDetailActivity extends BaseActivity{
 			public void onSuccess(JSONObject response) {
 				Toast.makeText(HotelInfoDetailActivity.this, "酒店数据上传成功", Toast.LENGTH_SHORT).show();
 				mHotel.setDataStatus(true);
-				DataManager.getInstance().setHotel(position, mHotel);
+				DataManager.getInstance().setHotel(mPosition, mHotel);
 				mLoadingGroup.setVisibility(View.GONE);
 				mIsLoading = false;
 			}
@@ -317,8 +320,8 @@ public class HotelInfoDetailActivity extends BaseActivity{
 //					DataManager.getInstance().setHotelChecked(position, hotel);
 				Toast.makeText(HotelInfoDetailActivity.this, "酒店检查状态上传成功", Toast.LENGTH_SHORT).show();
 				mHotel.setStatus(true);
-				DataManager.getInstance().setHotel(position, mHotel);
-				DataManager.getInstance().initCheckedData(mHotel);
+				DataManager.getInstance().setHotel(mPosition, mHotel);
+				DataManager.getInstance().updateCheckedHotelList(mHotel);
 				if (mViewPager.getCurrentItem() != 2) {
 					mViewPager.setCurrentItem(2);
 				}
@@ -328,7 +331,7 @@ public class HotelInfoDetailActivity extends BaseActivity{
 				}
 				mLoadingGroup.setVisibility(View.GONE);
 				mIsLoading = false;
-				EventBus.getDefault().post(new MessageEvent(MessageEvent.MESSAGE_UPDATE_HOTEL_DATA));
+//				EventBus.getDefault().post(new MessageEvent(MessageEvent.MESSAGE_UPDATE_HOTEL_DATA));
 			}
 			
 			@Override
@@ -345,6 +348,14 @@ public class HotelInfoDetailActivity extends BaseActivity{
 		});
 	 }
 	
+	 @Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		 if (keyCode == KeyEvent.KEYCODE_BACK && mIsLoading) {
+				return true;
+			}
+		return super.onKeyDown(keyCode, event);
+	}
+	 
 	class DetailAdapter extends FragmentStatePagerAdapter{
 
 		private String[] mTitle = new String[]{"基本信息","问题","报表"};

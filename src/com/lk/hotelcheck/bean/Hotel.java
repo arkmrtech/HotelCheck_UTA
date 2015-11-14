@@ -717,6 +717,7 @@ public class Hotel extends SugarRecord<Hotel>{
 		if (data != null) {
 			for (CheckData checkData : data) {
 				if (checkData.getCheckedIssueCount() > 0) {
+					int index = 0;
 					for (IssueItem issueItem : checkData.getCheckedIssue()) {
 						if (issueItem.getImageCount() > 0) {
 							for (int i = 0; i < issueItem.getImageCount(); i++) {
@@ -728,10 +729,13 @@ public class Hotel extends SugarRecord<Hotel>{
 											&& issueItem.getImageCount() == 0) {
 										issueItem.setCheck(false);
 										checkData.initCheckedIssue();
+										DataManager.getInstance().saveIssueCheck(getCheckId(), checkData.getId().intValue(), issueItem.getId(), issueItem.isCheck(), issueItem.getReformState());
 										if (type == CheckDataType.TYPE_ROOM) {
-											initDymicCheckedData(roomArray, roomCheckedIsuueArray);
+											updateDymicCheckedIssue(index, checkData, roomArray, roomCheckedIsuueArray, issueItem);
+//											initDymicCheckedData(roomArray, roomCheckedIsuueArray);
 										} else if (type == CheckDataType.TYPE_PASSWAY) {
-											initDymicCheckedData(passwayArray, passwayCheckedIsuueArray);
+											updateDymicCheckedIssue(index, checkData, passwayArray, passwayCheckedIsuueArray, issueItem);
+//											initDymicCheckedData(passwayArray, passwayCheckedIsuueArray);
 										}
 										
 									}
@@ -739,6 +743,7 @@ public class Hotel extends SugarRecord<Hotel>{
 								}
 							}
 						}
+						index++;
 					}
 				}
 				

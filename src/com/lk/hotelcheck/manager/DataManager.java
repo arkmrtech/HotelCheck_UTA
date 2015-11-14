@@ -728,7 +728,7 @@ public class DataManager {
 		return mUser.getUserName();
 	}
 
-	public void initCheckedData(Hotel hotel) {
+	public void updateCheckedHotelList(Hotel hotel) {
 		if (mCheckedHotelList == null) {
 			mCheckedHotelList = new ArrayList<Hotel>();
 		}

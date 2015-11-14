@@ -1,11 +1,9 @@
 package com.lk.hotelcheck.activity.hotel;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.LayoutManager;
@@ -25,17 +23,16 @@ import android.widget.Toast;
 import com.lk.hotelcheck.R;
 import com.lk.hotelcheck.activity.checkIssue.CheckHotelIssueActivity;
 import com.lk.hotelcheck.bean.CheckData;
-import com.lk.hotelcheck.bean.Hotel;
 import com.lk.hotelcheck.manager.DataManager;
 import com.lk.hotelcheck.util.DrawUtil;
 import common.Constance;
 import common.Constance.CheckDataType;
 
-public class HotelIssueFragment extends Fragment {
+public class HotelIssueFragment extends BaseHotelFragment {
 
-	private Context mContext;
+//	private Context mContext;
 	private View mRootView;
-	private Hotel mHotel;
+//	private Hotel mHotel;
 	private int mPosition;
 	private static final int VIEW_TYPE_SUBLIST = 10087;
 	private static final int  VIEW_TYPE_NORMAL = 10088;
@@ -52,11 +49,11 @@ public class HotelIssueFragment extends Fragment {
 		return fragment;
 	}
 
-	@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-		mContext = activity;
-	}
+//	@Override
+//	public void onAttach(Activity activity) {
+//		super.onAttach(activity);
+//		mContext = activity;
+//	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {

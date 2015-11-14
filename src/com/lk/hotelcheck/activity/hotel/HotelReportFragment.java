@@ -1,12 +1,9 @@
 package com.lk.hotelcheck.activity.hotel;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -15,25 +12,23 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.lk.hotelcheck.R;
 import com.lk.hotelcheck.activity.photochosen.PhotoChosenActivity;
 import com.lk.hotelcheck.bean.CheckData;
-import com.lk.hotelcheck.bean.Hotel;
 import com.lk.hotelcheck.bean.IssueItem;
 import com.lk.hotelcheck.bean.MessageEvent;
 import com.lk.hotelcheck.manager.DataManager;
 import com.lk.hotelcheck.util.DrawUtil;
-
 import common.Constance;
 import common.Constance.CheckDataType;
 import common.Constance.CheckType;
 import common.Constance.PreQueType;
+
 import de.greenrobot.event.EventBus;
 import de.greenrobot.event.Subscribe;
 
-public class HotelReportFragment extends Fragment{
+public class HotelReportFragment extends BaseHotelFragment{
 	
 	public static HotelReportFragment newInstance(int position) {
 		HotelReportFragment fragment = new HotelReportFragment();
@@ -43,9 +38,9 @@ public class HotelReportFragment extends Fragment{
 		return fragment;
 	}
 	
-	private Hotel mHotel;
+//	private Hotel mHotel;
 	private int mPosition;
-	private Activity mActivity;
+//	private Activity mActivity;
 	private View mRootView;
 	private IssueListAdapter mAdapter;
 	private TextView mUserNameTextView;
@@ -73,11 +68,11 @@ public class HotelReportFragment extends Fragment{
 		}
 	}
 	
-	@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-		this.mActivity = activity;
-	}
+//	@Override
+//	public void onAttach(Activity activity) {
+//		super.onAttach(activity);
+//		this.mActivity = activity;
+//	}
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -111,7 +106,7 @@ public class HotelReportFragment extends Fragment{
 	@Subscribe
 	public void onEvent(MessageEvent event) {
 		if (event.getMessageType() == MessageEvent.MESSAGE_UPDATE_HOTEL_DATA) {
-			mHotel = DataManager.getInstance().getHotel(mPosition);
+//			mHotel = DataManager.getInstance().getHotel(mPosition);
 		}
 	};
 
@@ -418,7 +413,7 @@ public class HotelReportFragment extends Fragment{
 						issueImageCount = issueItem.getImageCount();
 					}
 					if (issueImageCount > 0) {
-						PhotoChosenActivity.gotoPhotoChosen(mActivity, mPosition,groupPosition,childPosition);
+						PhotoChosenActivity.gotoPhotoChosen(mContext, mPosition,groupPosition,childPosition);
 					}
 				}
 			}
