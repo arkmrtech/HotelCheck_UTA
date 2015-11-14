@@ -110,8 +110,6 @@ public class PhotoPickerActivity extends BaseActivity implements CallBackListene
 		mCheckDataPosition = getIntent().getIntExtra(IntentKey.INTENT_KEY_CHECK_DATA_POSITION, -99);
 		mHotelPosition = getIntent().getIntExtra(IntentKey.INTENT_KEY_POSITION, -99);
 		mType = getIntent().getIntExtra(IntentKey.INTENT_KEY_TYPE, Constance.CheckDataType.TYPE_NORMAL);
-//		mImagePath = getIntent().getStringExtra(IntentKey.INTENT_KEY_FILE_PATH);
-//		mImageName = getIntent().getStringExtra(IntentKey.INTENT_KEY_NAME);
 		mLoadingView = findViewById(R.id.vg_loadig);
 		Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar);
 		mToolbar.setTitle("选择图片");
@@ -230,7 +228,7 @@ public class PhotoPickerActivity extends BaseActivity implements CallBackListene
 			}
 			HotelCheck hotelCheck = new HotelCheck(mHotel.getCheckId(), mCheckData.getId().intValue(), mIssueItem.getId(), imageItem);
 			hotelCheck.save();
-			initCheckedIssue();
+			updateCheckedIssue();
 		}
 		
 	}
@@ -249,30 +247,11 @@ public class PhotoPickerActivity extends BaseActivity implements CallBackListene
 					checkIssue.delete();
 				} 
 			}
-			initCheckedIssue();
+			updateCheckedIssue();
 		}
 	}
 	
-	private void initCheckedIssue() {
-//		DataManager.getInstance().saveIssueCheck(mHotel.getCheckId(),
-//				mCheckData.getId().intValue(), mIssueItem.getId(),
-//				mIssueItem.isCheck(), mIssueItem.getReformState());
-//		//保存动态区域的问题修复状态
-//		if (mCheckData.getType() == CheckDataType.TYPE_ROOM) {
-//			DataManager.getInstance().saveIssueCheck(mHotel.getCheckId(),
-//					Constance.CHECK_DATA_ID_ROOM, mIssueItem.getId(),
-//					mIssueItem.isCheck(), mIssueItem.getReformState());
-//		} else if (mCheckData.getType() == CheckDataType.TYPE_PASSWAY) {
-//			DataManager.getInstance().saveIssueCheck(mHotel.getCheckId(),
-//					Constance.CHECK_DATA_ID_PASSWAY, mIssueItem.getId(),
-//					mIssueItem.isCheck(), mIssueItem.getReformState());
-//		}
-//		mCheckData.updateIssueCheck(mIssueItem);
-//		if (mCheckData.getType() == CheckDataType.TYPE_ROOM) {
-//			mHotel.initDymicRoomCheckedData();
-//		} else if (mCheckData.getType() == CheckDataType.TYPE_PASSWAY) {
-//			mHotel.initDymicPasswayCheckedData();
-//		}
+	private void updateCheckedIssue() {
 		DataManager.getInstance().saveIssueCheck(mHotel.getCheckId(), mCheckData.getId().intValue(), mIssueItem.getId(), mIssueItem.isCheck(), mIssueItem.getReformState());
 		mCheckData.updateIssueCheck(mIssueItem);
 		if (mCheckData.getType() == CheckDataType.TYPE_ROOM || 
@@ -329,29 +308,6 @@ public class PhotoPickerActivity extends BaseActivity implements CallBackListene
                         MediaStore.Images.Media.MIME_TYPE + "=? or "  
                                 + MediaStore.Images.Media.MIME_TYPE + "=?",  
                         new String[] { "image/jpeg", "image/png" }, MediaStore.Images.Media.DATE_MODIFIED);  
-                
-//                Log.d("lxk", "image count = "+mCursor.getCount());
-                  
-                  
-//                while (mCursor.moveToNext()) {  
-//                    //获取图片的路径  
-//                    String path = mCursor.getString(mCursor  
-//                            .getColumnIndex(MediaStore.Images.Media.DATA));  
-//                      
-////                    //获取该图片的父路径名  
-////                    String parentName = new File(path).getParentFile().getName();  
-//  
-//                      
-//                    //根据父路径名将图片放入到mGruopMap中  
-////                    if (!mGruopMap.containsKey(parentName)) {  
-////                        List<String> chileList = new ArrayList<String>();  
-////                        chileList.add(path);  
-////                        mGruopMap.put(parentName, chileList);  
-////                    } else {  
-////                        mGruopMap.get(parentName).add(path);  
-////                    } 
-//                    mDataList.add(path);
-//                } 
                 String firstImage = null;
                 while (mCursor.moveToNext())
 				{
@@ -448,9 +404,6 @@ public class PhotoPickerActivity extends BaseActivity implements CallBackListene
 		imagePath = mImgDir.getAbsolutePath()+"/"+imagePath;
 		File imageFile = new File(imagePath);
 		if (imageFile.exists()) {
-//			mImagePath = mImagePath+mImageName+imageFile.getName();
-//			FileUtil.Copy(imageFile, mImagePath);
-//			sendResult();
 			if (isCheck) {
 				saveImage(imagePath, getSavePath());
 			} else {
@@ -517,16 +470,9 @@ public class PhotoPickerActivity extends BaseActivity implements CallBackListene
 		mListImageDirPopupWindow.setOnImageDirSelected(this);
 	}
 
-//	@Override
-//	public void onBackPressed() {
-//		// TODO Auto-generated method stub
-//		super.onBackPressed();
-//		sendResult();
-//	}
 	
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		// TODO Auto-generated method stub
 		switch (keyCode) {
 		case KeyEvent.KEYCODE_BACK:
 			sendResult();

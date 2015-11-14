@@ -95,9 +95,7 @@ public class CheckData extends SugarRecord<CheckData> implements Serializable{
 			checkedIssueArray = new SparseArray<IssueItem>();
 		}
 		if (issueItem.isCheck()) {
-//			if (checkedIssueArray.indexOfKey(issueItem.getId()) < 0) {
 				checkedIssueArray.put(issueItem.getId(), issueItem);
-//			}
 		} else if (!issueItem.isCheck() && issueItem.getIsPreQue() != Constance.PreQueType.TYPE_REVIEW) {
 			if (checkedIssueArray.indexOfKey(issueItem.getId()) > -1) {
 				checkedIssueArray.remove(issueItem.getId());
