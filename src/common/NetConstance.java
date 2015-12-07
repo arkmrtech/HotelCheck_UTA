@@ -98,6 +98,7 @@ public class NetConstance {
 	public static final String PARAM_BRANCH_MANAGER_TELE = "branchManagerTele";
 	public static final String PARAM_SESSION = "key";
 	public static final String PARAM_REGIONAL_MANAGER = "regional_manager";
+	public static final String PARAM_SORT = "sort";
 	
 	
 	

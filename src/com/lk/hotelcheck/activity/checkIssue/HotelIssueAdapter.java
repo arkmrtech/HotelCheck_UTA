@@ -254,19 +254,19 @@ public class HotelIssueAdapter extends RecyclerView.Adapter<ViewHolder>{
 			canmerImageView.setTag(position);
 			mCheckBox.setTag(position);
 			mContentView.setTag(position);
-			if (item.getIsPreQue() == PreQueType.TYPE_REVIEW) {
+			if (item.getPreQueType() == PreQueType.TYPE_REVIEW) {
 				mReviewTextView.setVisibility(View.VISIBLE);
 				mReviewTextView.setBackgroundResource(R.color.content_orange);
 				nameTextView.setTextColor(nameTextView.getContext().getResources().getColor(R.color.content_orange));
 				mReviewTextView.setText("复检问题");
 			} else {
+				nameTextView.setTextColor(Color.BLACK);
 				if (mIsPreview && item.isCheck()) {
 					mReviewTextView.setVisibility(View.VISIBLE);
 					mReviewTextView.setBackgroundResource(R.color.color_three);
 					mReviewTextView.setText("新发现");
 				} else {
 					mReviewTextView.setVisibility(View.GONE);
-					nameTextView.setTextColor(Color.BLACK);
 				}
 			}
 			if (mIsChecked) {

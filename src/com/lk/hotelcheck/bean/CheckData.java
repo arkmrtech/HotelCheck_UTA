@@ -5,12 +5,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import android.R.integer;
 import android.text.TextUtils;
 import android.util.SparseArray;
 
-import com.lk.hotelcheck.bean.dao.HotelCheck;
+import com.lk.hotelcheck.bean.dao.IssueCheckedImage;
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
+
 import common.Constance;
 import common.Constance.PreQueType;
 
@@ -25,6 +27,8 @@ public class CheckData extends SugarRecord<CheckData> implements Serializable{
 	private String name;
 	private int type;
 	private long checkId;
+	private int preQueType = PreQueType.TYPE_NEW;
+	
 	@Ignore
 	private SparseArray<IssueItem> checkedIssueArray;
 	
@@ -96,7 +100,7 @@ public class CheckData extends SugarRecord<CheckData> implements Serializable{
 		}
 		if (issueItem.isCheck()) {
 				checkedIssueArray.put(issueItem.getId(), issueItem);
-		} else if (!issueItem.isCheck() && issueItem.getIsPreQue() != Constance.PreQueType.TYPE_REVIEW) {
+		} else if (!issueItem.isCheck() && issueItem.getPreQueType() != Constance.PreQueType.TYPE_REVIEW) {
 			if (checkedIssueArray.indexOfKey(issueItem.getId()) > -1) {
 				checkedIssueArray.remove(issueItem.getId());
 			}
@@ -110,7 +114,7 @@ public class CheckData extends SugarRecord<CheckData> implements Serializable{
 			checkedIssueArray.clear();
 		}
 		for (IssueItem issueItem : mIssuelist) {
-			if (issueItem.isCheck() || issueItem.getIsPreQue() == PreQueType.TYPE_REVIEW) {
+			if (issueItem.isCheck() || issueItem.getPreQueType() == PreQueType.TYPE_REVIEW) {
 				checkedIssueArray.put(issueItem.getId(), issueItem);
 			}
 		}
@@ -163,7 +167,7 @@ public class CheckData extends SugarRecord<CheckData> implements Serializable{
 			ImageItem temp = issueItem.getImageItem(i);
 			if (temp.getLocalImagePath().equals(imageItem.getLocalImagePath())) {
 				issueItem.removeImageItem(i);
-				HotelCheck hotelCheck = HotelCheck.deleteItemByImageLocalPath(imageItem.getLocalImagePath());
+				IssueCheckedImage hotelCheck = IssueCheckedImage.deleteItemByImageLocalPath(imageItem.getLocalImagePath());
 				if (TextUtils.isEmpty(issueItem.getContent())
 						&& issueItem.getImageCount() == 0) {
 					issueItem.setCheck(false);
@@ -184,7 +188,7 @@ public class CheckData extends SugarRecord<CheckData> implements Serializable{
 				if (temp.getLocalImagePath().equals(
 						imageItem.getLocalImagePath())) {
 					issueItem.removeImageItem(i);
-					HotelCheck.deleteItemByImageLocalPath(imageItem.getLocalImagePath());
+					IssueCheckedImage.deleteItemByImageLocalPath(imageItem.getLocalImagePath());
 					if (TextUtils.isEmpty(issueItem.getContent())
 							&& issueItem.getImageCount() == 0) {
 						issueItem.setCheck(false);
@@ -269,12 +273,33 @@ public class CheckData extends SugarRecord<CheckData> implements Serializable{
 		int count = 0;
 		if (checkedIssueArray != null) {
 			for (IssueItem issueItem : mIssuelist) {
-				if (issueItem.getIsPreQue() != PreQueType.TYPE_REVIEW && issueItem.isCheck()) {
+				if (issueItem.getPreQueType() != PreQueType.TYPE_REVIEW && issueItem.isCheck()) {
 					count++;
 				}
 			}
 		}
 		return count;
+	}
+	public boolean isCanDelete() {
+		if (preQueType == PreQueType.TYPE_REVIEW) {
+			return false;
+		} else {
+			if (checkedIssueArray != null) {
+				for (int i = 0; i < checkedIssueArray.size(); i++) {
+					IssueItem issueItem = checkedIssueArray.valueAt(i);
+					if (issueItem.isCheck()) {
+						return false;
+					}
+				}
+			}
+		}
+		return true;
+	}
+	public int getPreQueType() {
+		return preQueType;
+	}
+	public void setPreQueType(int preQueType) {
+		this.preQueType = preQueType;
 	}
 	
 }

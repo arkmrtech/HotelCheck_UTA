@@ -24,6 +24,8 @@ import com.upyun.block.api.listener.CompleteListener;
 import com.upyun.block.api.listener.ProgressListener;
 import com.upyun.block.api.main.UploaderManager;
 import com.upyun.block.api.utils.UpYunUtils;
+
+import common.Constance.CheckDataType;
 import common.Constance.HotelAction;
 import common.Constance.ImageUploadState;
 import common.Constance.UPAI;
@@ -85,12 +87,15 @@ public class UploadService extends Service {
 	}
 	
 	public synchronized void addUploadTask(Hotel hotel) {
-
 		if (hotel == null) {
 			return;
 		}
 		for (CheckData checkData : hotel.getCheckDatas()) {
-			addUploadTask(checkData, hotel.getCheckId());
+			//过滤掉动态区域的问题
+			if (checkData.getType() != CheckDataType.TYPE_PASSWAY 
+					&& checkData.getType() != CheckDataType.TYPE_ROOM) {
+				addUploadTask(checkData, hotel.getCheckId());
+			}
 		}
 		for (CheckData checkData : hotel.getRoomList()) {
 			addUploadTask(checkData, hotel.getCheckId());
@@ -116,7 +121,8 @@ public class UploadService extends Service {
 						} else {
 							uploadBean.setIsWidth(1);
 						}
-						uploadBean.setType(imageItem.getType());
+//						uploadBean.setType(imageItem.getType());
+						uploadBean.setType(checkData.getType());
 						addUploadTask(uploadBean);
 					}
 				}

@@ -13,7 +13,7 @@ import android.util.SparseArray;
 import com.lk.hotelcheck.bean.dao.AreaIssue;
 import com.lk.hotelcheck.bean.dao.CheckIssue;
 import com.lk.hotelcheck.bean.dao.DymicIssue;
-import com.lk.hotelcheck.bean.dao.HotelCheck;
+import com.lk.hotelcheck.bean.dao.IssueCheckedImage;
 import com.lk.hotelcheck.manager.DataManager;
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
@@ -282,7 +282,7 @@ public class Hotel extends SugarRecord<Hotel>{
 			roomArray = new ArrayList<CheckData>();
 		}
 		if (checkType == CheckType.CHECK_TYPE_REVIEW) {
-			initDymicQuestionCheckData(checkData);
+			initReviewQuestionCheckData(checkData);
 		}
 		roomArray.add(0, checkData);
 		initDymicRoomCheckedData();
@@ -307,7 +307,7 @@ public class Hotel extends SugarRecord<Hotel>{
 			passwayArray = new ArrayList<CheckData>();
 		}
 		if (checkType == CheckType.CHECK_TYPE_REVIEW) {
-			initDymicQuestionCheckData(checkData);
+			initReviewQuestionCheckData(checkData);
 		}
 		passwayArray.add(0, checkData);
 		initDymicPasswayCheckedData();
@@ -517,7 +517,7 @@ public class Hotel extends SugarRecord<Hotel>{
 		if (roomCheckedIsuueArray != null) {
 			for (int i = 0; i < roomCheckedIsuueArray.size(); i++) {
 				IssueItem issueItem = roomCheckedIsuueArray.valueAt(i);
-				if (issueItem.getIsPreQue() != PreQueType.TYPE_REVIEW && issueItem.isCheck()) {
+				if (issueItem.getPreQueType() != PreQueType.TYPE_REVIEW && issueItem.isCheck()) {
 					count++;
 				}
 			}
@@ -525,7 +525,7 @@ public class Hotel extends SugarRecord<Hotel>{
 		if (passwayCheckedIsuueArray != null) {
 			for (int i = 0; i < passwayCheckedIsuueArray.size(); i++) {
 				IssueItem issueItem = passwayCheckedIsuueArray.valueAt(i);
-				if (issueItem.getIsPreQue() != PreQueType.TYPE_REVIEW && issueItem.isCheck()) {
+				if (issueItem.getPreQueType() != PreQueType.TYPE_REVIEW && issueItem.isCheck()) {
 					count++;
 				}
 			}
@@ -533,21 +533,27 @@ public class Hotel extends SugarRecord<Hotel>{
 		return count;
 	}
 	
-	public String getRoomIssuePercent(int issueId) {
-		if (roomArray == null ) {
+	public String getDymicAreaCheckedIssuePercent(int checkType, int issueId) {
+		List<CheckData> dataList = null;
+		if (checkType == CheckDataType.TYPE_PASSWAY) {
+			dataList = passwayArray;
+		} else if (checkType == CheckDataType.TYPE_ROOM) {
+			dataList = roomArray;
+		}
+		if (dataList == null ) {
 			return "";
 		}
 		String percent = "";
 		int count = 0;
-		for (CheckData checkData : roomArray) {
+		for (CheckData checkData : dataList) {
 			for (IssueItem issueItem : checkData.getCheckedIssue()) {
-				if (issueItem.getId() == issueId) {
+				if (issueItem.getId() == issueId && issueItem.isCheck()) {
 					count++;
 					break;
 				}
 			}
 		}
-		int total = roomArray.size();
+		int total = dataList.size();
 		if (count >0 && total >0) {
 			
 			percent = String.format(Locale.CHINA, "%.2f%s", (count*1.00) /total * 100, "%");
@@ -555,27 +561,58 @@ public class Hotel extends SugarRecord<Hotel>{
 		return percent ;
 	}
 	
-	public String getPasswayIssuePercent(int issueId) {
-		if (passwayArray == null ) {
-			return "";
-		}
-		String percent = "";
-		int count = 0;
-		for (CheckData checkData : passwayArray) {
-			for (IssueItem issueItem : checkData.getCheckedIssue()) {
-				if (issueItem.getId() == issueId) {
-					count++;
-					break;
-				}
-			}
-		}
-		int total = passwayArray.size();
-		if (count >0 && total >0) {
-			
-			percent = String.format(Locale.CHINA, "%.2f%s", (count*1.00) /total * 100, "%");
-		}
-		return percent ;
+	public String getRoomIssuePercent(int issueId) {
+		return getDymicAreaCheckedIssuePercent(CheckDataType.TYPE_ROOM, issueId);
 	}
+	
+	public String getPasswayIssuePercent(int issueId) {
+		return getDymicAreaCheckedIssuePercent(CheckDataType.TYPE_PASSWAY, issueId);
+	}
+	
+//	public String getRoomIssuePercent(int issueId) {
+//		if (roomArray == null ) {
+//			return "";
+//		}
+//		String percent = "";
+//		int count = 0;
+//		for (CheckData checkData : roomArray) {
+//			for (IssueItem issueItem : checkData.getCheckedIssue()) {
+//				if (issueItem.getId() == issueId) {
+//					count++;
+//					break;
+//				}
+//			}
+//		}
+//		int total = roomArray.size();
+//		if (count >0 && total >0) {
+//			
+//			percent = String.format(Locale.CHINA, "%.2f%s", (count*1.00) /total * 100, "%");
+//		}
+//		return percent ;
+//	}
+//	
+//	public String getPasswayIssuePercent(int issueId) {
+//		if (passwayArray == null ) {
+//			return "";
+//		}
+//		String percent = "";
+//		int count = 0;
+//		for (CheckData checkData : passwayArray) {
+//			for (IssueItem issueItem : checkData.getCheckedIssue()) {
+//				if (issueItem.getId() == issueId) {
+//					count++;
+//					break;
+//				}
+//			}
+//		}
+//		int total = passwayArray.size();
+//		if (count >0 && total >0) {
+//			
+//			percent = String.format(Locale.CHINA, "%.2f%s", (count*1.00) /total * 100, "%");
+//		}
+//		return percent ;
+//	}
+	
 	public int getBranchNumber() {
 		return branchNumber;
 	}
@@ -626,10 +663,12 @@ public class Hotel extends SugarRecord<Hotel>{
 		if (checkDatas != null && issueItem != null) {
 			if (checkedIssueArray.indexOfKey(issueItem.getId()) > -1) {
 				IssueItem tempIssueItem = checkedIssueArray.get(issueItem.getId());
-				if (tempIssueItem.getIsPreQue() == PreQueType.TYPE_REVIEW) {
+				if (tempIssueItem.getPreQueType() == PreQueType.TYPE_REVIEW) {
 					if (tempIssueItem.getReformState() != issueItem.getReformState()) {
 						if (issueItem.getReformState() == IssueItem.REFORM_STATE_DEFAULT) {
 							tempIssueItem.setReformState(IssueItem.REFORM_STATE_DEFAULT);
+							tempIssueItem.setCheck(issueItem.isCheck());
+							DataManager.getInstance().saveIssueCheck(getId().intValue(), checkData.getId().intValue(), tempIssueItem.getId(), tempIssueItem.isCheck(), tempIssueItem.getReformState());
 						} else {
 								for (CheckData tempCheckData : checkDatas) {
 									IssueItem issueItem2 = tempCheckData.getIssue(position);
@@ -687,21 +726,51 @@ public class Hotel extends SugarRecord<Hotel>{
 		}
 		return null;
 	}
+	
 	public List<ImageItem> getAllRoomCheckedImageList() {
-		List<ImageItem> dataList = new ArrayList<ImageItem>();
-		for (int i = 0; i < roomCheckedIsuueArray.size(); i++) {
-			if (roomCheckedIsuueArray.valueAt(i).getImageCount() >0) {
-				dataList.addAll(roomCheckedIsuueArray.valueAt(i).getImagelist());
-			}
-		}
-		return dataList;
+//		List<ImageItem> dataList = new ArrayList<ImageItem>();
+//		for (int i = 0; i < roomCheckedIsuueArray.size(); i++) {
+//			if (roomCheckedIsuueArray.valueAt(i).getImageCount() >0) {
+//				dataList.addAll(roomCheckedIsuueArray.valueAt(i).getImagelist());
+//			}
+//		}
+//		return dataList;
+		return getAllDymicCheckedImage(roomCheckedIsuueArray, roomArray);
 	}
+	
 	public List<ImageItem> getAllPasswayCheckedImageList() {
+//		List<ImageItem> dataList = new ArrayList<ImageItem>();
+//		for (int i = 0; i < passwayCheckedIsuueArray.size(); i++) {
+//			if (passwayCheckedIsuueArray.valueAt(i).getImageCount() >0) {
+//				dataList.addAll(passwayCheckedIsuueArray.valueAt(i).getImagelist());
+//			}
+//		}
+//		return dataList;
+		return getAllDymicCheckedImage(passwayCheckedIsuueArray, passwayArray);
+	}
+	
+	public List<ImageItem> getAllDymicCheckedImage(SparseArray<IssueItem> dymicCheckedIssue, List<CheckData> dymicDatas) {
+		if (dymicCheckedIssue == null || dymicDatas == null) {
+			return Collections.emptyList();
+		}
 		List<ImageItem> dataList = new ArrayList<ImageItem>();
-		for (int i = 0; i < passwayCheckedIsuueArray.size(); i++) {
-			if (passwayCheckedIsuueArray.valueAt(i).getImageCount() >0) {
-				dataList.addAll(passwayCheckedIsuueArray.valueAt(i).getImagelist());
+		if (dymicCheckedIssue != null) {
+			for (int i = 0; i < dymicCheckedIssue.size(); i++) {
+				IssueItem issueItem = dymicCheckedIssue.valueAt(i);
+				if (issueItem != null) {
+					for (CheckData checkData : dymicDatas) {
+						for (IssueItem tempItem : checkData.getCheckedIssue()) {
+							if (tempItem != null && tempItem.getId() == issueItem.getId()) {
+								if (tempItem.getImagelist() != null && tempItem.getImagelist().size() >0) {
+									dataList.addAll(tempItem.getImagelist());
+								}
+								
+							}
+						}
+					}
+				}
 			}
+			
 		}
 		return dataList;
 	}
@@ -724,7 +793,7 @@ public class Hotel extends SugarRecord<Hotel>{
 								ImageItem temp = issueItem.getImageItem(i);
 								if (temp.getLocalImagePath().equals(imageItem.getLocalImagePath())) {
 									issueItem.removeImageItem(i);
-									HotelCheck hotelCheck = HotelCheck.deleteItemByImageLocalPath(imageItem.getLocalImagePath());
+									IssueCheckedImage hotelCheck = IssueCheckedImage.deleteItemByImageLocalPath(imageItem.getLocalImagePath());
 									if (TextUtils.isEmpty(issueItem.getContent())
 											&& issueItem.getImageCount() == 0) {
 										issueItem.setCheck(false);
@@ -888,7 +957,7 @@ public class Hotel extends SugarRecord<Hotel>{
 		this.branchManagerTele = branchManagerTele;
 	}
 	
-	public void initDymicQuestionCheckData(CheckData checkData) {
+	public void initReviewQuestionCheckData(CheckData checkData) {
 		if (checkData == null || questionList == null) {
 			return;
 		}
@@ -898,23 +967,24 @@ public class Hotel extends SugarRecord<Hotel>{
 					IssueItem issueItem = new IssueItem();
 					issueItem.setId(areaIssue.getIssueId());
 					issueItem.setName(areaIssue.getIssueName());
-					issueItem.setIsPreQue(areaIssue.getIsPreQue());
+					issueItem.setPreQueType(areaIssue.getIsPreQue());
 					issueItem.setIsDefQue(areaIssue.getIsDefQue());
 					checkData.addIssue(issueItem);
 				} else {
 					if (areaIssue.getIsPreQue() == PreQueType.TYPE_REVIEW) {
 						for (IssueItem issueItem : checkData.getIssuelist()) {
 							if (issueItem.getId() == areaIssue.getIssueId()) {
-								issueItem.setIsPreQue(areaIssue.getIsPreQue());
+								issueItem.setPreQueType(areaIssue.getIsPreQue());
 								issueItem.setIsDefQue(areaIssue.getIsDefQue());
 								issueItem.setCheck(issueItem.isCheck());
 							}
 						}
 					}
 				}
-				checkData.initCheckedIssue();
+				
 			}
 		}
+		checkData.initCheckedIssue();
 	}
 	
 	public boolean checkReformState() {
@@ -923,7 +993,7 @@ public class Hotel extends SugarRecord<Hotel>{
 			if (checkDatas != null) {
 				for (CheckData checkData : checkDatas) {
 					for (IssueItem issueItem : checkData.getCheckedIssue()) {
-						if (issueItem.getIsPreQue() == PreQueType.TYPE_REVIEW 
+						if (issueItem.getPreQueType() == PreQueType.TYPE_REVIEW 
 								&& issueItem.getReformState() == IssueItem.REFORM_STATE_DEFAULT) {
 							return false;
 						}
@@ -932,7 +1002,7 @@ public class Hotel extends SugarRecord<Hotel>{
 			}
 			if (roomCheckedIsuueArray != null) {
 				for (int i = 0; i < roomCheckedIsuueArray.size(); i++) {
-					if (roomCheckedIsuueArray.valueAt(i).getIsPreQue() == PreQueType.TYPE_REVIEW  
+					if (roomCheckedIsuueArray.valueAt(i).getPreQueType() == PreQueType.TYPE_REVIEW  
 							&& roomCheckedIsuueArray.valueAt(i).getReformState() == IssueItem.REFORM_STATE_DEFAULT) {
 						return false;
 					}
@@ -940,7 +1010,7 @@ public class Hotel extends SugarRecord<Hotel>{
 			}
 			if (passwayCheckedIsuueArray != null) {
 				for (int i = 0; i < passwayCheckedIsuueArray.size(); i++) {
-					if (passwayCheckedIsuueArray.valueAt(i).getIsPreQue() == PreQueType.TYPE_REVIEW  
+					if (passwayCheckedIsuueArray.valueAt(i).getPreQueType() == PreQueType.TYPE_REVIEW  
 							&& passwayCheckedIsuueArray.valueAt(i).getReformState() == IssueItem.REFORM_STATE_DEFAULT) {
 						return false;
 					}
@@ -1025,7 +1095,7 @@ public class Hotel extends SugarRecord<Hotel>{
 		issueItem.setName(name);
 		issueItem.setContent("");
 		issueItem.setIsDefQue(DefQueType.TYPE_DYMIC);
-		issueItem.setIsPreQue(PreQueType.TYPE_NEW);
+		issueItem.setPreQueType(PreQueType.TYPE_NEW);
 		issueItem.setDimOneId(1013);
 		issueItem.setDimOneName("其他");
 		int id = Math.abs(name.hashCode());

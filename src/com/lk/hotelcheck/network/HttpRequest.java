@@ -193,8 +193,8 @@ public class HttpRequest {
 			    .create();
 			JSONObject json = new JSONObject(gson.toJson(uploadBean));
 			if (json != null) {
-				int type = json.optInt("type");
-				switch (type) {
+//				int type = json.optInt("type");
+				switch (uploadBean.getType()) {
 				case Constance.CheckDataType.TYPE_ROOM:
 					json.put("areaId", Constance.CHECK_DATA_ID_ROOM);
 					break;

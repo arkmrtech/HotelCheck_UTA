@@ -11,7 +11,7 @@ import com.orm.SugarRecord;
  * @author lk
  *
  */
-public class HotelCheck extends SugarRecord<HotelCheck>{
+public class IssueCheckedImage extends SugarRecord<IssueCheckedImage>{
 
 //	public static final int IMAGE_TYPE = 1;
 //	public static final int TEXT_TYPE = 2;
@@ -30,10 +30,10 @@ public class HotelCheck extends SugarRecord<HotelCheck>{
 	
 	
 	
-	public HotelCheck() {
+	public IssueCheckedImage() {
 		super();
 	}
-	public HotelCheck(int checkId, String name, int areaId, String areaName,
+	public IssueCheckedImage(int checkId, String name, int areaId, String areaName,
 			int issueId, String localImagePath, String serviceImagePath,
 			 int type) {
 		super();
@@ -46,7 +46,7 @@ public class HotelCheck extends SugarRecord<HotelCheck>{
 		this.serviceImagePath = serviceImagePath;
 //		this.type = type;
 	}
-	public HotelCheck(int checkId, int areaId, int issueId, ImageItem imageItem) {
+	public IssueCheckedImage(int checkId, int areaId, int issueId, ImageItem imageItem) {
 		if (imageItem == null) {
 			return;
 		}
@@ -104,10 +104,10 @@ public class HotelCheck extends SugarRecord<HotelCheck>{
 	public void setAreaName(String areaName) {
 		this.areaName = areaName;
 	}
-	public static HotelCheck deleteItemByImageLocalPath(String localImagePath) {
-		List<HotelCheck> dataList = HotelCheck.find(HotelCheck.class, "LOCAL_IMAGE_PATH = ?", localImagePath);
+	public static IssueCheckedImage deleteItemByImageLocalPath(String localImagePath) {
+		List<IssueCheckedImage> dataList = IssueCheckedImage.find(IssueCheckedImage.class, "LOCAL_IMAGE_PATH = ?", localImagePath);
 		if (dataList != null) {
-			for (HotelCheck hotelCheck: dataList) {
+			for (IssueCheckedImage hotelCheck: dataList) {
 				hotelCheck.delete();
 				return hotelCheck;
 			}

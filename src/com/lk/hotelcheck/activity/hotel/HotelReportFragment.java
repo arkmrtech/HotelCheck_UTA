@@ -17,16 +17,12 @@ import com.lk.hotelcheck.R;
 import com.lk.hotelcheck.activity.photochosen.PhotoChosenActivity;
 import com.lk.hotelcheck.bean.CheckData;
 import com.lk.hotelcheck.bean.IssueItem;
-import com.lk.hotelcheck.bean.MessageEvent;
 import com.lk.hotelcheck.manager.DataManager;
 import com.lk.hotelcheck.util.DrawUtil;
 import common.Constance;
 import common.Constance.CheckDataType;
 import common.Constance.CheckType;
 import common.Constance.PreQueType;
-
-import de.greenrobot.event.EventBus;
-import de.greenrobot.event.Subscribe;
 
 public class HotelReportFragment extends BaseHotelFragment{
 	
@@ -79,7 +75,7 @@ public class HotelReportFragment extends BaseHotelFragment{
 		super.onCreate(savedInstanceState);
 		mPosition = getArguments().getInt(Constance.IntentKey.INTENT_KEY_POSITION);
 		mHotel = DataManager.getInstance().getHotel(mPosition);
-		EventBus.getDefault().register(this);
+//		EventBus.getDefault().register(this);
 	}
 	
 	@Override
@@ -103,12 +99,12 @@ public class HotelReportFragment extends BaseHotelFragment{
 		expanAll();
 	}
 	
-	@Subscribe
-	public void onEvent(MessageEvent event) {
-		if (event.getMessageType() == MessageEvent.MESSAGE_UPDATE_HOTEL_DATA) {
-//			mHotel = DataManager.getInstance().getHotel(mPosition);
-		}
-	};
+//	@Subscribe
+//	public void onEvent(MessageEvent event) {
+//		if (event.getMessageType() == MessageEvent.MESSAGE_UPDATE_HOTEL_DATA) {
+////			mHotel = DataManager.getInstance().getHotel(mPosition);
+//		}
+//	};
 
 	
 	
@@ -324,7 +320,7 @@ public class HotelReportFragment extends BaseHotelFragment{
 				viewHolder.mFlagTextView.setText("");
 			}
 			viewHolder.mNameTextView.setText(issueItem.getName());
-			if (issueItem.getIsPreQue() == PreQueType.TYPE_REVIEW) {
+			if (issueItem.getPreQueType() == PreQueType.TYPE_REVIEW) {
 				viewHolder.mStatusTextView.setTag(R.id.tv_name, groupPosition);
 				viewHolder.mStatusTextView.setTag(R.id.tv_flag, childPosition);
 				if (!mHotel.isStatus()) {
@@ -368,17 +364,29 @@ public class HotelReportFragment extends BaseHotelFragment{
 							.getColor(R.color.white));
 				}
 			}
-			if (checkData.getType() == CheckDataType.TYPE_ROOM) {
-				viewHolder.mPercentTextView.setText(mHotel
-						.getRoomIssuePercent(issueItem.getId()));
-				viewHolder.mPercentTextView.setVisibility(View.VISIBLE);
-			} else if (checkData.getType() == CheckDataType.TYPE_PASSWAY) {
-				viewHolder.mPercentTextView.setText(mHotel
-						.getPasswayIssuePercent(issueItem.getId()));
-				viewHolder.mPercentTextView.setVisibility(View.VISIBLE);
+			if (checkData.getType() == CheckDataType.TYPE_ROOM 
+					|| checkData.getType() == CheckDataType.TYPE_PASSWAY) {
+				if (issueItem.isCheck()) {
+					viewHolder.mPercentTextView.setVisibility(View.VISIBLE);
+					viewHolder.mPercentTextView.setText(mHotel
+								.getDymicAreaCheckedIssuePercent(checkData.getType(), issueItem.getId()));
+				} else {
+					viewHolder.mPercentTextView.setVisibility(View.GONE);
+				}
 			} else {
 				viewHolder.mPercentTextView.setVisibility(View.GONE);
 			}
+//			if (checkData.getType() == CheckDataType.TYPE_ROOM || ) {
+//				viewHolder.mPercentTextView.setText(mHotel
+//						.getRoomIssuePercent(issueItem.getId()));
+//				viewHolder.mPercentTextView.setVisibility(View.VISIBLE);
+//			} else if (checkData.getType() == CheckDataType.TYPE_PASSWAY) {
+//				viewHolder.mPercentTextView.setText(mHotel
+//						.getPasswayIssuePercent(issueItem.getId()));
+//				viewHolder.mPercentTextView.setVisibility(View.VISIBLE);
+//			} else {
+//				viewHolder.mPercentTextView.setVisibility(View.GONE);
+//			}
 			return convertView;
 		}
 

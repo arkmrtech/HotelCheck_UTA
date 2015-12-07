@@ -12,7 +12,7 @@ public class AreaIssue extends SugarRecord<AreaIssue>{
 	private int type;
 	private int isDefQue;
 	private int isPreQue;
-	
+	private int sort;
 	
 	
 
@@ -115,6 +115,16 @@ public class AreaIssue extends SugarRecord<AreaIssue>{
 
 	public void setType(int type) {
 		this.type = type;
+	}
+
+
+	public int getSort() {
+		return sort;
+	}
+
+
+	public void setSort(int sort) {
+		this.sort = sort;
 	}
 	
 	

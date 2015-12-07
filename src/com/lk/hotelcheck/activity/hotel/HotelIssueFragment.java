@@ -241,7 +241,7 @@ public class HotelIssueFragment extends BaseHotelFragment {
 			mNameTextView.setText(checkData.getName());
 			if (checkData.getId() == Constance.CHECK_DATA_ID_ROOM) {
 				mSubFloorAdapter = new AddItemAdapter(Constance.CheckDataType.TYPE_ROOM, checkDataPosition);
-			} else {
+			} else if ((checkData.getId() == Constance.CHECK_DATA_ID_PASSWAY)) {
 				mSubFloorAdapter = new AddItemAdapter(Constance.CheckDataType.TYPE_PASSWAY, checkDataPosition);
 			}
 			
@@ -493,7 +493,6 @@ public class HotelIssueFragment extends BaseHotelFragment {
 				@Override
 				public boolean onLongClick(View v) {
 					int position = (Integer) v.getTag();
-//					CheckData checkData = DataManager.getInstance().getHotel(mPosition).getCheckData(mCheckDataPosition).getSubCheckData(position-1);
 					CheckData checkData = null;
 					switch (mType) {
 					case Constance.CheckDataType.TYPE_ROOM:
@@ -505,7 +504,11 @@ public class HotelIssueFragment extends BaseHotelFragment {
 					default:
 						break;
 					}
-					if (checkData != null && checkData.getCheckedIssueCount() >0 ) {
+//					if (checkData != null && checkData.getCheckedIssueCount() >0 ) {
+//						Toast.makeText(v.getContext(), "已登记问题，不能删除", Toast.LENGTH_SHORT).show();
+//						return true;
+//					}
+					if (checkData != null && !checkData.isCanDelete() ) {
 						Toast.makeText(v.getContext(), "已登记问题，不能删除", Toast.LENGTH_SHORT).show();
 						return true;
 					}

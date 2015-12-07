@@ -41,7 +41,7 @@ import com.lk.hotelcheck.bean.Hotel;
 import com.lk.hotelcheck.bean.ImageItem;
 import com.lk.hotelcheck.bean.IssueItem;
 import com.lk.hotelcheck.bean.dao.DymicIssue;
-import com.lk.hotelcheck.bean.dao.HotelCheck;
+import com.lk.hotelcheck.bean.dao.IssueCheckedImage;
 import com.lk.hotelcheck.manager.DataManager;
 import com.lk.hotelcheck.util.BitmapUtil;
 import com.lk.hotelcheck.util.FileUtil;
@@ -220,7 +220,7 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 			if (!issueItem.isCheck()) {
 				issueItem.setCheck(true);
 			}
-			HotelCheck hotelCheck = new HotelCheck(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), imageItem);
+			IssueCheckedImage hotelCheck = new IssueCheckedImage(mHotel.getCheckId(), mCheckData.getId().intValue(), issueItem.getId(), imageItem);
 			hotelCheck.save();
 			updateIssue(mCurrentIssuePosition, issueItem, null);
 		}
@@ -404,7 +404,7 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 		issueItem.setName(name);
 		issueItem.setContent("");
 		issueItem.setIsDefQue(DefQueType.TYPE_DYMIC);
-		issueItem.setIsPreQue(PreQueType.TYPE_NEW);
+		issueItem.setPreQueType(PreQueType.TYPE_NEW);
 		issueItem.setDimOneId(1013);
 		issueItem.setDimOneName("其他");
 		int id = Math.abs(name.hashCode());

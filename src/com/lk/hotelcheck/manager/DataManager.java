@@ -1,6 +1,7 @@
 package com.lk.hotelcheck.manager;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -22,13 +23,14 @@ import com.lk.hotelcheck.bean.User;
 import com.lk.hotelcheck.bean.dao.AreaIssue;
 import com.lk.hotelcheck.bean.dao.CheckIssue;
 import com.lk.hotelcheck.bean.dao.DymicIssue;
-import com.lk.hotelcheck.bean.dao.HotelCheck;
+import com.lk.hotelcheck.bean.dao.IssueCheckedImage;
 import com.lk.hotelcheck.network.DataCallback;
 import com.lk.hotelcheck.network.HttpCallback;
 import com.lk.hotelcheck.network.HttpRequest;
 import com.lk.hotelcheck.util.FileUtil;
 import com.lk.hotelcheck.util.JsonParseHandler;
 import com.lk.hotelcheck.util.SharedPreferencesUtil;
+import com.tencent.bugly.proguard.u;
 
 import common.Constance;
 import common.Constance.CheckDataType;
@@ -194,53 +196,144 @@ public class DataManager {
 		return bean;
 	}
 	
+//	private SparseArray<CheckData> initCheckData() {
+////		List<AreaIssue> areaIssueList = AreaIssue.listAll(AreaIssue.class);
+//		Iterator<AreaIssue> dataIterator = AreaIssue.findAsIterator(AreaIssue.class, null, null, null, "sort ASC", null);
+//		if (dataIterator != null) {
+//			SparseArray<CheckData> checkModel = new SparseArray<CheckData>();
+//			while (dataIterator.hasNext()) {
+//				AreaIssue areaIssue = (AreaIssue) dataIterator.next();
+//				IssueItem issueItem = new IssueItem();
+//				issueItem.setId(areaIssue.getIssueId());
+//				issueItem.setName(areaIssue.getIssueName());
+//				issueItem.setDimOneId(areaIssue.getDimOneId());
+//				issueItem.setDimOneName(areaIssue.getDimOneName());
+//				CheckData checkData = null;
+//				if (checkModel.indexOfKey(areaIssue.getSort()) > -1) {
+//					checkData = checkModel.get(areaIssue.getSort());
+//				} else {
+//					checkData = new CheckData();
+//					checkData.setId((long) areaIssue.getAreaId());
+//					checkData.setName(areaIssue.getAreaName());
+//					if (checkData.getId() == Constance.CHECK_DATA_ID_ROOM) {
+//						checkData.setType(Constance.CheckDataType.TYPE_ROOM);
+//					} else if (checkData.getId() == Constance.CHECK_DATA_ID_PASSWAY) {
+//						checkData.setType(Constance.CheckDataType.TYPE_PASSWAY);
+//					} else {
+//						checkData.setType(Constance.CheckDataType.TYPE_NORMAL);
+//					}
+//				}
+//				checkData.addIssue(issueItem);
+//				checkModel.put(areaIssue.getSort(), checkData);
+//			}
+//			return checkModel;
+//		} else {
+//			return null;
+//		}
+//		
+//		
+//		
+//		
+//	}
+	
 	private SparseArray<CheckData> initCheckData() {
 		List<AreaIssue> areaIssueList = AreaIssue.listAll(AreaIssue.class);
-		SparseArray<CheckData> mCheckModel = new SparseArray<CheckData>();
-		for (AreaIssue areaIssue : areaIssueList) {
-			IssueItem issueItem = new IssueItem();
-			issueItem.setId(areaIssue.getIssueId());
-			issueItem.setName(areaIssue.getIssueName());
-			issueItem.setDimOneId(areaIssue.getDimOneId());
-			issueItem.setDimOneName(areaIssue.getDimOneName());
-			CheckData checkData;
-			if (mCheckModel.indexOfKey(areaIssue.getAreaId()) > -1) {
-				checkData = mCheckModel.get(areaIssue.getAreaId());
-			} else {
-				checkData = new CheckData();
-				checkData.setId((long) areaIssue.getAreaId());
-				checkData.setName(areaIssue.getAreaName());
-				if (checkData.getId() == Constance.CHECK_DATA_ID_ROOM) {
-					checkData.setType(Constance.CheckDataType.TYPE_ROOM);
-				} else if (checkData.getId() == Constance.CHECK_DATA_ID_PASSWAY) {
-					checkData.setType(Constance.CheckDataType.TYPE_PASSWAY);
+		if (areaIssueList != null) {
+			SparseArray<CheckData> checkModel = new SparseArray<CheckData>();
+			for (AreaIssue areaIssue : areaIssueList) {
+				IssueItem issueItem = new IssueItem();
+				issueItem.setId(areaIssue.getIssueId());
+				issueItem.setName(areaIssue.getIssueName());
+				issueItem.setDimOneId(areaIssue.getDimOneId());
+				issueItem.setDimOneName(areaIssue.getDimOneName());
+				CheckData checkData = null;
+				if (checkModel.indexOfKey(areaIssue.getSort()) > -1) {
+					checkData = checkModel.get(areaIssue.getSort());
 				} else {
-					checkData.setType(Constance.CheckDataType.TYPE_NORMAL);
+					checkData = new CheckData();
+					checkData.setId((long) areaIssue.getAreaId());
+					checkData.setName(areaIssue.getAreaName());
+					if (checkData.getId() == Constance.CHECK_DATA_ID_ROOM) {
+						checkData.setType(Constance.CheckDataType.TYPE_ROOM);
+					} else if (checkData.getId() == Constance.CHECK_DATA_ID_PASSWAY) {
+						checkData.setType(Constance.CheckDataType.TYPE_PASSWAY);
+					} else {
+						checkData.setType(Constance.CheckDataType.TYPE_NORMAL);
+					}
 				}
+				checkData.addIssue(issueItem);
+				checkModel.put(areaIssue.getSort(), checkData);
 			}
-			checkData.addIssue(issueItem);
-			mCheckModel.put(areaIssue.getAreaId(), checkData);
+			return checkModel;
+		} else {
+			return null;
 		}
 		
-		return mCheckModel;
+		
+		
+		
 	}
 	
-	public void initHotelData(List<Hotel> hoteList) {
+	
+//	private SparseArray<CheckData> initCheckData() {
+////		List<AreaIssue> areaIssueList = AreaIssue.listAll(AreaIssue.class);
+//		Iterator<AreaIssue> dataIterator = AreaIssue.findAsIterator(AreaIssue.class, null, null, null, "sort ASC", null);
+//		if (dataIterator == null) {
+//			while (dataIterator.hasNext()) {
+//				type type = (type) dataIterator.nextElement();
+//				
+//			}
+//		} else {
+//			return null;
+//		}
+//		SparseArray<CheckData> mCheckModel = new SparseArray<CheckData>();
+//		for (AreaIssue areaIssue : areaIssueList) {
+//			IssueItem issueItem = new IssueItem();
+//			issueItem.setId(areaIssue.getIssueId());
+//			issueItem.setName(areaIssue.getIssueName());
+//			issueItem.setDimOneId(areaIssue.getDimOneId());
+//			issueItem.setDimOneName(areaIssue.getDimOneName());
+//			CheckData checkData;
+//			if (mCheckModel.indexOfKey(areaIssue.getAreaId()) > -1) {
+//				checkData = mCheckModel.get(areaIssue.getAreaId());
+//			} else {
+//				checkData = new CheckData();
+//				checkData.setId((long) areaIssue.getAreaId());
+//				checkData.setName(areaIssue.getAreaName());
+//				if (checkData.getId() == Constance.CHECK_DATA_ID_ROOM) {
+//					checkData.setType(Constance.CheckDataType.TYPE_ROOM);
+//				} else if (checkData.getId() == Constance.CHECK_DATA_ID_PASSWAY) {
+//					checkData.setType(Constance.CheckDataType.TYPE_PASSWAY);
+//				} else {
+//					checkData.setType(Constance.CheckDataType.TYPE_NORMAL);
+//				}
+//			}
+//			checkData.addIssue(issueItem);
+//			mCheckModel.put(areaIssue.getAreaId(), checkData);
+//		}
+//		
+//		return mCheckModel;
+//	}
+	
+	private void initHotelData(List<Hotel> hoteList) {
 		if (hoteList == null ) {
 			return;
 		}
 		for (Hotel hotel : hoteList) {
-			SparseArray<CheckData> mCheckModel = initCheckData();
+			SparseArray<CheckData> checkModel = initCheckData();
+			if (checkModel == null) {
+				return;
+			}
 			//init normal checkData
-			for (int i = 0; i < mCheckModel.size(); i++) {
-				CheckData checkData = mCheckModel.valueAt(i);
+			for (int i = 0; i < checkModel.size(); i++) {
+				CheckData checkData = checkModel.valueAt(i);
 				if (checkData.getType() != Constance.CheckDataType.TYPE_ROOM
-						|| checkData.getType() != Constance.CheckDataType.TYPE_PASSWAY) {
+						&& checkData.getType() != Constance.CheckDataType.TYPE_PASSWAY) {
 					initCheckDataIssue(hotel, checkData, hotel.getCheckId());
 				}
 				hotel.addCheckData(checkData);
 			}
-			//初始化动态区域的问题
+			//恢复上次保存记录的动态区域(客房，走廊)的数据
 			List<CheckData> dymicCheckData = CheckData.find(CheckData.class, "CHECK_ID = ?", String.valueOf(hotel.getCheckId()));
 			if (dymicCheckData != null) {
 				for (CheckData checkData : dymicCheckData) {
@@ -273,11 +366,11 @@ public class DataManager {
 			}
 			//初始化复检问题
 			initQuestion(hotel);
+			//初始化之前检查过的动态区域的问题数据
+			hotel.initCheckedData();
 			if (mHotelDataList == null) {
 				mHotelDataList = new ArrayList<Hotel>();
 			}
-			//初始化之前检查过的问题数据
-			hotel.initCheckedData();
 			mHotelDataList.add(hotel);
 			if (hotel.isStatus()) {
 				if (mCheckedHotelList == null) {
@@ -315,13 +408,13 @@ public class DataManager {
 		}
 		//初始化上次保存的检查点拍摄的图片
 		for (IssueItem issueItem : checkData.getIssuelist()) {
-			List<HotelCheck> hotelCheckList = HotelCheck.find(
-					HotelCheck.class,
+			List<IssueCheckedImage> hotelCheckList = IssueCheckedImage.find(
+					IssueCheckedImage.class,
 					"CHECK_ID = ? and AREA_ID = ? and ISSUE_ID = ?",
 					String.valueOf(checkId),
 					String.valueOf(checkData.getId()),
 					String.valueOf(issueItem.getId()));
-			for (HotelCheck hotelCheck : hotelCheckList) {
+			for (IssueCheckedImage hotelCheck : hotelCheckList) {
 				if (issueItem.getId() == hotelCheck.getIssueId()) {
 					ImageItem imageItem = new ImageItem();
 					imageItem.setLocalImagePath(hotelCheck
@@ -338,8 +431,11 @@ public class DataManager {
 				issueItem.setCheck(checkIssue.isCheck());
 				issueItem.setContent(checkIssue.getContent());
 //				if (checkData.getType() == CheckDataType.TYPE_NORMAL) {
-				Log.d("lxk", "hotel checked issue hotel name = "+hotel.getName()+" checkData = "+checkData.getName()+ " issue name = "+issueItem.getName()+" issue reform status = "+checkIssue.getReformState());
+				Log.d("lxk", "hotel checked issue hotel name = "+hotel.getName()+" checkData = "+checkData.getName()+ " issue name = "+issueItem.getName()+" issue reform status = "+checkIssue.getReformState()
+						+" isCheck = "+checkIssue.isCheck());
 				issueItem.setReformState(checkIssue.getReformState());
+				Log.d("lxk", "set reform hotel checked issue hotel name = "+hotel.getName()+" checkData = "+checkData.getName()+ " issue name = "+issueItem.getName()+" issue reform status = "+checkIssue.getReformState()
+						+" isCheck = "+checkIssue.isCheck());
 //				}
 			}
 		}
@@ -350,9 +446,9 @@ public class DataManager {
 		if (hotel.getQuestionList() != null) {
 			for (AreaIssue areaIssue : hotel.getQuestionList()) {
 				if (areaIssue.getType() == CheckDataType.TYPE_ROOM) {
-					initDymicQuestionCheckData(hotel.getCheckId(), areaIssue, hotel.getRoomList());
+					initQuestionCheckData(hotel.getCheckId(), areaIssue, hotel.getRoomList());
 				} else if (areaIssue.getType() == CheckDataType.TYPE_PASSWAY) {
-					initDymicQuestionCheckData(hotel.getCheckId(), areaIssue, hotel.getPasswayList());
+					initQuestionCheckData(hotel.getCheckId(), areaIssue, hotel.getPasswayList());
 				} else {
 					initQuestionCheckData(hotel.getCheckId(), areaIssue, hotel.getCheckDatas());
 				}
@@ -361,56 +457,58 @@ public class DataManager {
 		}
 	}
 	
-	private void initDymicQuestionCheckData(int checkId, AreaIssue areaIssue, List<CheckData> dataList) {
-		if (dataList == null) {
-			return;
-		}
-		for (CheckData checkData : dataList) {
-				if (areaIssue.getIsDefQue() == DefQueType.TYPE_DYMIC) {
-					
-					IssueItem issueItem = new IssueItem();
-					issueItem.setId(areaIssue.getIssueId());
-					issueItem.setName(areaIssue.getIssueName());
-					issueItem.setIsPreQue(areaIssue.getIsPreQue());
-					issueItem.setIsDefQue(areaIssue.getIsDefQue());
-					//问题是否已经检查过
-					CheckIssue checkIssue = getCheckIssue(checkId,
-							checkData.getId(), areaIssue.getIssueId());
-					if (checkIssue != null) {
-						issueItem.setCheck(checkIssue.isCheck());
-						issueItem.setContent(checkIssue.getContent());
-						issueItem.setReformState(checkIssue.getReformState());
-					} 
-					checkData.addIssue(issueItem);
-				} else {
-					if (areaIssue.getIsPreQue() == PreQueType.TYPE_REVIEW) {
-						for (IssueItem issueItem : checkData.getIssuelist()) {
-							if (issueItem.getId() == areaIssue.getIssueId()) {
-								issueItem.setIsPreQue(areaIssue.getIsPreQue());
-								issueItem.setIsDefQue(areaIssue.getIsDefQue());
-//								if (issueItem.getReformState() == IssueItem.REFORM_STATE_DEFAULT) {
-//									issueItem.setReformState(IssueItem.REFORM_STATE_FIXED);
-//								}
-//								issueItem.setCheck(issueItem.isCheck());
-							}
-						}
-					} 
-				}
-				checkData.initCheckedIssue();
-		}
-	}
+//	private void initDymicQuestionCheckData(int checkId, AreaIssue areaIssue, List<CheckData> dataList) {
+//		if (dataList == null) {
+//			return;
+//		}
+//		for (CheckData checkData : dataList) {
+//				if (areaIssue.getIsDefQue() == DefQueType.TYPE_DYMIC) {
+//					
+//					IssueItem issueItem = new IssueItem();
+//					issueItem.setId(areaIssue.getIssueId());
+//					issueItem.setName(areaIssue.getIssueName());
+//					issueItem.setIsPreQue(areaIssue.getIsPreQue());
+//					issueItem.setIsDefQue(areaIssue.getIsDefQue());
+//					//问题是否已经检查过
+//					CheckIssue checkIssue = getCheckIssue(checkId,
+//							checkData.getId(), areaIssue.getIssueId());
+//					if (checkIssue != null) {
+//						issueItem.setCheck(checkIssue.isCheck());
+//						issueItem.setContent(checkIssue.getContent());
+//						issueItem.setReformState(checkIssue.getReformState());
+//					} 
+//					checkData.addIssue(issueItem);
+//				} else {
+//					if (areaIssue.getIsPreQue() == PreQueType.TYPE_REVIEW) {
+//						for (IssueItem issueItem : checkData.getIssuelist()) {
+//							if (issueItem.getId() == areaIssue.getIssueId()) {
+//								issueItem.setIsPreQue(areaIssue.getIsPreQue());
+//								issueItem.setIsDefQue(areaIssue.getIsDefQue());
+////								if (issueItem.getReformState() == IssueItem.REFORM_STATE_DEFAULT) {
+////									issueItem.setReformState(IssueItem.REFORM_STATE_FIXED);
+////								}
+////								issueItem.setCheck(issueItem.isCheck());
+//							}
+//						}
+//					} 
+//				}
+//				checkData.initCheckedIssue();
+//		}
+//	}
 	
 	private void initQuestionCheckData(int checkId, AreaIssue areaIssue, List<CheckData> dataList) {
 		if (dataList == null) {
 			return;
 		}
 		for (CheckData checkData : dataList) {
-			if (checkData.getId() == areaIssue.getAreaId()) {
+			if (checkData.getId() == areaIssue.getAreaId() 
+					|| (areaIssue.getAreaId() == Constance.CHECK_DATA_ID_ROOM && checkData.getName().contains("客房"))
+					|| (areaIssue.getAreaId() == Constance.CHECK_DATA_ID_PASSWAY && checkData.getName().contains("走廊"))) {
 				if (areaIssue.getIsDefQue() == DefQueType.TYPE_DYMIC) {
 					IssueItem issueItem = new IssueItem();
 					issueItem.setId(areaIssue.getIssueId());
 					issueItem.setName(areaIssue.getIssueName());
-					issueItem.setIsPreQue(areaIssue.getIsPreQue());
+					issueItem.setPreQueType(areaIssue.getIsPreQue());
 					issueItem.setIsDefQue(areaIssue.getIsDefQue());
 					//问题是否已经检查过
 					CheckIssue checkIssue = getCheckIssue(checkId,
@@ -425,8 +523,17 @@ public class DataManager {
 					if (areaIssue.getIsPreQue() == PreQueType.TYPE_REVIEW) {
 						for (IssueItem issueItem : checkData.getIssuelist()) {
 							if (issueItem.getId() == areaIssue.getIssueId()) {
-								issueItem.setIsPreQue(areaIssue.getIsPreQue());
 								issueItem.setIsDefQue(areaIssue.getIsDefQue());
+								if (checkData.getType() == CheckDataType.TYPE_PASSWAY 
+										|| checkData.getType() == CheckDataType.TYPE_ROOM) {
+									issueItem.setPreQueType(areaIssue.getIsPreQue());
+								} else {
+									if (issueItem.getReformState() != IssueItem.REFORM_STATE_DEFAULT) {
+										issueItem.setPreQueTypeOnly(areaIssue.getIsPreQue());
+									} else {
+										issueItem.setPreQueType(areaIssue.getIsPreQue());
+									}
+								}
 //								if (issueItem.getReformState() == IssueItem.REFORM_STATE_DEFAULT) {
 //									issueItem.setReformState(IssueItem.REFORM_STATE_FIXED);
 //								}
@@ -515,7 +622,7 @@ public class DataManager {
 		if (imageItem == null) {
 			return;
 		}
-		HotelCheck hotelCheck = new HotelCheck();
+		IssueCheckedImage hotelCheck = new IssueCheckedImage();
 		hotelCheck.setCheckId(checkId);
 		hotelCheck.setAreaId(areaId);
 		hotelCheck.setAreaName(areaName);
@@ -529,16 +636,6 @@ public class DataManager {
 		if (content == null) {
 			return;
 		}
-//		long id = Long.valueOf(checkId+""+areaId+""+issueId);
-//		CheckIssue checkIssue = CheckIssue.findById(CheckIssue.class, id);
-//		if (checkIssue == null) {
-//			checkIssue = new CheckIssue();
-//			checkIssue.setId(id);
-//		} 
-//		checkIssue.setCheck(isCheck);
-//		checkIssue.setContent(content);
-//		checkIssue.setReformState(reformState);
-//		checkIssue.save();
 		CheckIssue checkIssue = null;
 		List<CheckIssue> checkIssueList = CheckIssue.find(CheckIssue.class, "CHECK_ID = ? and AREA_ID = ? and ISSUE_ID = ?", ""+checkId, ""+areaId, ""+issueId);
 		if (checkIssueList == null || checkIssueList.size() == 0) {
@@ -557,15 +654,6 @@ public class DataManager {
 	
 	
 	public void saveIssueCheck(int checkId, int areaId, int issueId, boolean isCheck, int reformState) {
-//		long id = Long.valueOf(checkId+""+areaId+""+issueId);
-//		CheckIssue checkIssue = CheckIssue.findById(CheckIssue.class, id);
-//		if (checkIssue == null) {
-//			checkIssue = new CheckIssue();
-//			checkIssue.setId(id);
-//		} 
-//		checkIssue.setCheck(isCheck);
-//		checkIssue.setReformState(reformState);
-//		checkIssue.save();
 		CheckIssue checkIssue = null;
 		List<CheckIssue> checkIssueList = CheckIssue.find(CheckIssue.class, "CHECK_ID = ? and AREA_ID = ? and ISSUE_ID  = ?", ""+checkId, ""+areaId, ""+issueId);
 		if (checkIssueList == null || checkIssueList.size() == 0) {
@@ -581,15 +669,7 @@ public class DataManager {
 		checkIssue.save();
 	}
 	
-	public boolean isIssueCheck(int checkId, int areaId, int issueId ) {
-//		long id = Long.valueOf(checkId+""+areaId+""+issueId);
-//		CheckIssue checkIssue = CheckIssue.findById(CheckIssue.class, id);
-//		if (checkIssue == null) {
-//			return false;
-//		} 
-//		return checkIssue.isCheck();
-		
-		
+	public boolean isIssueCheck(int checkId, int areaId, int issueId ) {		
 		List<CheckIssue> checkIssueList = CheckIssue.find(CheckIssue.class, "CHECK_ID = ? and AREA_ID = ? and ISSUE_ID = ?", ""+checkId, ""+areaId, ""+issueId);
 		if (checkIssueList == null || checkIssueList.size() == 0) {
 			return false;
@@ -599,8 +679,6 @@ public class DataManager {
 	}
 	
 	public String getIssueContent(int checkId, long areaId, int issueId ) {
-//		long id = Long.valueOf(checkId+""+areaId+""+issueId);
-//		CheckIssue checkIssue = CheckIssue.findById(CheckIssue.class, id);
 		List<CheckIssue> checkIssueList = CheckIssue.find(CheckIssue.class, "CHECK_ID = ? and AREA_ID = ? and ISSUE_ID = ?", ""+checkId, ""+areaId, ""+issueId);
 		if (checkIssueList == null || checkIssueList.size() == 0) {
 			return null;
@@ -612,8 +690,6 @@ public class DataManager {
 	}
 	
 	public CheckIssue getCheckIssue(int checkId, long areaId, int issueId ) {
-//		long id = Long.valueOf(checkId+""+areaId+""+issueId);
-//		return CheckIssue.findById(CheckIssue.class, id);
 		List<CheckIssue> checkIssueList = CheckIssue.find(CheckIssue.class, "CHECK_ID = ? and AREA_ID = ? and ISSUE_ID = ?", ""+checkId, ""+areaId, ""+issueId);
 		if (checkIssueList == null || checkIssueList.size() == 0) {
 			return null;

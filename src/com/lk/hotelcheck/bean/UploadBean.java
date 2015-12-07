@@ -36,7 +36,7 @@ public class UploadBean extends SugarRecord<UploadBean> implements Serializable{
 	@Expose
 	private int isWidth;
 	@Expose
-	private int type;
+	private int type; //这个上传任务的图片所需checkData 的type(room ,passway ,nromal)
 	
 	
 	

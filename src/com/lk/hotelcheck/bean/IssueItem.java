@@ -18,7 +18,7 @@ public class IssueItem{
 	private transient List<ImageItem> imageList;
 	private boolean isCheck;
 	private int isDefQue;//是否自定义问题，0=固定问题，1=自定义问题
-	private int isPreQue;
+	private int preQueType;
 	private int dimOneId;
 	private String dimOneName;
 	private int reformState = REFORM_STATE_DEFAULT;//整改状态：1.未整改，2整改中，3完成整改
@@ -39,7 +39,7 @@ public class IssueItem{
 			this.dimOneId = issueItem.getDimOneId();
 			this.dimOneName = issueItem.getDimOneName();
 			this.isDefQue = issueItem.getIsDefQue();
-			this.isPreQue = issueItem.getIsPreQue();
+			this.preQueType = issueItem.getPreQueType();
 			this.reformState = issueItem.getReformState();
 		}
 	}
@@ -98,7 +98,7 @@ public class IssueItem{
 	}
 	
 	private void initIssueState() {
-		if (isPreQue == PreQueType.TYPE_REVIEW) {
+		if (preQueType == PreQueType.TYPE_REVIEW) {
 			if (isCheck) {
 				this.reformState = REFORM_STATE_DEFAULT;
 			} else {
@@ -126,13 +126,18 @@ public class IssueItem{
 	public void setIsDefQue(int isDefQue) {
 		this.isDefQue = isDefQue;
 	}
-	public int getIsPreQue() {
-		return isPreQue;
+	public int getPreQueType() {
+		return preQueType;
 	}
-	public void setIsPreQue(int isPreQue) {
-		this.isPreQue = isPreQue;
+	public void setPreQueType(int isPreQue) {
+		this.preQueType = isPreQue;
 		initIssueState();
 	}
+	
+	public void setPreQueTypeOnly(int isPreQue) {
+		this.preQueType = isPreQue;
+	}
+	
 	public int getDimOneId() {
 		return dimOneId;
 	}

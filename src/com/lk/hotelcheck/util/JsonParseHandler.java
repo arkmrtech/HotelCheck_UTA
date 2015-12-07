@@ -19,6 +19,7 @@ import com.lk.hotelcheck.manager.DataManager;
 import common.Constance;
 import common.Constance.CheckDataType;
 import common.Constance.DefQueType;
+import common.Constance.PreQueType;
 import common.NetConstance;
 
 public class JsonParseHandler {
@@ -34,6 +35,7 @@ public class JsonParseHandler {
 		areaIssue.setIssueName(jsonObject.optString(NetConstance.PARAM_DIM_TWO_NAME));
 		areaIssue.setDimOneId(jsonObject.optInt(NetConstance.PARAM_DIM_ONE_ID));
 		areaIssue.setDimOneName(jsonObject.optString(NetConstance.PARAM_DIM_ONE_NAME));
+		areaIssue.setSort(jsonObject.optInt(NetConstance.PARAM_SORT));
 		return areaIssue;
 	}
 	
@@ -97,7 +99,7 @@ public class JsonParseHandler {
 		if (dymicList != null) {
 			for (int i = 0; i < dymicList.length(); i++) {
 				try {
-					CheckData checkData = parseDymicData(dymicList.getJSONObject(i), hotel.getName());
+					CheckData checkData = parseReviewDymicData(dymicList.getJSONObject(i), hotel.getName(), hotel.getCheckId());
 					if (checkData.getType() == Constance.CheckDataType.TYPE_ROOM) {
 						if (hotel.hasRoom(checkData.getId())) {
 							hotel.setRoom(checkData.getId(), checkData);
@@ -143,7 +145,7 @@ public class JsonParseHandler {
 		return areaIssue;
 	}
 	
-	public static CheckData parseDymicData(JSONObject jsonObject, String hotelName) {
+	public static CheckData parseReviewDymicData(JSONObject jsonObject, String hotelName, int checkId) {
 		if (jsonObject == null) {
 			return null;
 		}
@@ -163,14 +165,13 @@ public class JsonParseHandler {
 			checkData = new CheckData();
 			checkData.setType(Constance.CheckDataType.TYPE_NORMAL);
 		}
-		checkData.setCheckId(jsonObject.optLong(NetConstance.PARAM_BRANCH_CHECK_ID));
+		checkData.setPreQueType(PreQueType.TYPE_REVIEW);
+		checkData.setCheckId(checkId);
 		String name = jsonObject.optString(NetConstance.PARAM_NAME);
 		if (name != null) {
 			checkData.setName(name);
 			checkData.setId((long) Math.abs(name.hashCode()+hotelName.hashCode()));
 		}
-		
-		
 		return checkData;
 	}
 	
@@ -371,7 +372,7 @@ public class JsonParseHandler {
 						issueItem.getName());
 			}
 			tempObject.put(NetConstance.PARAM_DEF_QUE, issueItem.getIsDefQue());
-			tempObject.put(NetConstance.PARAM_PRE_QUE, issueItem.getIsPreQue());
+			tempObject.put(NetConstance.PARAM_PRE_QUE, issueItem.getPreQueType());
 			tempObject.put(NetConstance.PARAM_IS_CHECK, issueItem.isCheck());
 			if (issueItem.getContent() == null) {
 				tempObject.put(NetConstance.PARAM_CONTENT, JSONObject.NULL);
@@ -469,7 +470,7 @@ public class JsonParseHandler {
 				jsonObject.put(NetConstance.PARAM_DIM_TWO_NAME, issueItem.getName());
 			}
 			jsonObject.put(NetConstance.PARAM_DEF_QUE, issueItem.getIsDefQue());
-			jsonObject.put(NetConstance.PARAM_PRE_QUE, issueItem.getIsPreQue());
+			jsonObject.put(NetConstance.PARAM_PRE_QUE, issueItem.getPreQueType());
 			jsonObject.put(NetConstance.PARAM_IS_CHECK, issueItem.isCheck());
 			if (issueItem.getContent() == null) {
 				jsonObject.put(NetConstance.PARAM_CONTENT, JSONObject.NULL);

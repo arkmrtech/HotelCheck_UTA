@@ -52,7 +52,7 @@ import com.lk.hotelcheck.bean.ImageFloder;
 import com.lk.hotelcheck.bean.ImageItem;
 import com.lk.hotelcheck.bean.IssueItem;
 import com.lk.hotelcheck.bean.dao.CheckIssue;
-import com.lk.hotelcheck.bean.dao.HotelCheck;
+import com.lk.hotelcheck.bean.dao.IssueCheckedImage;
 import com.lk.hotelcheck.manager.DataManager;
 import com.lk.hotelcheck.util.BitmapUtil;
 import com.lk.hotelcheck.util.DrawUtil;
@@ -226,7 +226,7 @@ public class PhotoPickerActivity extends BaseActivity implements CallBackListene
 			if (!mIssueItem.isCheck()) {
 				mIssueItem.setCheck(true);
 			}
-			HotelCheck hotelCheck = new HotelCheck(mHotel.getCheckId(), mCheckData.getId().intValue(), mIssueItem.getId(), imageItem);
+			IssueCheckedImage hotelCheck = new IssueCheckedImage(mHotel.getCheckId(), mCheckData.getId().intValue(), mIssueItem.getId(), imageItem);
 			hotelCheck.save();
 			updateCheckedIssue();
 		}
@@ -237,7 +237,7 @@ public class PhotoPickerActivity extends BaseActivity implements CallBackListene
 		String fileName = FileUtil.getFileName(imagePath);
 		String localSavePath = getSavePath() + fileName;
 		mIssueItem.removeImageItem(localSavePath);
-		HotelCheck hotelCheck = HotelCheck.deleteItemByImageLocalPath(localSavePath);
+		IssueCheckedImage hotelCheck = IssueCheckedImage.deleteItemByImageLocalPath(localSavePath);
 		if (TextUtils.isEmpty(mIssueItem.getContent())
 				&& mIssueItem.getImageCount() == 0) {
 			mIssueItem.setCheck(false);

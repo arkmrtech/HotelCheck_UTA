@@ -113,7 +113,6 @@ public class UploadFragment extends Fragment{
 
 		@Override
 		public int getItemCount() {
-			Log.d("lxk", "UploadAdapter count = "+mDataList.size());
 			return mDataList == null ? 0 : mDataList.size();
 		}
 
