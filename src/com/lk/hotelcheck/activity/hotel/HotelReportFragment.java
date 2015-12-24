@@ -19,6 +19,7 @@ import com.lk.hotelcheck.bean.CheckData;
 import com.lk.hotelcheck.bean.IssueItem;
 import com.lk.hotelcheck.manager.DataManager;
 import com.lk.hotelcheck.util.DrawUtil;
+
 import common.Constance;
 import common.Constance.CheckDataType;
 import common.Constance.CheckType;
@@ -54,7 +55,7 @@ public class HotelReportFragment extends BaseHotelFragment{
 	private ExpandableListView mExpandableListView;
 	private String[] mStateItems = new String[]{"未整改","整改中","已整改"};
 	private int[] mStateValues = new int[]{IssueItem.REFORM_STATE_UN_FIX, IssueItem.REFORM_STATE_FIXING, IssueItem.REFORM_STATE_FIXED};
-	private int mChoosePosition;
+	private int mChoosePosition = -1;
 	@Override
 	public void setUserVisibleHint(boolean isVisibleToUser) {
 		super.setUserVisibleHint(isVisibleToUser);
@@ -197,31 +198,26 @@ public class HotelReportFragment extends BaseHotelFragment{
 
 		@Override
 		public Object getGroup(int groupPosition) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public Object getChild(int groupPosition, int childPosition) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public long getGroupId(int groupPosition) {
-			// TODO Auto-generated method stub
 			return 0;
 		}
 
 		@Override
 		public long getChildId(int groupPosition, int childPosition) {
-			// TODO Auto-generated method stub
 			return 0;
 		}
 
 		@Override
 		public boolean hasStableIds() {
-			// TODO Auto-generated method stub
 			return false;
 		}
 
@@ -310,7 +306,6 @@ public class HotelReportFragment extends BaseHotelFragment{
 			} else {
 				issueImageCount = issueItem.getImageCount();
 			}
-			
 			if (issueImageCount > 0) {
 				viewHolder.mFlagTextView.setText("查看图片");
 				viewHolder.mFlagTextView.setTag(R.id.tv_name, groupPosition);
@@ -376,17 +371,6 @@ public class HotelReportFragment extends BaseHotelFragment{
 			} else {
 				viewHolder.mPercentTextView.setVisibility(View.GONE);
 			}
-//			if (checkData.getType() == CheckDataType.TYPE_ROOM || ) {
-//				viewHolder.mPercentTextView.setText(mHotel
-//						.getRoomIssuePercent(issueItem.getId()));
-//				viewHolder.mPercentTextView.setVisibility(View.VISIBLE);
-//			} else if (checkData.getType() == CheckDataType.TYPE_PASSWAY) {
-//				viewHolder.mPercentTextView.setText(mHotel
-//						.getPasswayIssuePercent(issueItem.getId()));
-//				viewHolder.mPercentTextView.setVisibility(View.VISIBLE);
-//			} else {
-//				viewHolder.mPercentTextView.setVisibility(View.GONE);
-//			}
 			return convertView;
 		}
 
@@ -457,6 +441,7 @@ public class HotelReportFragment extends BaseHotelFragment{
 					position = 2;
 					break;
 				default:
+					position = -1;
 					break;
 				}
 			    builder.setSingleChoiceItems(mStateItems, position, new DialogInterface.OnClickListener() {  
@@ -469,10 +454,13 @@ public class HotelReportFragment extends BaseHotelFragment{
 			          
 			        @Override  
 			        public void onClick(DialogInterface dialog, int which) {  
-			        	tempIssueItem.setReformState(mStateValues[mChoosePosition]);
-			        	initInfoData();
-			        	DataManager.getInstance().saveIssueCheck(mHotel.getCheckId(), checkData.getId().intValue(), tempIssueItem.getId(), tempIssueItem.isCheck(), tempIssueItem.getReformState());
-			        	mAdapter.notifyDataSetChanged();
+			        	if (mChoosePosition != -1) {
+			        		tempIssueItem.setReformState(mStateValues[mChoosePosition]);
+				        	initInfoData();
+				        	DataManager.getInstance().saveIssueCheck(mHotel.getCheckId(), checkData.getId().intValue(), tempIssueItem.getId(), tempIssueItem.isCheck(), tempIssueItem.getReformState());
+				        	mAdapter.notifyDataSetChanged();
+				        	mChoosePosition = -1;
+			        	}
 			        }  
 			    });  
 			    builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {  

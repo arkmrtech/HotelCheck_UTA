@@ -10,6 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.text.InputType;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -26,6 +27,7 @@ import android.widget.Toast;
 import com.lk.hotelcheck.R;
 import com.lk.hotelcheck.bean.IssueItem;
 import com.lk.hotelcheck.bean.dao.DymicIssue;
+
 import common.Constance;
 import common.Constance.DefQueType;
 import common.Constance.PreQueType;
@@ -79,6 +81,7 @@ public class HotelIssueAdapter extends RecyclerView.Adapter<ViewHolder>{
 	@Override
 	public void onBindViewHolder(ViewHolder arg0, int arg1) {
 		IssueItem item = mDataList.get(arg1);
+		Log.d("lxk", "item name = "+item.getName()+" dim one id = "+item.getDimOneId()+" dim one name = "+item.getDimOneName());
 		((ItemViewHolder)arg0).setData(item, arg1);
 		
 	}

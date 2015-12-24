@@ -91,6 +91,22 @@ public class JsonParseHandler {
 				try {
 					issueItem = parseIssueItem(questionList.getJSONObject(i));
 					hotel.addQuestion(issueItem);
+//					if (issueItem.getIsDefQue() == DefQueType.TYPE_DYMIC) {
+//						IssueItem dymicIssueItem = new IssueItem();
+//						dymicIssueItem.setName(issueItem.getIssueName());
+//						dymicIssueItem.setContent("");
+//						dymicIssueItem.setIsDefQue(DefQueType.TYPE_DYMIC);
+//						dymicIssueItem.setPreQueType(issueItem.getIsPreQue());
+//						dymicIssueItem.setDimOneId(issueItem.getDimOneId());
+//						dymicIssueItem.setDimOneName(issueItem.getDimOneName());
+//						int id = Math.abs(issueItem.getIssueName().hashCode());
+//						dymicIssueItem.setId(id);
+//						if (issueItem.getAreaId() == Constance.CHECK_DATA_ID_ROOM) {
+//							hotel.addRoomDymicIssue(dymicIssueItem);
+//						} else if (issueItem.getAreaId() == Constance.CHECK_DATA_ID_PASSWAY) {
+//							hotel.addPasswayDymicIssue(dymicIssueItem);
+//						}
+//					}
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}

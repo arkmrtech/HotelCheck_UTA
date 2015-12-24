@@ -444,7 +444,7 @@ public class Hotel extends SugarRecord<Hotel>{
 			return;
 		}
 		this.roomCount = hotel.getRoomCount();
-		this.roomCheckedCount = hotel.getRoomCount();
+		this.roomCheckedCount = hotel.getRoomCheckedCount();
 		this.floor = hotel.getFloor();
 		this.imageStatus = hotel.isImageStatus();
 		this.guardianNumber = hotel.getGuardianNumber();
@@ -870,6 +870,7 @@ public class Hotel extends SugarRecord<Hotel>{
 					CheckIssue checkIssue = DataManager.getInstance().getCheckIssue(id.intValue(),
 							(long)Constance.CHECK_DATA_ID_ROOM, issueItem.getId());
 					if (checkIssue != null) {
+						issueItem.setCheck(checkIssue.isCheck());
 						issueItem.setReformState(checkIssue.getReformState());
 					}
 				}
@@ -881,6 +882,7 @@ public class Hotel extends SugarRecord<Hotel>{
 					CheckIssue checkIssue = DataManager.getInstance().getCheckIssue(id.intValue(),
 							(long)Constance.CHECK_DATA_ID_PASSWAY, issueItem.getId());
 					if (checkIssue != null) {
+						issueItem.setCheck(checkIssue.isCheck());
 						issueItem.setReformState(checkIssue.getReformState());
 					}
 				}
@@ -961,14 +963,25 @@ public class Hotel extends SugarRecord<Hotel>{
 		if (checkData == null || questionList == null) {
 			return;
 		}
+		Log.d("lxk", "initReviewQuestionCheckData");
 		for (AreaIssue areaIssue : questionList) {
 			if (areaIssue.getType() == checkData.getType()) {
 				if (areaIssue.getIsDefQue() == DefQueType.TYPE_DYMIC) {
 					IssueItem issueItem = new IssueItem();
-					issueItem.setId(areaIssue.getIssueId());
+					int id = Math.abs(areaIssue.getIssueName().hashCode());
+					issueItem.setId(id);
 					issueItem.setName(areaIssue.getIssueName());
 					issueItem.setPreQueType(areaIssue.getIsPreQue());
 					issueItem.setIsDefQue(areaIssue.getIsDefQue());
+					issueItem.setDimOneId(areaIssue.getDimOneId());
+					issueItem.setDimOneName(areaIssue.getDimOneName());
+					CheckIssue checkIssue = DataManager.getInstance().getCheckIssue(getCheckId(),
+							checkData.getId(), id);
+					if (checkIssue != null) {
+						issueItem.setCheck(checkIssue.isCheck());
+						issueItem.setContent(checkIssue.getContent());
+						issueItem.setReformState(checkIssue.getReformState());
+					}
 					checkData.addIssue(issueItem);
 				} else {
 					if (areaIssue.getIsPreQue() == PreQueType.TYPE_REVIEW) {

@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -32,10 +33,13 @@ import common.Constance.UPAI;
 
 public class UploadService extends Service {
 	
+	private static final String TAG = "UploadService";
+	
 	private ServiceBinder mServiceBinder = new ServiceBinder();
-	private static final int MAX_DOWNLOAD_SIZE = 4;
-	private Executor mTaskExecutor = Executors.newFixedThreadPool(MAX_DOWNLOAD_SIZE);
+	private static final int MAX_UPLOAD_SIZE = 1;
 	private ConcurrentHashMap<String, UploadBean> mRuningTaskQueue = new ConcurrentHashMap<String, UploadBean>();
+	private CopyOnWriteArrayList<UploadBean> mWaitingTaskQueue = new CopyOnWriteArrayList<UploadBean>();
+	private UploaderManager mUploaderManager = UploaderManager.getInstance(UPAI.BUCKET);
 	
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -45,6 +49,8 @@ public class UploadService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate(); 
+		mUploaderManager.setConnectTimeout(60);
+		mUploaderManager.setResponseTimeout(60);
 	}
 	
 	@Override
@@ -52,14 +58,25 @@ public class UploadService extends Service {
 		return super.onUnbind(intent);
 	}
 	
+	public class ServiceBinder extends Binder {
+        public UploadService getService() {
+            return UploadService.this;
+        }
+    }
+	
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
 		saveUnFinishData();
 	}
 	
-	public void saveUnFinishData() {
+	public synchronized void saveUnFinishData() {
 		for (UploadBean bean : mRuningTaskQueue.values()) {
+			bean.setImageState(ImageUploadState.STATE_FAIL);
+			bean.save();
+		}
+		
+		for (UploadBean bean : mWaitingTaskQueue) {
 			bean.setImageState(ImageUploadState.STATE_FAIL);
 			bean.save();
 		}
@@ -72,6 +89,7 @@ public class UploadService extends Service {
 		if (mRuningTaskQueue.containsKey(uploadBean.getLocalImagePath())) {
 			return;
 		}
+		
 		List<UploadBean> list = UploadBean.find(UploadBean.class, "LOCAL_IMAGE_PATH = ?", uploadBean.getLocalImagePath());
 		// 如果上传任务已经存在则更新，否则新增一条记录
 		if (list != null && list.size() > 0) {
@@ -79,6 +97,10 @@ public class UploadService extends Service {
 		}
 		uploadBean.setImageState(ImageUploadState.STATE_WAIT);
 		sendBroadcast(uploadBean);
+		if (mRuningTaskQueue.size() == MAX_UPLOAD_SIZE) {
+			mWaitingTaskQueue.add(uploadBean);
+			return;
+		}
 		startTask(uploadBean);
 	}
 	
@@ -105,7 +127,7 @@ public class UploadService extends Service {
 		}
 	}
 	
-	private void addUploadTask(CheckData checkData, long checkId) {
+	private synchronized void addUploadTask(CheckData checkData, long checkId) {
 		if (checkData.getCheckedIssueCount() > 0) {
 			for (IssueItem issueItem : checkData.getCheckedIssue()) {
 				if (issueItem.getImagelist() != null) {
@@ -131,54 +153,35 @@ public class UploadService extends Service {
 	}
 	
 	
-	private boolean startTask(UploadBean uploadBean) {
+	private synchronized boolean startTask(UploadBean uploadBean) {
 		if (null != uploadBean) {
 			mRuningTaskQueue.put(uploadBean.getLocalImagePath(), uploadBean);
-			UploadTask task = new UploadTask(uploadBean);
-			mTaskExecutor.execute(task);
+			uploadFile(uploadBean);
 			return true;
 		} else {
 			return false;
 		}
 	}
 	
-	public class ServiceBinder extends Binder {
-        public UploadService getService() {
-            return UploadService.this;
-        }
-    }
 	
 	
-	class UploadTask implements Runnable {
 
-		private static final String TAG = "UploadTask";
-		private UploadBean mBean;
 		
-		public UploadTask(UploadBean bean) {
-			super();
-			this.mBean = bean;
-		}
-
-		@Override
-		public void run() {
-			uploadFile();
-		}
-
-		private void uploadFile() {
-			String localFilePath = mBean.getLocalImagePath();
+		private synchronized void uploadFile(final UploadBean bean) {
+			String localFilePath = bean.getLocalImagePath();
 			if (TextUtils.isEmpty(localFilePath)) {
 				Log.e(TAG, "uploadFile localFilePath is null or empty");
-				mBean.setImageState(ImageUploadState.STATE_FAIL);
-				sendBroadcast(mBean);
-				mRuningTaskQueue.remove(mBean.getLocalImagePath());
+				bean.setImageState(ImageUploadState.STATE_FAIL);
+				sendBroadcast(bean);
+				mRuningTaskQueue.remove(bean.getLocalImagePath());
 				return;
 			}
 			File localFile = new File(localFilePath);
 			if (!localFile.exists()) {
 				Log.e(TAG, "uploadFile localFile not exist and filepath = "+localFilePath);
-				mBean.setImageState(ImageUploadState.STATE_FAIL);
-				sendBroadcast(mBean);
-				mRuningTaskQueue.remove(mBean.getLocalImagePath());
+				bean.setImageState(ImageUploadState.STATE_FAIL);
+				sendBroadcast(bean);
+				mRuningTaskQueue.remove(bean.getLocalImagePath());
 				return;
 			}
 			try {
@@ -193,54 +196,53 @@ public class UploadService extends Service {
 					@Override
 					public void transferred(long transferedBytes, long totalBytes) {
 						// do something...
-						mBean.setImageState(ImageUploadState.STATE_START);
-						mBean.setTransferedBytes(transferedBytes);
-						mBean.setTotalBytes(totalBytes);
-						sendBroadcast(mBean);
-						Log.d(TAG, "trans:" + transferedBytes + "; total:" + totalBytes +"imageurl = "+mBean.getServiceImageSavePath());
+						bean.setImageState(ImageUploadState.STATE_START);
+						bean.setTransferedBytes(transferedBytes);
+						bean.setTotalBytes(totalBytes);
+						sendBroadcast(bean);
 					}
 				};
 				
 				CompleteListener completeListener = new CompleteListener() {
 					@Override
 					public void result(boolean isComplete, String result, String error) {
-						// do something...
 						if (isComplete) {
-							mBean.setImageState(ImageUploadState.STATE_FINISH);
-							mRuningTaskQueue.remove(mBean.getLocalImagePath());
+							bean.setImageState(ImageUploadState.STATE_FINISH);
+							mRuningTaskQueue.remove(bean.getLocalImagePath());
 						} else {
-							mBean.setImageState(ImageUploadState.STATE_FAIL);
-							mRuningTaskQueue.remove(mBean.getLocalImagePath());
+							bean.setImageState(ImageUploadState.STATE_FAIL);
+							mRuningTaskQueue.remove(bean.getLocalImagePath());
 						}
-						sendBroadcast(mBean);
-						if (isComplete) {
-							DataManager.getInstance().updateImageStatus(UploadService.this, mBean);
-						}
+						sendBroadcast(bean);
 						Log.d(TAG, "upload task result = "+isComplete);
 					}
 				};
 				
-				UploaderManager uploaderManager = UploaderManager.getInstance(UPAI.BUCKET);
-				uploaderManager.setConnectTimeout(60);
-				uploaderManager.setResponseTimeout(60);
-				Map<String, Object> paramsMap = uploaderManager.fetchFileInfoDictionaryWith(localFile, mBean.getServiceImageSavePath());
+				
+				Map<String, Object> paramsMap = mUploaderManager.fetchFileInfoDictionaryWith(localFile, bean.getServiceImageSavePath());
 				//还可以加上其他的额外处理参数...
 				paramsMap.put("return_url", "http://httpbin.org/get");
 				// signature & policy 建议从服务端获取
 				String policyForInitial = UpYunUtils.getPolicy(paramsMap);
 				String signatureForInitial = UpYunUtils.getSignature(paramsMap, UPAI.FORM_API_SECRET);
-				uploaderManager.upload(policyForInitial, signatureForInitial, localFile, progressListener, completeListener);
+				mUploaderManager.upload(policyForInitial, signatureForInitial, localFile, progressListener, completeListener);
 				
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
-		
-	}
 	
 	
-	private void sendBroadcast(UploadBean bean) {
+	
+	private  void sendBroadcast(UploadBean bean) {
 		if (bean != null) {
+			if (bean.getImageState() == ImageUploadState.STATE_FINISH) {
+				if (mWaitingTaskQueue.size() > 0) {
+					UploadBean newTask = mWaitingTaskQueue.remove(0);
+					addUploadTask(newTask);
+				}
+				DataManager.getInstance().updateImageStatus(UploadService.this, bean);
+			}
 			Intent intent = new Intent(HotelAction.ACTION_IMAGE_UPLOAD);
 			intent.putExtra(HotelAction.IMAGE_UPLOAD_EXTRA, bean);
 			sendBroadcast(intent);	

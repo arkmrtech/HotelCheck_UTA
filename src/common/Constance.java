@@ -29,21 +29,23 @@ public class Constance {
 	}
 	
 	public static final class UPAI {
-////		// 空间名
-//		public static final String BUCKET = "sevenday-qctest";
-////		// 表单密钥
-//		public static final String FORM_API_SECRET = "7zkTYpfFXWK43AeiXw2pfryVi2A=";
 		
-//		// 空间名
-		public static final String BUCKET = "uat-space";
+//		//for trunk
+//		public static final String BUCKET = "sevenday-qualitycont";
 //		// 表单密钥
-		public static final String FORM_API_SECRET = "ji7gLUeMOhZ+UmRjGybHQFsPzkQ=";
+//		public static final String FORM_API_SECRET = "18q/p2UQHKQEJPpBauWsFtFz1Ds=";	
 		
+		//for test 
 		// 空间名
-//		public static final String BUCKET = "bayes-space";
+		public static final String BUCKET = "sevenday-qctest";
 		// 表单密钥
-//		public static final String FORM_API_SECRET = "aI2nEa+I9lFx5CSGl8QOyo08FoM=";
+		public static final String FORM_API_SECRET = "7zkTYpfFXWK43AeiXw2pfryVi2A=";	
 		
+		//for UTA
+		// 空间名
+//		public static final String BUCKET = "uat-space";
+//		// 表单密钥
+//		public static final String FORM_API_SECRET = "ji7gLUeMOhZ+UmRjGybHQFsPzkQ=";	
 	}
 	
 	public static final class ImageUploadState {

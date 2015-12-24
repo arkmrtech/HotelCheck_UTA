@@ -337,7 +337,22 @@ public class PhotoPickerActivity extends BaseActivity implements CallBackListene
 						imageFloder.setFirstImagePath(path);
 					}
 
-					int picSize = parentFile.list(new FilenameFilter()
+//					int picSize = parentFile.list(new FilenameFilter()
+//					{
+//						@Override
+//						public boolean accept(File dir, String filename)
+//						{
+//							if (filename.endsWith(".jpg")
+//									|| filename.endsWith(".png")
+//									|| filename.endsWith(".jpeg"))
+//								return true;
+//							return false;
+//						}
+//					}).length;
+//					imageFloder.setCount(picSize);
+//					mImageFloders.add(imageFloder);
+					
+					String[] files = parentFile.list(new FilenameFilter()
 					{
 						@Override
 						public boolean accept(File dir, String filename)
@@ -348,9 +363,12 @@ public class PhotoPickerActivity extends BaseActivity implements CallBackListene
 								return true;
 							return false;
 						}
-					}).length;
-					imageFloder.setCount(picSize);
-					mImageFloders.add(imageFloder);
+					});
+					if (files != null) {
+						int picSize = files.length;
+						imageFloder.setCount(picSize);
+						mImageFloders.add(imageFloder);
+					}
 
 				}
 

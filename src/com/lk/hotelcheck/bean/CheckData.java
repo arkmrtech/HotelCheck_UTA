@@ -7,9 +7,13 @@ import java.util.List;
 
 import android.R.integer;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.SparseArray;
 
+import com.lk.hotelcheck.bean.dao.AreaIssue;
+import com.lk.hotelcheck.bean.dao.CheckIssue;
 import com.lk.hotelcheck.bean.dao.IssueCheckedImage;
+import com.lk.hotelcheck.manager.DataManager;
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
 
@@ -300,6 +304,44 @@ public class CheckData extends SugarRecord<CheckData> implements Serializable{
 	}
 	public void setPreQueType(int preQueType) {
 		this.preQueType = preQueType;
+	}
+	public void addReviewDymicIssue(int checkId, AreaIssue areaIssue) {
+		Log.d("lxk", "addReviewDymicIssue");
+		if (areaIssue == null) {
+			return;
+		}
+		if (mIssuelist == null) {
+			mIssuelist = new ArrayList<IssueItem>();
+		} 
+		for (IssueItem temp : mIssuelist) {
+			if (temp.getName().contentEquals(areaIssue.getIssueName())) {
+				temp.setPreQueType(areaIssue.getIsPreQue());
+				temp.setIsDefQue(areaIssue.getIsDefQue());
+				temp.setDimOneId(areaIssue.getDimOneId());
+				temp.setDimOneName(areaIssue.getDimOneName());
+				Log.d("lxk", "addReviewDymicIssue return issue name = "+temp.getName());
+				return;
+			}
+		}
+		IssueItem issueItem = new IssueItem();
+		int id = Math.abs(areaIssue.getIssueName().hashCode());
+		issueItem.setId(id);
+		issueItem.setName(areaIssue.getIssueName());
+		issueItem.setPreQueType(areaIssue.getIsPreQue());
+		issueItem.setIsDefQue(areaIssue.getIsDefQue());
+		issueItem.setDimOneId(areaIssue.getDimOneId());
+		issueItem.setDimOneName(areaIssue.getDimOneName());
+		CheckIssue checkIssue = DataManager.getInstance().getCheckIssue(checkId,
+				getId(), id);
+		if (checkIssue != null) {
+			Log.d("lxk", "addReviewDymicIssue issue name = "+issueItem.getName());
+			issueItem.setCheck(checkIssue.isCheck());
+			issueItem.setContent(checkIssue.getContent());
+			issueItem.setReformState(checkIssue.getReformState());
+		}
+		Log.d("lxk", "review dymic issue dim one id = "+issueItem.getDimOneId()+"dim one name = "+issueItem.getDimOneName());
+		mIssuelist.add(issueItem);
+		return;
 	}
 	
 }

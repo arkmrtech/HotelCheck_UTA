@@ -19,8 +19,10 @@ import android.view.View;
 
 import com.lk.hotelcheck.R;
 import com.lk.hotelcheck.activity.BaseActivity;
+import com.lk.hotelcheck.bean.Hotel;
 import com.lk.hotelcheck.bean.UploadBean;
 import com.lk.hotelcheck.manager.DataManager;
+
 import common.Constance;
 import common.Constance.HotelAction;
 import common.Constance.ImageUploadState;
@@ -61,7 +63,11 @@ public class UploadProcessActivity extends BaseActivity {
 			String name = "图片传输进度";
 			if (mPosition != -1) {
 				name = DataManager.getInstance().getHotelName(mPosition)+name;
-				mCheckId = DataManager.getInstance().getHotel(mPosition).getCheckId();
+				Hotel hotel =  DataManager.getInstance().getHotel(mPosition);
+				if (hotel != null ) {
+					mCheckId = hotel.getCheckId();
+				}
+//				mCheckId = DataManager.getInstance().getHotel(mPosition).getCheckId();
 			}  
 			toolbar.setTitle(name);
 			init();

@@ -187,6 +187,9 @@ public class CheckHotelIssueActivity extends BaseActivity implements CallBackLis
 		
 		String imagePath = "";
 		Bitmap bitmap = PictureUtil.getSmallBitmap(Constance.Path.TEMP_IMAGE);
+		if (bitmap == null) {
+			return;
+		}
 		if (mCheckData.getType() == CheckDataType.TYPE_ROOM) {
 			fileName = mCheckData.getName()+"_"+new DateFormat().format("yyyyMMddhhmmss",
 					Calendar.getInstance(Locale.CHINA))

@@ -23,7 +23,7 @@ import common.Constance;
 
 public class HotelBaseInfoFragment extends BaseHotelFragment {
 //	private Context mContext;
-	private int mPosition;
+//	private int mPosition;
 //	private Hotel mHotel;
 	private View mRootView;
 	private TextView mNameTextView;
@@ -71,8 +71,8 @@ public class HotelBaseInfoFragment extends BaseHotelFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		if (getArguments() != null) {
-			mPosition = getArguments().getInt(
-					Constance.IntentKey.INTENT_KEY_POSITION, -1);
+//			mPosition = getArguments().getInt(
+//					Constance.IntentKey.INTENT_KEY_POSITION, -1);
 //			mHotel = DataManager.getInstance().getHotel(mPosition);
 		}
 	}
