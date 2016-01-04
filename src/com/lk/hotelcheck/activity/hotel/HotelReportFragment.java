@@ -311,8 +311,10 @@ public class HotelReportFragment extends BaseHotelFragment{
 				viewHolder.mFlagTextView.setTag(R.id.tv_name, groupPosition);
 				viewHolder.mFlagTextView.setTag(R.id.tv_flag, childPosition);
 				viewHolder.mFlagTextView.setOnClickListener(mPhotoClickListener);
+				viewHolder.mFlagTextView.setClickable(true);
 			} else {
 				viewHolder.mFlagTextView.setText("");
+				viewHolder.mFlagTextView.setClickable(false);
 			}
 			viewHolder.mNameTextView.setText(issueItem.getName());
 			if (issueItem.getPreQueType() == PreQueType.TYPE_REVIEW) {
