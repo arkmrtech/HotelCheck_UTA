@@ -2,7 +2,6 @@ package com.lk.hotelcheck.manager;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -10,7 +9,6 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.SparseArray;
 
 import com.google.gson.Gson;
@@ -316,7 +314,6 @@ public class DataManager {
 		List<DymicIssue> dataList = DymicIssue.find(DymicIssue.class, "CHECK_ID = ? and AREA_ID = ?", String.valueOf(checkId), String.valueOf(checkData.getId()));
 		if (dataList != null) {
 			for (DymicIssue dymicIssue : dataList) {
-				Log.d("lxk", "hote name = "+hotel.getName()+" check data = "+checkData.getName()+" issue name = "+dymicIssue.getName());
 				IssueItem issueItem = new IssueItem(dymicIssue);
 				checkData.addIssue(issueItem);
 				if (hotel != null) {
@@ -359,7 +356,6 @@ public class DataManager {
 	}
 	
 	private void initQuestion(Hotel hotel) {
-		Log.d("lxk", "initQuestion");
 		if (hotel.getQuestionList() != null) {
 			for (AreaIssue areaIssue : hotel.getQuestionList()) {
 				if (areaIssue.getType() == CheckDataType.TYPE_ROOM) {
@@ -379,7 +375,6 @@ public class DataManager {
 			return;
 		}
 		for (CheckData checkData : dataList) {
-			Log.d("lxk", "initQuestionCheckData check data name = "+checkData.getName());
 			if (checkData.getId() == areaIssue.getAreaId() 
 					|| (areaIssue.getAreaId() == Constance.CHECK_DATA_ID_ROOM && checkData.getName().contains("客房"))
 					|| (areaIssue.getAreaId() == Constance.CHECK_DATA_ID_PASSWAY && checkData.getName().contains("走廊"))) {
@@ -404,7 +399,6 @@ public class DataManager {
 						}
 					} 
 				}
-				Log.d("lxk", "initQuestionCheckData initCheckedIssue");
 				checkData.initCheckedIssue();
 			}
 		}
@@ -458,7 +452,9 @@ public class DataManager {
 								 if (hotel != null) {
 									 hotelTemp.setBaseInfo(hotel);
 								} 
-								 
+								 //for test
+//								 hotelTemp.setStatus(false);
+//								 hotelTemp.setDataStatus(false);
 								hotelList.add(hotelTemp);
 							}
 						}

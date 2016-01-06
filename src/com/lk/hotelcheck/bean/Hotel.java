@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import android.R.integer;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
@@ -17,7 +16,6 @@ import com.lk.hotelcheck.bean.dao.IssueCheckedImage;
 import com.lk.hotelcheck.manager.DataManager;
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
-
 import common.Constance;
 import common.Constance.CheckDataType;
 import common.Constance.CheckType;

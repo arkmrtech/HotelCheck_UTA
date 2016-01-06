@@ -363,7 +363,7 @@ public class HotelReportFragment extends BaseHotelFragment{
 			}
 			if (checkData.getType() == CheckDataType.TYPE_ROOM 
 					|| checkData.getType() == CheckDataType.TYPE_PASSWAY) {
-				if (issueItem.isCheck()) {
+				if (issueItem.isCheck() && issueItem.getReformState() != IssueItem.REFORM_STATE_FIXED) {
 					viewHolder.mPercentTextView.setVisibility(View.VISIBLE);
 					viewHolder.mPercentTextView.setText(mHotel
 								.getDymicAreaCheckedIssuePercent(checkData.getType(), issueItem.getId()));

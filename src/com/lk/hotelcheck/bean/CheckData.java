@@ -7,7 +7,6 @@ import java.util.List;
 
 import android.R.integer;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.SparseArray;
 
 import com.lk.hotelcheck.bean.dao.AreaIssue;
@@ -306,7 +305,6 @@ public class CheckData extends SugarRecord<CheckData> implements Serializable{
 		this.preQueType = preQueType;
 	}
 	public void addReviewDymicIssue(int checkId, AreaIssue areaIssue) {
-		Log.d("lxk", "addReviewDymicIssue");
 		if (areaIssue == null) {
 			return;
 		}
@@ -319,7 +317,6 @@ public class CheckData extends SugarRecord<CheckData> implements Serializable{
 				temp.setIsDefQue(areaIssue.getIsDefQue());
 				temp.setDimOneId(areaIssue.getDimOneId());
 				temp.setDimOneName(areaIssue.getDimOneName());
-				Log.d("lxk", "addReviewDymicIssue return issue name = "+temp.getName());
 				return;
 			}
 		}
@@ -334,12 +331,10 @@ public class CheckData extends SugarRecord<CheckData> implements Serializable{
 		CheckIssue checkIssue = DataManager.getInstance().getCheckIssue(checkId,
 				getId(), id);
 		if (checkIssue != null) {
-			Log.d("lxk", "addReviewDymicIssue issue name = "+issueItem.getName());
 			issueItem.setCheck(checkIssue.isCheck());
 			issueItem.setContent(checkIssue.getContent());
 			issueItem.setReformState(checkIssue.getReformState());
 		}
-		Log.d("lxk", "review dymic issue dim one id = "+issueItem.getDimOneId()+"dim one name = "+issueItem.getDimOneName());
 		mIssuelist.add(issueItem);
 		return;
 	}

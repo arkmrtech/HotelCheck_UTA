@@ -42,7 +42,7 @@ public class Constance {
 		public static final String FORM_API_SECRET = "7zkTYpfFXWK43AeiXw2pfryVi2A=";	
 		
 		//for UTA
-		// 空间名
+//		// 空间名
 //		public static final String BUCKET = "uat-space";
 //		// 表单密钥
 //		public static final String FORM_API_SECRET = "ji7gLUeMOhZ+UmRjGybHQFsPzkQ=";	
