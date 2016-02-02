@@ -6,8 +6,11 @@ public class NetConstance {
 	public static final String REQUEST_PARAM_PASSWORD = "password";
 	public static final String REQUEST_PARAM_KEY = "key";
 	
+//	/*内测环境*/
+//	public static final String BASE_URL = "http://203.195.172.191:8080/app/service/";
+	
 	/*内测环境*/
-	public static final String BASE_URL = "http://203.195.172.191:8080/app/service/";
+	public static final String BASE_URL = "http://203.195.172.191:8089/app/service/";
 	
 	/* 用户介入测试环境*/
 //	public static final String BASE_URL = "http://112.74.24.177:8080/app/service/";

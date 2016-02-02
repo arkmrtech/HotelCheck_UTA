@@ -117,19 +117,19 @@ public class HotelReportFragment extends BaseHotelFragment{
 		if (mHotel != null) {
 			mUserNameTextView.setText(DataManager.getInstance().getUserName());
 			mCheckDateTextView.setText(mHotel.getCheckDate());
-			mRoomNumberTextView.setText(""+mHotel.getRoomCount());
-			mRoomInUseNumberTextView.setText(""+mHotel.getRoomInUseCount());
-			mRoomCheckedNumberTextView.setText(""+mHotel.getRoomHadCheckedCount());
-			mIssueCountTextView.setText(""+mHotel.getIssueCount());
+			mRoomNumberTextView.setText(""+mHotel.getRoomCount()+"间");
+			mRoomInUseNumberTextView.setText(""+mHotel.getRoomInUseCount()+"间");
+			mRoomCheckedNumberTextView.setText(""+mHotel.getRoomHadCheckedCount()+"间");
+			mIssueCountTextView.setText(""+mHotel.getIssueCount()+"个");
 			mGNumberTextView.setText(mHotel.getGuardianNumber());
 			if (mHotel.getCheckType() == CheckType.CHECK_TYPE_NEW) {
 				mReviewGroup.setVisibility(View.GONE);
 			} else {
 				mReviewGroup.setVisibility(View.VISIBLE);
-				mFixedTextView.setText(""+mHotel.getFixIssueCount(IssueItem.REFORM_STATE_FIXED));
-				mFixingTextView.setText(""+mHotel.getFixIssueCount(IssueItem.REFORM_STATE_FIXING));
-				mNewTextView.setText(""+mHotel.getNewIssueCount());
-				mUnFixedTextView.setText(""+mHotel.getFixIssueCount(IssueItem.REFORM_STATE_UN_FIX));
+				mFixedTextView.setText(""+mHotel.getFixIssueCount(IssueItem.REFORM_STATE_FIXED)+"个");
+				mFixingTextView.setText(""+mHotel.getFixIssueCount(IssueItem.REFORM_STATE_FIXING)+"个");
+				mNewTextView.setText(""+mHotel.getNewIssueCount()+"个");
+				mUnFixedTextView.setText(""+mHotel.getFixIssueCount(IssueItem.REFORM_STATE_UN_FIX)+"个");
 			}
 		}
 	}
@@ -329,22 +329,19 @@ public class HotelReportFragment extends BaseHotelFragment{
 				switch (issueItem.getReformState()) {
 				case IssueItem.REFORM_STATE_FIXED:
 					viewHolder.mStatusTextView.setText("已整改");
-					viewHolder.mStatusTextView.setTextColor(getResources()
-							.getColor(R.color.color_two));
+					viewHolder.mStatusTextView.setTextColor(Color.parseColor("#009900"));
 					break;
 				case IssueItem.REFORM_STATE_UN_FIX:
 					viewHolder.mStatusTextView.setText("未整改");
-					viewHolder.mStatusTextView.setTextColor(Color.RED);
+					viewHolder.mStatusTextView.setTextColor(Color.parseColor("#cc0000"));
 					break;
 				case IssueItem.REFORM_STATE_FIXING:
 					viewHolder.mStatusTextView.setText("整改中");
-					viewHolder.mStatusTextView.setTextColor(getResources()
-							.getColor(R.color.color_one));
+					viewHolder.mStatusTextView.setTextColor(Color.parseColor("#ff9c00"));
 					break;
 				default:
 					viewHolder.mStatusTextView.setText("未整改/整改中");
-					viewHolder.mStatusTextView.setTextColor(getResources()
-							.getColor(R.color.content_orange));
+					viewHolder.mStatusTextView.setTextColor(Color.parseColor("#666666"));
 					break;
 				}
 			} else {
@@ -352,8 +349,7 @@ public class HotelReportFragment extends BaseHotelFragment{
 				if (mHotel.getCheckType() == CheckType.CHECK_TYPE_REVIEW) {
 					viewHolder.mStatusTextView.setVisibility(View.VISIBLE);
 					viewHolder.mStatusTextView.setText("新发现");
-					viewHolder.mStatusTextView.setTextColor(getResources()
-							.getColor(R.color.color_three));
+					viewHolder.mStatusTextView.setTextColor(Color.parseColor("#0e99dd"));
 				} else {
 					viewHolder.mStatusTextView.setVisibility(View.GONE);
 					viewHolder.mStatusTextView.setText("");

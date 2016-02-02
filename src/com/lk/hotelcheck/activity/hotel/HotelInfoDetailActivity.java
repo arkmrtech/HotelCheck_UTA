@@ -1,5 +1,7 @@
 package com.lk.hotelcheck.activity.hotel;
 
+
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,11 +22,13 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -95,6 +99,27 @@ public class HotelInfoDetailActivity extends BaseActivity{
 		mLoadingGroup = findViewById(R.id.vg_loadig);
 	}
 	
+	@Override 
+	public boolean onMenuOpened(int featureId, Menu menu)
+	{ 
+	    if(featureId == Window.FEATURE_ACTION_BAR && menu != null){
+	        if(menu.getClass().getSimpleName().equals("MenuBuilder")){
+	            try{ 
+	                Method m = menu.getClass().getDeclaredMethod(
+	                    "setOptionalIconsVisible", Boolean.TYPE);
+	                m.setAccessible(true);
+	                m.invoke(menu, true);
+	            } 
+	            catch(NoSuchMethodException e){
+	                Log.e("aa", "onMenuOpened", e);
+	            } 
+	            catch(Exception e){
+	                throw new RuntimeException(e);
+	            } 
+	        } 
+	    } 
+	    return super.onMenuOpened(featureId, menu);
+	} 
 //	public void onEvent(MessageEvent event) {
 //		Log.d("lxk", "get event bus message");
 //	};
@@ -129,11 +154,36 @@ public class HotelInfoDetailActivity extends BaseActivity{
 		}
 	}
 	
+	 //enable为true时，菜单添加图标有效，enable为false时无效。4.0系统默认无效  
+    private void setIconEnable(Menu menu, boolean enable)  
+    {  
+        try   
+        {  
+            Class<?> clazz = Class.forName("com.android.internal.view.menu.MenuBuilder");  
+            Method m = clazz.getDeclaredMethod("setOptionalIconsVisible", boolean.class);  
+            m.setAccessible(true);  
+              
+            //MenuBuilder实现Menu接口，创建菜单时，传进来的menu其实就是MenuBuilder对象(java的多态特征)  
+            m.invoke(menu, enable);  
+              
+        } catch (Exception e)   
+        {  
+            e.printStackTrace();  
+        }  
+    }  
+	
 	 @Override
 	    public boolean onCreateOptionsMenu(Menu menu) {
-	        // Inflate the menu; this adds items to the action bar if it is present.
+//		 	setIconEnable(menu, true);
 	        getMenuInflater().inflate(R.menu.menu_detail, menu);
-	        return true;
+	        return super.onCreateOptionsMenu(menu);
+	    }
+	 
+	 @Override  
+	    public boolean onPrepareOptionsMenu(Menu menu)   
+	    {  
+	        // TODO Auto-generated method stub  
+	        return super.onPrepareOptionsMenu(menu);  
 	    }
 
 	    @Override
@@ -183,7 +233,7 @@ public class HotelInfoDetailActivity extends BaseActivity{
 			View view = factory.inflate(R.layout.alert_check_done, null);// 这里必须是final的
 			TextView nameTextView = (TextView) view.findViewById(R.id.tv_name);// 获得输入框对象
 			TextView issueCountTextView = (TextView) view.findViewById(R.id.tv_checked_issue_count);
-			final EditText numberEditText = (EditText) view.findViewById(R.id.et_number);
+//			final EditText numberEditText = (EditText) view.findViewById(R.id.et_number);
 			ForegroundColorSpan redSpan = new ForegroundColorSpan(Color.RED); 
 			ForegroundColorSpan blackSpan = new ForegroundColorSpan(Color.BLACK); 
 			SpannableStringBuilder hotelName = new SpannableStringBuilder(mHotel.getName());
@@ -195,9 +245,9 @@ public class HotelInfoDetailActivity extends BaseActivity{
 			imageCount.setSpan(redSpan, 0, imageCount.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE); 
 			nameTextView.setText("本次检查中，"+hotelName);
 			issueCountTextView.setText("共登记问题"+issueCount+"个问题"+",拍摄"+imageCount+"张照片");
-			if (!TextUtils.isEmpty(mHotel.getGuardianNumber())) {
-				numberEditText.setText(mHotel.getGuardianNumber());
-			}
+//			if (!TextUtils.isEmpty(mHotel.getGuardianNumber())) {
+//				numberEditText.setText(mHotel.getGuardianNumber());
+//			}
 			AlertDialog alertDialog = new AlertDialog.Builder(this)
 //					 .setTitle("完成检查信息确认")//提示框标题
 					.setView(view)
@@ -206,13 +256,13 @@ public class HotelInfoDetailActivity extends BaseActivity{
 								@Override
 								public void onClick(DialogInterface dialog,
 										int which) {
-									String number = numberEditText.getText().toString();
-									if (TextUtils.isEmpty(number)) {
-										Toast.makeText(HotelInfoDetailActivity.this, "请输入陪同人工号", Toast.LENGTH_SHORT).show();
-									} else {
-										mHotel.setGuardianNumber(number);
+//									String number = numberEditText.getText().toString();
+//									if (TextUtils.isEmpty(number)) {
+//										Toast.makeText(HotelInfoDetailActivity.this, "请输入陪同人工号", Toast.LENGTH_SHORT).show();
+//									} else {
+//										mHotel.setGuardianNumber(number);
 										updateHotelCheckState();
-									}
+//									}
 									
 								}
 							})
