@@ -248,7 +248,7 @@
                 android:gravity="center"
                 android:paddingLeft="28dp"
                 android:text="@string/issue_fixed"
-                android:textColor="@android:color/black"
+                android:textColor="#009900"
                 android:textSize="16sp" />
 
             <TextView
@@ -281,7 +281,7 @@
                 android:gravity="center"
                 android:paddingLeft="28dp"
                 android:text="@string/issue_fixing"
-                android:textColor="@android:color/black"
+                android:textColor="#ff9c00"
                 android:textSize="16sp" />
 
             <TextView
@@ -313,7 +313,7 @@
                 android:gravity="center"
                 android:paddingLeft="28dp"
                 android:text="@string/issue_unfix"
-                android:textColor="@android:color/black"
+                android:textColor="#cc0000"
                 android:textSize="16sp" />
 
             <TextView
@@ -346,7 +346,7 @@
                 android:gravity="center"
                 android:paddingLeft="28dp"
                 android:text="@string/issue_new"
-                android:textColor="@android:color/black"
+                android:textColor="#0e99dd"
                 android:textSize="16sp" />
 
             <TextView
@@ -369,7 +369,8 @@
     <RelativeLayout
         android:id="@+id/rl_guardian_number"
         android:layout_width="match_parent"
-        android:layout_height="60dp" >
+        android:layout_height="60dp"
+        android:visibility="invisible" >
 
         <TextView
             android:layout_width="wrap_content"

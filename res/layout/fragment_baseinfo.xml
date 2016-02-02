@@ -25,7 +25,7 @@
             android:id="@+id/tv_address"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/tv_name"
+            android:layout_marginTop="70dp"
             android:layout_centerHorizontal="true"
             android:drawableLeft="@drawable/location"
             android:drawablePadding="8dp"
@@ -49,6 +49,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/tv_phone"
             android:layout_centerHorizontal="true"
+            android:visibility="gone"
             android:gravity="center"
             android:textColor="@android:color/white"
             android:textSize="14sp" />
@@ -59,6 +60,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/tv_memo"
             android:layout_centerHorizontal="true"
+            android:visibility="gone"
             android:gravity="center"
             android:textColor="@android:color/white"
             android:textSize="14sp" />
@@ -69,6 +71,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/tv_manager"
             android:layout_centerHorizontal="true"
+             android:visibility="gone"
             android:gravity="center"
             android:textColor="@android:color/white"
             android:textSize="14sp" />
@@ -79,6 +82,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/tv_mamager_tel"
             android:layout_centerHorizontal="true"
+            android:visibility="gone"
             android:gravity="center"
             android:textColor="@android:color/white"
             android:textSize="14sp" />
@@ -98,6 +102,7 @@
                 android:layout_marginLeft="10dp"
                 android:drawableLeft="@drawable/calendar"
                 android:drawablePadding="8dp"
+                 android:visibility="gone"
                 android:gravity="center"
                 android:textColor="@android:color/white"
                 android:textSize="13sp" />
@@ -106,10 +111,11 @@
                 android:id="@+id/tv_last_checked_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
+               
+                android:layout_centerInParent="true"
                 android:layout_centerVertical="true"
                 android:layout_marginRight="10dp"
-                android:drawableLeft="@drawable/crest"
+                
                 android:drawablePadding="8dp"
                 android:gravity="center"
                 android:textColor="@android:color/white"

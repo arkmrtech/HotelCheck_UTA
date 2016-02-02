@@ -35,6 +35,7 @@
         <item name="actionMenuTextColor">@color/white</item>
         <item name="android:textSize">18sp</item>
         <item name="android:textStyle">normal</item>
+        
         <!-- 箭头 -->
        <!--  <item name="drawerArrowStyle">@style/AppTheme.DrawerArrowToggle</item> -->
         </style>
@@ -42,6 +43,7 @@
     <style name="AppTheme.DrawerArrowToggle" parent="Base.Widget.AppCompat.DrawerArrowToggle">
         <item name="color">@color/white</item>
     </style>
+    
     
     <style name="anim_popup_dir">
         <item name="android:windowEnterAnimation">@anim/slide_in</item>
